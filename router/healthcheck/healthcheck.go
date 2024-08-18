@@ -1,4 +1,4 @@
-package index
+package healthcheck
 
 import "fmt"
 import "io"

@@ -5,7 +5,8 @@ import "fmt"
 import "net/http"
 import "os"
 
-import "buzzer/router"
+import "buzzer/router/index"
+import "buzzer/router/healthcheck"
 
 const ADDRESS = "localhost:3000"
 
@@ -13,6 +14,8 @@ func main() {
   mux := http.NewServeMux()
 
   mux.HandleFunc("GET /", index.Get)
+
+  mux.HandleFunc("GET /healthcheck", healthcheck.Get)
 
   fmt.Printf("Now listening at http://%s\n", ADDRESS)
   err := http.ListenAndServe(ADDRESS, mux)
