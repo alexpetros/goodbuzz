@@ -2,17 +2,20 @@ package main
 
 import "errors"
 import "fmt"
-import "io"
 import "net/http"
 import "os"
+
+import "buzzer/router"
 
 const ADDRESS = "localhost:3000"
 
 func main() {
-  http.HandleFunc("GET /", healthcheck)
+  mux := http.NewServeMux()
+
+  mux.HandleFunc("GET /", index.Get)
 
   fmt.Printf("Now listening at http://%s\n", ADDRESS)
-  err := http.ListenAndServe(ADDRESS, nil)
+  err := http.ListenAndServe(ADDRESS, mux)
 
   if errors.Is(err, http.ErrServerClosed) {
     fmt.Printf("server closed\n")
@@ -20,9 +23,4 @@ func main() {
     fmt.Printf("error starting server: %s\n", err)
     os.Exit(1)
   }
-}
-
-func healthcheck(w http.ResponseWriter, r *http.Request) {
-  	fmt.Printf("Receieved request at /\n")
-    io.WriteString(w, "OK")
 }
