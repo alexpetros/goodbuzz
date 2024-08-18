@@ -1,11 +1,37 @@
 package index
 
 import "net/http"
+import "fmt"
 
-func Get(w http.ResponseWriter, r *http.Request) {
-    ok().Render(r.Context(), w)
+
+type Tournament struct {
+  tournament_id int64;
+  name string
 }
 
-templ ok() {
-	<h1>OK</h1>
+var TEST_TOURNAMENTS = [2]Tournament{
+  Tournament { 13, "October Online Tournament" },
+  Tournament { 15, "Novemeber Online Tournament" },
+}
+
+func Get(w http.ResponseWriter, r *http.Request) {
+    index(TEST_TOURNAMENTS[:]).Render(r.Context(), w)
+}
+
+templ index(tournaments []Tournament) {
+<!DOCTYPE html>
+<title>Buzzer System</title>
+
+<h1>Buzzer System</h1>
+
+<p>
+Welcome to IAC's buzzer system!
+</p>
+
+<h2>Ongoing Tournaments</h2>
+<ul>
+for _, tournament := range tournaments {
+  <li><a href={ templ.URL(fmt.Sprintf("/tournaments/%d", tournament.tournament_id)) }>{ tournament.name }</a></li>
+}
+</ul>
 }

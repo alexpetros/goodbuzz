@@ -1,15 +1,20 @@
 # Adapted from https://templ.guide/commands-and-tools/live-reload-with-other-tools/
 
 PORT=3000
+PROXY_PORT=8080
 BINARY_NAME="buzzer"
 
 .PHONY: live
 live:
-	@make -j2 live/templ live/air
+	BUZZER_PROXY_PORT=$(PROXY_PORT) make -j2 live/templ live/air
+	@echo "Development mode is live\n Access application at http://localhost:$(PROXY_PORT)"
 
 .PHONY: live/templ
 live/templ:
-	@templ generate --watch --proxy="http://localhost:$(PORT)" --open-browser=false -v
+	@templ generate --watch \
+		--proxy="http://localhost:$(PORT)" \
+		--proxyport="$(PROXY_PORT)" \
+		--open-browser=false -v
 
 .PHONY: live/air
 live/air:
