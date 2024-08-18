@@ -5,21 +5,15 @@ import "fmt"
 import "net/http"
 import "os"
 
-import "buzzer/router/index"
-import "buzzer/router/healthcheck"
+import "buzzer/router"
 
 const ADDRESS = "localhost:3000"
 
 func main() {
-
   proxy_port := os.Getenv("BUZZER_PROXY_PORT")
+
   mux := http.NewServeMux()
-
-  // TODO static assets
-  // https://templ.guide/commands-and-tools/live-reload-with-other-tools#serving-static-assets
-
-  mux.HandleFunc("GET /", index.Get)
-  mux.HandleFunc("GET /healthcheck", healthcheck.Get)
+  router.SetupRouter(mux)
 
   if proxy_port != "" {
     fmt.Printf("Now listening at http://localhost:%s\n", proxy_port)
