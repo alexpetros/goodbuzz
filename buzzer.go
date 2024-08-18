@@ -14,7 +14,6 @@ func main() {
   mux := http.NewServeMux()
 
   mux.HandleFunc("GET /", index.Get)
-
   mux.HandleFunc("GET /healthcheck", healthcheck.Get)
 
   fmt.Printf("Now listening at http://%s\n", ADDRESS)
