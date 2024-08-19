@@ -1,0 +1,36 @@
+package rooms
+
+import "net/http"
+import "strconv"
+import "fmt"
+
+import "buzzer/lib"
+
+type Room struct {
+  room_id int64;
+}
+
+func Get(w http.ResponseWriter, r *http.Request) {
+    param :=  r.PathValue("id")
+    room_id, error := strconv.Atoi(param)
+
+    if error != nil {
+      http.NotFound(w, r)
+      return
+    }
+
+    room := Room { int64(room_id) }
+    content := index(room)
+    lib.Render(w, r, content)
+}
+
+templ index(room Room) {
+<title>Buzzer Room</title>
+
+<h1>Buzzer Room</h1>
+
+<p>
+Room #{fmt.Sprintf("%d", room.room_id)}
+</p>
+}
+
