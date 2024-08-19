@@ -1,0 +1,36 @@
+package tournament
+
+import "net/http"
+import "strconv"
+import "fmt"
+
+import "buzzer/lib"
+
+type Tournament struct {
+  tournament_id int64;
+}
+
+func Get(w http.ResponseWriter, r *http.Request) {
+    param :=  r.PathValue("id")
+    tournament_id, error := strconv.Atoi(param)
+
+    if error != nil {
+      http.NotFound(w, r)
+      return
+    }
+
+    tournament := Tournament { int64(tournament_id) }
+    content := index(tournament)
+    lib.Render(w, r, content)
+}
+
+templ index(tournament Tournament) {
+<title>Tournament Page</title>
+
+<h1>Tournament Page</h1>
+
+<p>
+Tournament #{fmt.Sprintf("%d", tournament.tournament_id)}
+</p>
+}
+

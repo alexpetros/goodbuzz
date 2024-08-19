@@ -23,10 +23,11 @@ live/air:
 			--build.cmd "go build -o dist/tmp/$(BINARY_NAME)" \
 			--build.bin "dist/tmp/$(BINARY_NAME)" \
 			--build.delay "100" \
-			--build.include_ext "go" \
+			--build.include_ext "go,css" \
 			--build.stop_on_error "false" \
 			--misc.clean_on_exit "true"
 
+# TODO update this to remove the templ files
 .PHONY: clean
 clean:
 	rm -rf ./dist

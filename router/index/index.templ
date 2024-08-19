@@ -3,6 +3,7 @@ package index
 import "net/http"
 import "fmt"
 
+import "buzzer/lib"
 
 type Tournament struct {
   tournament_id int64;
@@ -15,11 +16,11 @@ var TEST_TOURNAMENTS = [2]Tournament{
 }
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    index(TEST_TOURNAMENTS[:]).Render(r.Context(), w)
+    content := index(TEST_TOURNAMENTS[:])
+    lib.Render(w, r, content)
 }
 
 templ index(tournaments []Tournament) {
-<!DOCTYPE html>
 <title>Buzzer System</title>
 
 <h1>Buzzer System</h1>
@@ -35,3 +36,4 @@ for _, tournament := range tournaments {
 }
 </ul>
 }
+
