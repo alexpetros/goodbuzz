@@ -27,10 +27,8 @@ func Get(w http.ResponseWriter, r *http.Request) {
 templ index(room Room) {
 <title>Buzzer Room</title>
 
-<h1>Buzzer Room</h1>
+<h1>Room #{fmt.Sprintf("%d", room.room_id)}</h1>
 
-<p>
-Room #{fmt.Sprintf("%d", room.room_id)}
-</p>
+<button class="buzzer">Buzz</button>
 }
 

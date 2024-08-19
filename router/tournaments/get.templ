@@ -10,6 +10,17 @@ type Tournament struct {
   tournament_id int64;
 }
 
+type Room struct {
+  room_id int64;
+  name string;
+}
+
+var TEST_ROOMS = [2]Room {
+  Room { 7, "Room 1" },
+  Room { 200, "Room 2" },
+}
+
+
 func Get(w http.ResponseWriter, r *http.Request) {
     param :=  r.PathValue("id")
     tournament_id, error := strconv.Atoi(param)
@@ -20,17 +31,23 @@ func Get(w http.ResponseWriter, r *http.Request) {
     }
 
     tournament := Tournament { int64(tournament_id) }
-    content := index(tournament)
+    content := index(tournament, TEST_ROOMS[:])
     lib.Render(w, r, content)
 }
 
-templ index(tournament Tournament) {
+templ index(tournament Tournament, rooms []Room) {
 <title>Tournament Page</title>
 
 <h1>Tournament Page</h1>
 
 <p>
 Tournament #{fmt.Sprintf("%d", tournament.tournament_id)}
+
+<ul>
+for _, room := range rooms {
+  <li><a href={ templ.URL(fmt.Sprintf("/rooms/%d", room.room_id)) }>{ room.name }</a></li>
+}
+</ul>
 </p>
 }
 
