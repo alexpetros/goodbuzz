@@ -6,10 +6,6 @@ import "fmt"
 
 import "buzzer/lib"
 
-type Room struct {
-  room_id int64;
-}
-
 func Get(w http.ResponseWriter, r *http.Request) {
     param :=  r.PathValue("id")
     room_id, error := strconv.Atoi(param)
@@ -19,7 +15,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
       return
     }
 
-    room := Room { int64(room_id) }
+    room := Room { int64(room_id), "Unlocked" }
     content := index(room)
     lib.Render(w, r, content)
 }

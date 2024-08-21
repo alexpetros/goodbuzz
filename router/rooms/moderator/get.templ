@@ -1,0 +1,31 @@
+package moderator
+
+import "net/http"
+import "fmt"
+
+import "buzzer/lib"
+import "buzzer/router/rooms"
+
+func Get(w http.ResponseWriter, r *http.Request) {
+    param :=  r.PathValue("id")
+    room := rooms.GetRoom(param)
+
+    if room == nil {
+      http.NotFound(w, r)
+      return
+    }
+
+    content := index(room)
+    lib.Render(w, r, content)
+}
+
+templ index(room *rooms.Room) {
+<title>Room #{fmt.Sprintf("%d", room.Id())} - Moderator</title>
+
+<h1>Room #{fmt.Sprintf("%d", room.Id())} - Moderator</h1>
+
+<div>Buzzer Status: { room.Status() }</div>
+
+<div><button>Reset</button></div>
+}
+

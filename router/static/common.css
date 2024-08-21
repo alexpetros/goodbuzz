@@ -16,6 +16,7 @@ button.buzzer {
   color: white;
   background-color: var(--button-enabled-color);
   border: 2px solid gray;
+  border-radius: 50%;
 }
 
 button.buzzer:active:enabled {
