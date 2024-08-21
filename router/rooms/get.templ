@@ -25,6 +25,12 @@ templ index(room Room) {
 
 <h1>Room #{fmt.Sprintf("%d", room.room_id)}</h1>
 
-<button class="buzzer">Buzz</button>
+<button class="buzzer" hx-put={ fmt.Sprintf("/rooms/%d/buzz", room.room_id) }>Buzz</button>
+
+<script>
+function buzz() {
+  console.log('buzz')
+}
+</script>
 }
 

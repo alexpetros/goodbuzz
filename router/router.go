@@ -1,13 +1,15 @@
 package router
 
-import "net/http"
-import "embed"
-
-import "buzzer/router/index"
-import "buzzer/router/healthcheck"
-import "buzzer/router/tournaments"
-import "buzzer/router/rooms"
-import "buzzer/router/rooms/moderator"
+import (
+	"buzzer/router/healthcheck"
+	"buzzer/router/index"
+	"buzzer/router/rooms"
+	"buzzer/router/rooms/buzz"
+	"buzzer/router/rooms/moderator"
+	"buzzer/router/tournaments"
+	"embed"
+	"net/http"
+)
 
 // this bit of go magic embeds everything in the /static directory
 //go:embed all:static
@@ -22,6 +24,7 @@ func SetupRouter (mux *http.ServeMux) {
 
   mux.HandleFunc("GET /rooms/{id}", rooms.Get)
   mux.HandleFunc("GET /rooms/{id}/moderator", moderator.Get)
+  mux.HandleFunc("PUT /rooms/{id}/buzz", buzz.Put)
 
   mux.HandleFunc("GET /healthcheck", healthcheck.Get)
 }
