@@ -27,3 +27,7 @@ button.buzzer:active:enabled {
 button.buzzer:disabled {
   background-color: var(--button-disabled-color)
 }
+
+button.buzzer:disabled {
+  background-color: var(--button-disabled-color)
+}

@@ -31,3 +31,7 @@ live/air:
 .PHONY: clean
 clean:
 	rm -rf ./dist
+
+.PHONY: format
+format:
+	gofmt -s -w .
