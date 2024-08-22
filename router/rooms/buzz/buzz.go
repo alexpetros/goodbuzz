@@ -15,6 +15,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+  room.BuzzRoom()
 	io.WriteString(w,
 		`<button class="buzzer" disabled>Waiting...</button>`,
 	)

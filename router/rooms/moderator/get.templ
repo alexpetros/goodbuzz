@@ -9,6 +9,8 @@ func Get(w http.ResponseWriter, r *http.Request) {
     param :=  r.PathValue("id")
     room := lib.GetRoom(param)
 
+    fmt.Printf("moderate\n", room)
+    fmt.Printf("%s\n", room)
     if room == nil {
       http.NotFound(w, r)
       return
@@ -23,7 +25,7 @@ templ index(room *lib.Room) {
 
 <h1>Room #{fmt.Sprintf("%d", room.Id())} - Moderator</h1>
 
-<div>Buzzer Status: { room.Status() }</div>
+<div>Buzzer Status: { room.StatusString() }</div>
 
 <div><button>Reset</button></div>
 }

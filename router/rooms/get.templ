@@ -23,7 +23,11 @@ templ index(room *lib.Room) {
 
 <h1>Room #{fmt.Sprintf("%d", room.Id())}</h1>
 
-<button class="buzzer" hx-put={ fmt.Sprintf("/rooms/%d/buzz", room.Id()) }>Buzz</button>
+if room.Status() == lib.Unlocked {
+  <button class="buzzer" hx-put={ fmt.Sprintf("/rooms/%d/buzz", room.Id()) }>Buzz</button>
+} else {
+  <button class="buzzer" disabled>Waiting...</button>
+}
 
 <script>
 function buzz() {
