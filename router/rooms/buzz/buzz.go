@@ -2,6 +2,7 @@ package buzz
 
 import (
 	"buzzer/lib"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -16,9 +17,17 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	}
 
   room.BuzzRoom()
-	io.WriteString(w,
-		`<button class="buzzer" disabled>Waiting...</button>`,
+  res := fmt.Sprintf(
+		`<button class="buzzer"
+             disabled
+             hx-get="/rooms/%d/status"
+             hx-trigger="every 500ms"
+             >Waiting...
+     </button>`,
+     room.Id(),
 	)
+
+  io.WriteString(w, res)
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {

@@ -6,6 +6,7 @@ import (
 	"buzzer/router/rooms"
 	"buzzer/router/rooms/buzz"
 	"buzzer/router/rooms/moderator"
+	"buzzer/router/rooms/status"
 	"buzzer/router/tournaments"
 	"embed"
 	"net/http"
@@ -25,6 +26,7 @@ func SetupRouter(mux *http.ServeMux) {
 
 	mux.HandleFunc("GET /rooms/{id}", rooms.Get)
 	mux.HandleFunc("GET /rooms/{id}/moderator", moderator.Get)
+	mux.HandleFunc("GET /rooms/{id}/status", status.Get)
 	mux.HandleFunc("PUT /rooms/{id}/buzz", buzz.Put)
 	mux.HandleFunc("DELETE /rooms/{id}/buzz", buzz.Delete)
 
