@@ -26,6 +26,7 @@ func SetupRouter(mux *http.ServeMux) {
 	mux.HandleFunc("GET /rooms/{id}", rooms.Get)
 	mux.HandleFunc("GET /rooms/{id}/moderator", moderator.Get)
 	mux.HandleFunc("PUT /rooms/{id}/buzz", buzz.Put)
+	mux.HandleFunc("DELETE /rooms/{id}/buzz", buzz.Delete)
 
 	mux.HandleFunc("GET /healthcheck", healthcheck.Get)
 }

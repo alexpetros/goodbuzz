@@ -9,8 +9,6 @@ func Get(w http.ResponseWriter, r *http.Request) {
     param :=  r.PathValue("id")
     room := lib.GetRoom(param)
 
-    fmt.Printf("moderate\n", room)
-    fmt.Printf("%s\n", room)
     if room == nil {
       http.NotFound(w, r)
       return
@@ -21,12 +19,14 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 templ index(room *lib.Room) {
-<title>Room #{fmt.Sprintf("%d", room.Id())} - Moderator</title>
+<title>Room #{ fmt.Sprintf("%d", room.Id()) } - Moderator</title>
 
-<h1>Room #{fmt.Sprintf("%d", room.Id())} - Moderator</h1>
+<h1>Room #{ fmt.Sprintf("%d", room.Id()) } - Moderator</h1>
 
-<div>Buzzer Status: { room.StatusString() }</div>
+<div>Buzzer Status: <span class="buzzer-status">{ room.StatusString() }</span></div>
 
-<div><button>Reset</button></div>
+<div>
+  <button hx-delete={ fmt.Sprintf("/rooms/%d/buzz", room.Id()) }>Reset</button>
+</div>
 }
 

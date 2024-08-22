@@ -61,6 +61,11 @@ func (r *Room) StatusString() string {
 	return r.buzzer_status.String()
 }
 
+// TODO need a way to ignore buzzes that came in before the reset
 func (r *Room) BuzzRoom() {
   r.buzzer_status = Waiting
+}
+
+func (r *Room) Reset() {
+  r.buzzer_status = Unlocked
 }
