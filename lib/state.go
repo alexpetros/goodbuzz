@@ -7,20 +7,20 @@ type Room struct {
 	buzzer_status string
 }
 
-var TEST_ROOMS = [2]Room {
-  Room { 7, "Room 1" },
-  Room { 200, "Room 2" },
+var TEST_ROOMS = [2]Room{
+	{7, "Room 1"},
+	{200, "Room 2"},
 }
 
 func GetAllRooms() [2]Room {
-    return TEST_ROOMS
+	return TEST_ROOMS
 }
 
 func GetRoom(room_id string) *Room {
-    id, error := strconv.Atoi(room_id)
-    if error != nil {
-        return nil
-    }
+	id, error := strconv.Atoi(room_id)
+	if error != nil {
+		return nil
+	}
 
 	room := Room{int64(id), "Unlocked"}
 	return &room
