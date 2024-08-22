@@ -1,31 +1,29 @@
 package rooms
 
 import "net/http"
-import "strconv"
 import "fmt"
 
 import "buzzer/lib"
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    param :=  r.PathValue("id")
-    room_id, error := strconv.Atoi(param)
+    room_id :=  r.PathValue("id")
+    room := lib.GetRoom(room_id)
 
-    if error != nil {
+    if room == nil {
       http.NotFound(w, r)
       return
     }
 
-    room := Room { int64(room_id), "Unlocked" }
     content := index(room)
     lib.Render(w, r, content)
 }
 
-templ index(room Room) {
+templ index(room *lib.Room) {
 <title>Buzzer Room</title>
 
-<h1>Room #{fmt.Sprintf("%d", room.room_id)}</h1>
+<h1>Room #{fmt.Sprintf("%d", room.Id())}</h1>
 
-<button class="buzzer" hx-put={ fmt.Sprintf("/rooms/%d/buzz", room.room_id) }>Buzz</button>
+<button class="buzzer" hx-put={ fmt.Sprintf("/rooms/%d/buzz", room.Id()) }>Buzz</button>
 
 <script>
 function buzz() {

@@ -1,14 +1,14 @@
 package buzz
 
 import (
-	"buzzer/router/rooms"
+	"buzzer/lib"
 	"io"
 	"net/http"
 )
 
 func Put(w http.ResponseWriter, r *http.Request) {
 	room_id := r.PathValue("id")
-	room := rooms.GetRoom(room_id)
+	room := lib.GetRoom(room_id)
 
 	if room == nil {
 		http.NotFound(w, r)
