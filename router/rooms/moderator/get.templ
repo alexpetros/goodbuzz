@@ -23,7 +23,7 @@ templ index(room *lib.Room) {
 <title>Room #{ fmt.Sprintf("%d", room.Id()) } - Moderator</title>
 <h1>Room #{ fmt.Sprintf("%d", room.Id()) } - Moderator</h1>
 
-<section class="live">
+<section class="live" hx-swap="innerHTML">
   <h2>Live View</h2>
   <p>Buzzer Status:
   <span class="buzzer-status" hx-ext="sse" sse-connect="./moderator/live" sse-swap="status">

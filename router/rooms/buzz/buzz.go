@@ -40,7 +40,5 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
   room.Reset()
-
-  w.Header().Add("HX-Retarget", ".buzzer-status")
-  io.WriteString(w, `<span class="buzzer-status">Unlocked</span>`)
+  w.WriteHeader(204)
 }
