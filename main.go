@@ -5,7 +5,7 @@ import "fmt"
 import "net/http"
 import "os"
 
-import "buzzer/router"
+import "goodbuzz/router"
 
 const ADDRESS = "localhost:3000"
 

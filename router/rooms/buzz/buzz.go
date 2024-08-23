@@ -1,7 +1,7 @@
 package buzz
 
 import (
-	"buzzer/lib"
+	"goodbuzz/lib"
 	"fmt"
 	"io"
 	"net/http"

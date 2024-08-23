@@ -1,13 +1,13 @@
 package router
 
 import (
-	"buzzer/router/healthcheck"
-	"buzzer/router/index"
-	"buzzer/router/rooms"
-	"buzzer/router/rooms/buzz"
-	"buzzer/router/rooms/moderator"
-	"buzzer/router/rooms/status"
-	"buzzer/router/tournaments"
+	"goodbuzz/router/healthcheck"
+	"goodbuzz/router/index"
+	"goodbuzz/router/rooms"
+	"goodbuzz/router/rooms/buzz"
+	"goodbuzz/router/rooms/moderator"
+	"goodbuzz/router/rooms/status"
+	"goodbuzz/router/tournaments"
 	"embed"
 	"net/http"
 )

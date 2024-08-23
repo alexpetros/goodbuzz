@@ -1,4 +1,4 @@
-module buzzer
+module goodbuzz
 
 go 1.23.0
 

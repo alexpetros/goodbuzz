@@ -3,7 +3,7 @@ package rooms
 import "net/http"
 import "fmt"
 
-import "buzzer/lib"
+import "goodbuzz/lib"
 
 func Get(w http.ResponseWriter, r *http.Request) {
     room_id :=  r.PathValue("id")

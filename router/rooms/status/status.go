@@ -1,8 +1,8 @@
 package status
 
 import (
-	"buzzer/lib"
-	"buzzer/router/rooms"
+	"goodbuzz/lib"
+	"goodbuzz/router/rooms"
 	"net/http"
 )
 
