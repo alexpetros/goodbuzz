@@ -12,7 +12,7 @@ live:
 .PHONY: prod
 prod:
 	templ generate
-	go run .
+	BUZZER_PORT=8080 go run .
 
 .PHONY: live/templ
 live/templ:
