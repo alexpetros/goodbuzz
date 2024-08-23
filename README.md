@@ -1,4 +1,4 @@
-# Unnamed Buzzer System
+# Goodbuzz System
 
 ## Installation
 

@@ -26,18 +26,15 @@ func (s BuzzerStatus) String() string {
 }
 
 type Room struct {
-	room_id       int64
-	buzzer_status BuzzerStatus
+  room_id       int64
+  buzzer_status BuzzerStatus
+  listeners     map[chan string]struct{}
 }
 
 var TEST_ROOMS = map[int]*Room {
-  7: {7, Unlocked},
-  200: {200, Unlocked},
+  7: {7, Unlocked, make(map[chan string]struct{})},
+  200: {200, Unlocked, make(map[chan string]struct{})},
 }
-
-// func GetAllRooms() [2]Room {
-// 	return TEST_ROOMS
-// }
 
 func GetRoom(room_id string) *Room {
 	id, error := strconv.Atoi(room_id)
@@ -64,8 +61,28 @@ func (r *Room) StatusString() string {
 // TODO need a way to ignore buzzes that came in before the reset
 func (r *Room) BuzzRoom() {
   r.buzzer_status = Waiting
+  for listener := range r.listeners {
+    sse := FormatEvent("status", "<span>Waiting<span>")
+    listener <- sse
+  }
 }
 
 func (r *Room) Reset() {
   r.buzzer_status = Unlocked
+  for listener := range r.listeners {
+    sse := FormatEvent("status", "<span>Unlocked<span>")
+    listener <- sse
+  }
+}
+
+func (r *Room) AddListener() chan string {
+  // Create a channel and add it to the room's list of channels
+  eventChan := make(chan string)
+  r.listeners[eventChan] = struct{}{}
+
+  return eventChan
+}
+
+func (r *Room) RemoveListener(listener chan string) {
+  delete(r.listeners, listener)
 }
