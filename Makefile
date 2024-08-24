@@ -9,9 +9,13 @@ live:
 	BUZZER_PROXY_PORT=$(PROXY_PORT) make -j2 live/templ live/air
 	@echo "Development mode is live\n Access application at http://localhost:$(PROXY_PORT)"
 
+.PHONY: templ
+templ:
+	templ generate
+
 .PHONY: prod
 prod:
-	templ generate
+	make templ
 	BUZZER_PORT=8080 go run .
 
 .PHONY: live/templ

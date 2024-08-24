@@ -1,4 +1,4 @@
-package rooms
+package player
 
 import "net/http"
 import "fmt"
@@ -7,8 +7,8 @@ import "goodbuzz/lib"
 
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    room_id :=  r.PathValue("id")
-    room := lib.GetRoom(room_id)
+    roomId :=  r.PathValue("id")
+    room := lib.GetRoom(roomId)
 
     if room == nil {
       http.NotFound(w, r)
@@ -19,25 +19,21 @@ func Get(w http.ResponseWriter, r *http.Request) {
     lib.Render(w, r, content)
 }
 
-func Live(w http.ResponseWriter, r *http.Request) {
-    // TODO "waiting" button handler
-}
-
 templ index(room *lib.Room) {
 <title>Buzzer Room</title>
 
 <h1>Room #{fmt.Sprintf("%d", room.Id())}</h1>
 
 if room.Status() == lib.Unlocked {
-  @UnlockedBuzzer(room.Id())
+  @UnlockedBuzzer()
 } else {
   <button class="buzzer" disabled>Waiting...</button>
 }
 
 }
 
-templ UnlockedBuzzer (room_id int64) {
-  <button class="buzzer" onclick={ buzz(room_id) }>Buzz</button>
+templ UnlockedBuzzer () {
+  <button class="buzzer" onclick={ buzz() }>Buzz</button>
 }
 
 templ LockedBuzzer (room_id int64) {
@@ -49,14 +45,14 @@ templ LockedBuzzer (room_id int64) {
     </button>
 }
 
-script buzz(room_id int64) {
+script buzz() {
   const button = document.querySelector('.buzzer')
-  fetch(`./${room_id}/buzz`, { method: 'PUT' })
+  fetch(`./buzz`, { method: 'PUT' })
 
   button.setAttribute('disabled', 'true')
   button.innerText = 'Waiting...'
   button.setAttribute('hx-ext', 'sse')
-  button.setAttribute('sse-connect', `./${room_id}/buzz`)
+  button.setAttribute('sse-connect', `./buzz`)
   button.setAttribute('sse-swap', 'status')
   button.setAttribute('hx-swap', 'outerHTML')
   htmx.process(button)

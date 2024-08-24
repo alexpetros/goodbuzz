@@ -45,7 +45,7 @@ Tournament #{fmt.Sprintf("%d", tournament.tournament_id)}
 
 <ul>
 for _, room := range rooms {
-  <li><a href={ templ.URL(fmt.Sprintf("/rooms/%d", room.room_id)) }>{ room.name }</a></li>
+  <li><a href={ templ.URL(fmt.Sprintf("/rooms/%d/player", room.room_id)) }>{ room.name }</a></li>
 }
 </ul>
 </p>
