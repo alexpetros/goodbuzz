@@ -22,7 +22,7 @@ func Live(w http.ResponseWriter, r *http.Request) {
 
   fmt.Printf("Player connected to room %d\n", room.Id())
 
-  eventChan := room.AddListener()
+  eventChan := room.AddPlayer()
 
   // Delete client when they disconnect
   defer func() {

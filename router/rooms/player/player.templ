@@ -24,35 +24,29 @@ templ index(room *lib.Room) {
 
 <h1>Room #{fmt.Sprintf("%d", room.Id())}</h1>
 
-if room.Status() == lib.Unlocked {
-  @UnlockedBuzzer()
-} else {
-  <button class="buzzer" disabled>Waiting...</button>
-}
+@BuzzerButton(room.Status() != lib.Unlocked)
 
-<section hx-ext="sse" sse-connect="./player/live" sse-swap="log" hx-swap="beforeend">
+<section class="log" hx-ext="sse" sse-connect="./player/live" sse-swap="log" hx-swap="beforeend">
 </section>
-}
 
-templ UnlockedBuzzer () {
-  <button class="buzzer" onclick={ buzz() }>Buzz</button>
-}
-
-templ LockedBuzzer (room_id int64) {
-  <button class="buzzer"
-    disabled
-    hx-get="/rooms/%d/status"
-    hx-trigger="every 500ms"
-    >Waiting...
-    </button>
-}
-
-script buzz() {
+<script>
+function buzz() {
   const button = document.querySelector('.buzzer')
   fetch(`./buzz`, { method: 'PUT' })
 
   button.setAttribute('disabled', 'true')
   button.innerText = 'Waiting...'
+}
+</script>
+}
 
-  htmx.process(button)
+templ BuzzerButton (isDisabled bool) {
+  <button
+    class="buzzer"
+    id="buzzer"
+    onclick="buzz()"
+    hx-swap-oob="outerHTML:.buzzer"
+    disabled?={isDisabled}
+    >Buzz
+    </button>
 }

@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -28,12 +29,22 @@ func (s BuzzerStatus) String() string {
 type Room struct {
   room_id       int64
   buzzer_status BuzzerStatus
-  listeners     map[chan string]struct{}
+  players       map[chan string]struct{}
+  moderators     map[chan string]struct{}
 }
 
 var TEST_ROOMS = map[int]*Room {
-  7: {7, Unlocked, make(map[chan string]struct{})},
-  200: {200, Unlocked, make(map[chan string]struct{})},
+  7: NewRoom(7),
+  200: NewRoom(200),
+}
+
+func NewRoom(room_id int64) *Room {
+  return &Room {
+    room_id,
+    Unlocked,
+    make(map[chan string]struct{}),
+    make(map[chan string]struct{}),
+  }
 }
 
 func GetRoom(room_id string) *Room {
@@ -61,28 +72,39 @@ func (r *Room) StatusString() string {
 // TODO need a way to ignore buzzes that came in before the reset
 func (r *Room) BuzzRoom() {
   r.buzzer_status = Waiting
-  for listener := range r.listeners {
-    sse := FormatEvent("status", "<span>Waiting<span>")
-    listener <- sse
+  for listener := range r.moderators {
+    listener <- FormatEvent("status", "<span>Waiting<span>")
   }
 }
 
 func (r *Room) Reset() {
   r.buzzer_status = Unlocked
-  for listener := range r.listeners {
-    sse := FormatEvent("status", "<span>Unlocked<span>")
-    listener <- sse
+  for listener := range r.moderators {
+    listener <- FormatEvent("status", "<span>Unlocked<span>")
+  }
+
+  for listener := range r.players {
+    fmt.Printf("Sending unlock message")
+    // buzzer := player.BuzzerButton(false)
+    listener <- FormatEvent("log", "<div>Buzzer Unlocked<div>")
+    listener <- FormatEvent("log", `<button class="buzzer" onclick="buzz()" hx-swap-oob="outerHTML:.buzzer">Buzz</button>`)
   }
 }
 
-func (r *Room) AddListener() chan string {
+func (r *Room) AddModerator() chan string {
   // Create a channel and add it to the room's list of channels
   eventChan := make(chan string)
-  r.listeners[eventChan] = struct{}{}
+  r.moderators[eventChan] = struct{}{}
+  return eventChan
+}
 
+func (r *Room) AddPlayer() chan string {
+  // Create a channel and add it to the room's list of channels
+  eventChan := make(chan string)
+  r.players[eventChan] = struct{}{}
   return eventChan
 }
 
 func (r *Room) RemoveListener(listener chan string) {
-  delete(r.listeners, listener)
+  delete(r.moderators, listener)
 }

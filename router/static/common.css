@@ -31,3 +31,7 @@ button.buzzer:disabled {
 button.buzzer:disabled {
   background-color: var(--button-disabled-color)
 }
+
+section.log {
+  margin-top: 30px;
+}
