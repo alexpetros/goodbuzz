@@ -25,7 +25,7 @@ templ index(room *rooms.Room) {
 
 <h1>Room #{fmt.Sprintf("%d", room.Id())}</h1>
 
-@BuzzerButton(room.Status() != rooms.Unlocked)
+@rooms.BuzzerButton(room.Status() != rooms.Unlocked)
 
 <section class="log" hx-ext="sse" sse-connect="./player/live" sse-swap="log" hx-swap="beforeend">
 </section>
@@ -39,15 +39,4 @@ function buzz() {
   button.innerText = 'Waiting...'
 }
 </script>
-}
-
-templ BuzzerButton (isDisabled bool) {
-  <button
-    class="buzzer"
-    id="buzzer"
-    onclick="buzz()"
-    hx-swap-oob="outerHTML:.buzzer"
-    disabled?={isDisabled}
-    >Buzz
-    </button>
 }

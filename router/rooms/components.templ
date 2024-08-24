@@ -1,0 +1,12 @@
+package rooms
+
+templ BuzzerButton (isDisabled bool) {
+  <button
+    class="buzzer"
+    id="buzzer"
+    onclick="buzz()"
+    hx-swap-oob="outerHTML:.buzzer"
+    disabled?={isDisabled}
+    >Buzz
+    </button>
+}

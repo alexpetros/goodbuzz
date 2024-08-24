@@ -1,6 +1,7 @@
 package rooms
 
 import (
+	"context"
 	"fmt"
 	"goodbuzz/lib"
 	"strconv"
@@ -86,9 +87,9 @@ func (r *Room) Reset() {
 
 	for listener := range r.players {
 		fmt.Printf("Sending unlock message")
-		// buzzer := player.BuzzerButton(false)
+		buzzer := lib.ToString(BuzzerButton(false))
 		listener <- lib.FormatEvent("log", "<div>Buzzer Unlocked<div>")
-		listener <- lib.FormatEvent("log", `<button class="buzzer" onclick="buzz()" hx-swap-oob="outerHTML:.buzzer">Buzz</button>`)
+		listener <- lib.FormatEvent("log", buzzer)
 	}
 }
 
