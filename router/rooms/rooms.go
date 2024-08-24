@@ -16,7 +16,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if room.Status() == lib.Unlocked {
-		res := player.UnlockedBuzzer(room.Id())
+		res := player.UnlockedBuzzer()
 		res.Render(r.Context(), w)
 	} else {
 		w.WriteHeader(204)

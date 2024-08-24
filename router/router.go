@@ -6,7 +6,6 @@ import (
 	"goodbuzz/router/index"
 	"goodbuzz/router/rooms/buzz"
 	"goodbuzz/router/rooms/moderator"
-	"goodbuzz/router/rooms/moderator/live"
 	"goodbuzz/router/rooms/player"
 	"goodbuzz/router/tournaments"
 	"net/http"
@@ -28,7 +27,7 @@ func SetupRouter(mux *http.ServeMux) {
 	mux.HandleFunc("GET /rooms/{id}/player/live", player.Live)
 
 	mux.HandleFunc("GET /rooms/{id}/moderator", moderator.Get)
-	mux.HandleFunc("GET /rooms/{id}/moderator/live", live.Get)
+	mux.HandleFunc("GET /rooms/{id}/moderator/live", moderator.Live)
 
 	mux.HandleFunc("PUT /rooms/{id}/buzz", buzz.Put)
 	mux.HandleFunc("DELETE /rooms/{id}/buzz", buzz.Delete)

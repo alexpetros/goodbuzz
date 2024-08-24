@@ -30,6 +30,8 @@ if room.Status() == lib.Unlocked {
   <button class="buzzer" disabled>Waiting...</button>
 }
 
+<section hx-ext="sse" sse-connect="./player/live" sse-swap="log" hx-swap="beforeend">
+</section>
 }
 
 templ UnlockedBuzzer () {
@@ -51,9 +53,6 @@ script buzz() {
 
   button.setAttribute('disabled', 'true')
   button.innerText = 'Waiting...'
-  button.setAttribute('hx-ext', 'sse')
-  button.setAttribute('sse-connect', `./buzz`)
-  button.setAttribute('sse-swap', 'status')
-  button.setAttribute('hx-swap', 'outerHTML')
+
   htmx.process(button)
 }
