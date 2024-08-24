@@ -2,13 +2,13 @@ package moderator
 
 import (
 	"fmt"
-	"goodbuzz/lib"
+	"goodbuzz/router/rooms"
 	"net/http"
 )
 
 func Live(w http.ResponseWriter, r *http.Request) {
 	param := r.PathValue("id")
-	room := lib.GetRoom(param)
+	room := rooms.GetRoom(param)
 
 	if room == nil {
 		http.NotFound(w, r)

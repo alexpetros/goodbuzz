@@ -1,44 +1,44 @@
 package buzz
 
 import (
-	"goodbuzz/lib"
 	"fmt"
+	"goodbuzz/router/rooms"
 	"io"
 	"net/http"
 )
 
 func Put(w http.ResponseWriter, r *http.Request) {
 	room_id := r.PathValue("id")
-	room := lib.GetRoom(room_id)
+	room := rooms.GetRoom(room_id)
 
 	if room == nil {
 		http.NotFound(w, r)
 		return
 	}
 
-  room.BuzzRoom()
-  res := fmt.Sprintf(
+	room.BuzzRoom()
+	res := fmt.Sprintf(
 		`<button class="buzzer"
              disabled
              hx-get="/rooms/%d/status"
              hx-trigger="every 500ms"
              >Waiting...
      </button>`,
-     room.Id(),
+		room.Id(),
 	)
 
-  io.WriteString(w, res)
+	io.WriteString(w, res)
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
 	room_id := r.PathValue("id")
-	room := lib.GetRoom(room_id)
+	room := rooms.GetRoom(room_id)
 
 	if room == nil {
 		http.NotFound(w, r)
 		return
 	}
 
-  room.Reset()
-  w.WriteHeader(204)
+	room.Reset()
+	w.WriteHeader(204)
 }

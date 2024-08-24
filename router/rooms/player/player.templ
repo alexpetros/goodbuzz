@@ -4,11 +4,12 @@ import "net/http"
 import "fmt"
 
 import "goodbuzz/lib"
+import "goodbuzz/router/rooms"
 
 
 func Get(w http.ResponseWriter, r *http.Request) {
     roomId :=  r.PathValue("id")
-    room := lib.GetRoom(roomId)
+    room := rooms.GetRoom(roomId)
 
     if room == nil {
       http.NotFound(w, r)
@@ -19,12 +20,12 @@ func Get(w http.ResponseWriter, r *http.Request) {
     lib.Render(w, r, content)
 }
 
-templ index(room *lib.Room) {
+templ index(room *rooms.Room) {
 <title>Buzzer Room</title>
 
 <h1>Room #{fmt.Sprintf("%d", room.Id())}</h1>
 
-@BuzzerButton(room.Status() != lib.Unlocked)
+@BuzzerButton(room.Status() != rooms.Unlocked)
 
 <section class="log" hx-ext="sse" sse-connect="./player/live" sse-swap="log" hx-swap="beforeend">
 </section>
