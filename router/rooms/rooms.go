@@ -1,7 +1,6 @@
 package rooms
 
 import (
-	"context"
 	"fmt"
 	"goodbuzz/lib"
 	"strconv"
