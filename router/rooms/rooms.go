@@ -76,6 +76,12 @@ func (r *Room) BuzzRoom() {
 	for listener := range r.moderators {
 		listener <- lib.FormatEvent("status", "<span>Waiting<span>")
 	}
+
+	for listener := range r.players {
+		buzzer := lib.ToString(BuzzerButton(true))
+		listener <- lib.FormatEvent("log", buzzer)
+		listener <- lib.FormatEvent("log", "<div>Player Buzzed<div>")
+	}
 }
 
 func (r *Room) Reset() {
