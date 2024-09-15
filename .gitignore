@@ -1,4 +1,6 @@
-dist/*
+goodbuzz
+dist/
 
+*.db
 *_templ.go
 *_templ.txt

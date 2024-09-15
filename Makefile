@@ -38,11 +38,11 @@ live/air:
 			--build.stop_on_error "false" \
 			--misc.clean_on_exit "true"
 
-# TODO update this to remove the templ files
 .PHONY: clean
 clean:
 	find . -name '*_templ.go' | xargs rm
 	rm -rf ./dist
+	go clean
 
 .PHONY: format
 format:
