@@ -39,6 +39,7 @@ live/air:
 # TODO update this to remove the templ files
 .PHONY: clean
 clean:
+	find . -name '*_templ.go' | xargs rm
 	rm -rf ./dist
 
 .PHONY: format
