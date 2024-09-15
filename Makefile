@@ -3,6 +3,7 @@
 PORT=3000
 PROXY_PORT=8080
 BINARY_NAME="buzzer"
+PROJECT_NAME="goodbuzz"
 
 .PHONY: live
 live:
@@ -16,7 +17,8 @@ templ:
 .PHONY: prod
 prod:
 	make templ
-	BUZZER_PORT=8080 go run .
+	go build
+	BUZZER_PORT=8080 ./$(PROJECT_NAME)
 
 .PHONY: live/templ
 live/templ:
