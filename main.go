@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"goodbuzz/lib"
+	"goodbuzz/lib/db"
 	"goodbuzz/router"
 	"log"
 	"net/http"
@@ -18,7 +18,7 @@ func main() {
   proxy_port := os.Getenv("BUZZER_PROXY_PORT")
   port := os.Getenv("BUZZER_PORT")
 
-  db := lib.GetDb(SQLITE_FILE)
+  db.InitDb(SQLITE_FILE)
   mux := http.NewServeMux()
   router.SetupRouter(mux)
 
