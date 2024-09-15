@@ -1,18 +1,21 @@
 package main
 
-import "errors"
-import "fmt"
-import "net/http"
-import "os"
-
-import "goodbuzz/router"
+import (
+	"errors"
+	"fmt"
+	"goodbuzz/router"
+	"net/http"
+	"os"
+)
 
 const DEFAULT_PORT = "3000"
+const SQLITE_FILE = "goodbuzz.db"
 
 func main() {
 	proxy_port := os.Getenv("BUZZER_PROXY_PORT")
 	port := os.Getenv("BUZZER_PORT")
 
+  // db := lib.GetDb(SQLITE_FILE)
 	mux := http.NewServeMux()
 	router.SetupRouter(mux)
 
