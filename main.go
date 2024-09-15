@@ -39,7 +39,7 @@ func main() {
     err := http.ListenAndServe(address, mux)
 
     if errors.Is(err, http.ErrServerClosed) {
-      log.Panicln("server closed")
+      log.Fatalf("server closed")
     } else if err != nil {
       log.Fatalf("unexpected error from server: %s\n", err)
     }

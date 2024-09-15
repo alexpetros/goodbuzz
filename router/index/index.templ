@@ -2,25 +2,16 @@ package index
 
 import "net/http"
 import "fmt"
-
 import "goodbuzz/lib"
-
-type Tournament struct {
-  tournament_id int64;
-  name string
-}
-
-var TEST_TOURNAMENTS = [2]Tournament{
-  Tournament { 13, "October Online Tournament" },
-  Tournament { 15, "Novemeber Online Tournament" },
-}
+import "goodbuzz/lib/db"
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    content := index(TEST_TOURNAMENTS[:])
+    tournaments := db.GetTournaments(r.Context())
+    content := index(tournaments)
     lib.Render(w, r, content)
 }
 
-templ index(tournaments []Tournament) {
+templ index(tournaments []db.Tournament) {
 <title>Buzzer System</title>
 
 <h1>Buzzer System</h1>
@@ -32,7 +23,9 @@ Welcome to the online buzzer system!
 <h2>Ongoing Tournaments</h2>
 <ul>
 for _, tournament := range tournaments {
-  <li><a href={ templ.URL(fmt.Sprintf("/tournaments/%d", tournament.tournament_id)) }>{ tournament.name }</a></li>
+  <li>
+    <a href={ templ.URL(fmt.Sprintf("/tournaments/%d", tournament.Id())) }>{ tournament.Name() }</a>
+  </li>
 }
 </ul>
 }

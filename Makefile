@@ -2,8 +2,9 @@
 
 PORT=3000
 PROXY_PORT=8080
-BINARY_NAME="buzzer"
-PROJECT_NAME="goodbuzz"
+BINARY_NAME=buzzer
+PROJECT_NAME=goodbuzz
+DB_NAME=goodbuzz.db
 
 .PHONY: live
 live:
@@ -47,3 +48,10 @@ clean:
 .PHONY: format
 format:
 	gofmt -s -w .
+
+.PHONY: reset-db
+reset-db:
+	rm -f $(DB_NAME)
+	rm -f $(DB_NAME)-wal
+	rm -f $(DB_NAME)-shm
+	sqlite3 $(DB_NAME) < schema.sql

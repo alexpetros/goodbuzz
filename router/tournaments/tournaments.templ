@@ -5,47 +5,35 @@ import "strconv"
 import "fmt"
 
 import "goodbuzz/lib"
-
-type Tournament struct {
-  tournament_id int64;
-}
-
-type Room struct {
-  room_id int64;
-  name string;
-}
-
-var TEST_ROOMS = [2]Room {
-    Room { 7, "Room 1" },
-    Room { 200, "Room 2" },
-}
-
+import "goodbuzz/lib/db"
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    param :=  r.PathValue("id")
-    tournament_id, error := strconv.Atoi(param)
+    param, error := strconv.Atoi(r.PathValue("id"))
+    context := r.Context()
+    tournament_id := int64(param)
 
     if error != nil {
       http.NotFound(w, r)
       return
     }
 
-    tournament := Tournament { int64(tournament_id) }
-    content := index(tournament, TEST_ROOMS[:])
+    tournament := db.GetTournament(r.Context(), tournament_id)
+    rooms := db.GetRoomsForTournament(context, tournament_id)
+    content := index(tournament, rooms)
     lib.Render(w, r, content)
 }
 
-templ index(tournament Tournament, rooms []Room) {
-<title>Tournament Page</title>
+templ index(tournament *db.Tournament, rooms []db.Room) {
+<title>{tournament.Name()}</title>
 
-<h1>Tournament Page</h1>
+<h1>{tournament.Name()}</h1>
 
 <p>
-Tournament #{fmt.Sprintf("%d", tournament.tournament_id)}
+Rooms:
 
 <ul>
 for _, room := range rooms {
-  <li><a href={ templ.URL(fmt.Sprintf("/rooms/%d/player", room.room_id)) }>{ room.name }</a></li>
+  <li><a href={ templ.URL(fmt.Sprintf("/rooms/%d/player", room.Id())) }>{ room.Name() }</a></li>
 }
 </ul>
 </p>

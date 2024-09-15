@@ -2,5 +2,7 @@ goodbuzz
 dist/
 
 *.db
+*.db-shm
+*.db-wal
 *_templ.go
 *_templ.txt
