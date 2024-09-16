@@ -16,12 +16,10 @@ func Get(w http.ResponseWriter, r *http.Request) {
     }
 
     content := index(room)
-    lib.Render(w, r, content)
+    lib.Render(w, r, room.Name(), content)
 }
 
 templ index(room *rooms.Room) {
-<title>{ room.Name() }</title>
-
 <h1>{room.Name()}</h1>
 
 @rooms.BuzzerButton(room.Status() != rooms.Unlocked)

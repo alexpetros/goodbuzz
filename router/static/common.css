@@ -2,12 +2,24 @@
   --button-enabled-color: green;
   --button-pressed-color: darkgreen;
   --button-disabled-color: red;
+  --logo-color: green;
 }
 
 body {
   max-width: 800px;
   padding: 0 10px;
   margin: 0 auto;
+}
+
+.logo {
+  font-size: 30px;
+  font-family: "Arial Black";
+  font-style: italic;
+  color: var(--logo-color);
+}
+
+.logo:visited {
+  color: var(--logo-color);
 }
 
 button.buzzer {

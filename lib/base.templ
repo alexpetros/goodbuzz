@@ -1,6 +1,6 @@
 package lib
 
-templ Base(content templ.Component) {
+templ Base(title string, content templ.Component) {
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -8,6 +8,10 @@ templ Base(content templ.Component) {
 <script src="/static/vendor/htmx-2.0.2.js"></script>
 <script src="/static/vendor/htmx-sse-2.2.2.js"></script>
 <meta name="htmx-config" content='{"defaultSwapStyle":"outerHTML"}'>
+
+<title>{title}</title>
+
+<a class="logo" href="/">GOODBUZZ</a>
 
 @content
 }

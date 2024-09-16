@@ -7,12 +7,10 @@ import "goodbuzz/lib/db"
 func Get(w http.ResponseWriter, r *http.Request) {
     tournaments := db.GetTournaments(r.Context())
     content := index(tournaments)
-    lib.Render(w, r, content)
+    lib.Render(w, r, "Admin Page", content)
 }
 
 templ index(tournaments []db.Tournament) {
-<title>Admin Page</title>
-
 <h1>Admin Page</h1>
 <p>
 Welcome to the admin page.

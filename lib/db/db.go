@@ -66,7 +66,7 @@ func Close() {
 
 type dbFn [T any] func (conn *sqlite.Conn) T
 
-func get[T any] (ctx context.Context, fn dbFn[T] ) T {
+func run[T any] (ctx context.Context, fn dbFn[T] ) T {
   conn, err := pool.Take(ctx)
 
   if err != nil {
@@ -89,7 +89,7 @@ func GetTournament (ctx context.Context, id int64) *Tournament {
       return nil
     }
     if !row {
-      log.Printf("No tournamnet found", err)
+      log.Printf("No tournament found", err)
       return nil
     }
 
@@ -102,7 +102,7 @@ func GetTournament (ctx context.Context, id int64) *Tournament {
     return &tournament
   }
 
-  return get(ctx, fn)
+  return run(ctx, fn)
 }
 
 func GetTournaments(ctx context.Context) []Tournament{
@@ -129,7 +129,7 @@ func GetTournaments(ctx context.Context) []Tournament{
     return tournaments
   }
 
-  return get(ctx, fn)
+  return run(ctx, fn)
 }
 
 func GetRoom(ctx context.Context, room_id int64) *Room {
@@ -155,7 +155,7 @@ func GetRoom(ctx context.Context, room_id int64) *Room {
     stmt.Reset()
     return &room
   }
-  return get(ctx, fn)
+  return run(ctx, fn)
 }
 
 func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
@@ -183,5 +183,23 @@ func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
 
     return rooms
   }
-return get(ctx, fn)
+return run(ctx, fn)
+}
+
+func DeleteTournament(ctx context.Context, tournament_id int64) error {
+  fn := func (conn *sqlite.Conn) error {
+    stmt := conn.Prep("DELETE FROM tournaments WHERE tournament_id = $1")
+    stmt.SetInt64("$1", tournament_id)
+
+    _, err := stmt.Step()
+    if err != nil {
+      log.Printf("Error deleting tournament: %s", err)
+      return err
+    }
+
+    stmt.Reset()
+    return nil
+  }
+
+  return run(ctx, fn)
 }

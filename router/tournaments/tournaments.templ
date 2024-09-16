@@ -20,12 +20,10 @@ func Get(w http.ResponseWriter, r *http.Request) {
     tournament := db.GetTournament(r.Context(), tournament_id)
     rooms := db.GetRoomsForTournament(context, tournament_id)
     content := index(tournament, rooms)
-    lib.Render(w, r, content)
+    lib.Render(w, r, tournament.Name(), content)
 }
 
 templ index(tournament *db.Tournament, rooms []db.Room) {
-<title>{tournament.Name()}</title>
-
 <h1>{tournament.Name()}</h1>
 
 <p>

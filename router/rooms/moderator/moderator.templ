@@ -15,14 +15,13 @@ func Get(w http.ResponseWriter, r *http.Request) {
       return
     }
 
-    content := index(room)
-    lib.Render(w, r, content)
+    title := fmt.Sprintf("%s - Moderator", room.Name())
+    content := index(title, room)
+    lib.Render(w, r, title, content)
 }
 
-templ index(room *rooms.Room) {
-
-<title>Room #{ fmt.Sprintf("%d", room.Id()) } - Moderator</title>
-<h1>Room #{ fmt.Sprintf("%d", room.Id()) } - Moderator</h1>
+templ index(title string, room *rooms.Room) {
+<h1>{title}</h1>
 
 <section class="live" hx-swap="innerHTML">
   <h2>Live View</h2>

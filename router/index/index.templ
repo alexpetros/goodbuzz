@@ -7,16 +7,14 @@ import "goodbuzz/lib/db"
 func Get(w http.ResponseWriter, r *http.Request) {
     tournaments := db.GetTournaments(r.Context())
     content := index(tournaments)
-    lib.Render(w, r, content)
+    lib.Render(w, r, "Goodbuzz", content)
 }
 
 templ index(tournaments []db.Tournament) {
-<title>Buzzer System</title>
-
-<h1>Buzzer System</h1>
+<h1>Welcome!</h1>
 
 <p>
-Welcome to the online buzzer system!
+Welcome to Goodbuzz, the online buzzer system for quiz bowl.
 </p>
 
 <p>
