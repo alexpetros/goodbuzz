@@ -1,7 +1,6 @@
 package index
 
 import "net/http"
-import "fmt"
 import "goodbuzz/lib"
 import "goodbuzz/lib/db"
 
@@ -20,11 +19,15 @@ templ index(tournaments []db.Tournament) {
 Welcome to the online buzzer system!
 </p>
 
+<p>
+<a href="/admin">Admin Page</a>
+</p>
+
 <h2>Ongoing Tournaments</h2>
 <ul>
 for _, tournament := range tournaments {
   <li>
-    <a href={ templ.URL(fmt.Sprintf("/tournaments/%d", tournament.Id())) }>{ tournament.Name() }</a>
+    <a href={ templ.URL(tournament.Url()) }>{ tournament.Name() }</a>
   </li>
 }
 </ul>

@@ -1,0 +1,46 @@
+package admin
+
+import "net/http"
+import "goodbuzz/lib"
+import "goodbuzz/lib/db"
+
+func Get(w http.ResponseWriter, r *http.Request) {
+    tournaments := db.GetTournaments(r.Context())
+    content := index(tournaments)
+    lib.Render(w, r, content)
+}
+
+templ index(tournaments []db.Tournament) {
+<title>Admin Page</title>
+
+<h1>Admin Page</h1>
+<p>
+Welcome to the admin page.
+</p>
+
+<p>
+<a href="/">Return to home page</a>
+</p>
+
+<h2>Tournaments</h2>
+<table class="tournaments">
+  for _, tournament := range tournaments {
+    <tr>
+        <td>{ tournament.Name() }</td>
+        <td>
+          <a href={templ.URL(tournament.Url())}>Rooms</a>
+         </td><td>
+          <a href={templ.URL(tournament.EditUrl())}>Edit</a>
+         </td>
+        <td>
+          <button
+            class="action delete"
+            hx-delete={tournament.Url()}
+            hx-confirm="Are you sure you want to delete this tournament and all its rooms?"
+            >Delete
+            </button>
+        </td>
+    </tr>
+  }
+</table>
+}

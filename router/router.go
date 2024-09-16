@@ -4,6 +4,7 @@ import (
 	"embed"
 	"goodbuzz/router/healthcheck"
 	"goodbuzz/router/index"
+	"goodbuzz/router/admin"
 	"goodbuzz/router/rooms/buzz"
 	"goodbuzz/router/rooms/moderator"
 	"goodbuzz/router/rooms/player"
@@ -31,6 +32,8 @@ func SetupRouter(mux *http.ServeMux) {
 
 	mux.HandleFunc("PUT /rooms/{id}/buzz", buzz.Put)
 	mux.HandleFunc("DELETE /rooms/{id}/buzz", buzz.Delete)
+
+	mux.HandleFunc("GET /admin", admin.Get)
 
 	mux.HandleFunc("GET /healthcheck", healthcheck.Get)
 }

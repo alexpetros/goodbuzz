@@ -5,7 +5,8 @@
 }
 
 body {
-  max-width: 700px;
+  max-width: 800px;
+  padding: 0 10px;
   margin: 0 auto;
 }
 
@@ -18,20 +19,52 @@ button.buzzer {
   background-color: var(--button-enabled-color);
   border: 8px solid black;
   border-radius: 50%;
-}
 
-button.buzzer:active:enabled {
-  background-color: var(--button-disabled-color);
-}
+  &:active:enabled {
+    background-color: var(--button-pressed-color);
+  }
 
-button.buzzer:disabled {
-  background-color: var(--button-disabled-color)
-}
-
-button.buzzer:disabled {
-  background-color: var(--button-disabled-color)
+  &:disabled {
+    background-color: var(--button-disabled-color)
+  }
 }
 
 section.log {
   margin-top: 30px;
+}
+
+table.tournaments {
+  width: min(90%, 400px);
+
+  th, td {
+    padding: 5px;
+  }
+
+}
+
+button.action, a.action {
+  background-color: #f7f7f7;
+  border-radius: 2px;
+  border: 1px solid #424141;
+  font-size: .9rem;
+  cursor: pointer;
+  margin: 3px;
+  padding: 1px 4px;
+
+  &:hover {
+    background-color: #e2e2e2;
+  }
+
+  &.edit {
+    color: #00693e;
+  }
+
+  &.delete {
+    color: rgb(205, 62, 43);
+  }
+}
+
+a.button {
+  display: inline-block;
+  text-decoration: none;
 }

@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"zombiezen.com/go/sqlite"
@@ -19,6 +20,14 @@ func (t *Tournament) Id() int64 {
 
 func (t *Tournament) Name() string {
   return t.name
+}
+
+func (t *Tournament) Url() string {
+  return fmt.Sprintf("/tournaments/%d", t.tournament_id)
+}
+
+func (t *Tournament) EditUrl() string {
+  return fmt.Sprintf("/tournaments/%d/edit", t.tournament_id)
 }
 
 type Room struct {
