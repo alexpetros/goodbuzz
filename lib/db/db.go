@@ -55,7 +55,9 @@ func Close() {
 	pool.Close()
 }
 
-func GetTournament (ctx context.Context, id int64) *Tournament {
+type dbFn [T any] func (conn *sqlite.Conn) T
+
+func get[T any] (ctx context.Context, fn dbFn[T] ) T {
   conn, err := pool.Take(ctx)
 
   if err != nil {
@@ -64,110 +66,76 @@ func GetTournament (ctx context.Context, id int64) *Tournament {
 
   defer pool.Put(conn)
 
-  stmt := conn.Prep("SELECT tournament_id, name FROM tournaments WHERE tournament_id = $id")
-  stmt.SetInt64("$id", id)
-
-  row, err := stmt.Step()
-  if err != nil {
-    log.Printf("Error getting tournament: %s", err)
-    return nil
-  }
-  if !row {
-    log.Printf("No tournamnet found", err)
-    return nil
-  }
-
-  tournament := Tournament {
-    tournament_id: stmt.ColumnInt64(0),
-    name: stmt.ColumnText(1),
-  }
-
-  stmt.Reset()
-  return &tournament
+  return fn(conn)
 }
 
-func GetTournaments(ctx context.Context) []Tournament{
-  conn, err := pool.Take(ctx)
+func GetTournament (ctx context.Context, id int64) *Tournament {
+  fn := func (conn *sqlite.Conn) *Tournament {
+    stmt := conn.Prep("SELECT tournament_id, name FROM tournaments WHERE tournament_id = $id")
+    stmt.SetInt64("$id", id)
 
-  if err != nil {
-    log.Printf("failed to take connection: %w\n", err)
-  }
-
-  defer pool.Put(conn)
-
-  stmt := conn.Prep("SELECT tournament_id, name FROM tournaments")
-
-  tournaments := make([]Tournament, 0)
-  for {
     row, err := stmt.Step()
     if err != nil {
-      log.Printf("Error getting tournaments: %s", err)
+      log.Printf("Error getting tournament: %s", err)
+      return nil
     }
     if !row {
-      break
+      log.Printf("No tournamnet found", err)
+      return nil
     }
 
     tournament := Tournament {
       tournament_id: stmt.ColumnInt64(0),
       name: stmt.ColumnText(1),
     }
-    tournaments = append(tournaments, tournament)
+
+    stmt.Reset()
+    return &tournament
   }
 
-  return tournaments
+  return get(ctx, fn)
+}
+
+func GetTournaments(ctx context.Context) []Tournament{
+  fn := func (conn *sqlite.Conn) []Tournament {
+    stmt := conn.Prep("SELECT tournament_id, name FROM tournaments")
+
+    tournaments := make([]Tournament, 0)
+    for {
+      row, err := stmt.Step()
+      if err != nil {
+        log.Printf("Error getting tournaments: %s", err)
+      }
+      if !row {
+        break
+      }
+
+      tournament := Tournament {
+        tournament_id: stmt.ColumnInt64(0),
+        name: stmt.ColumnText(1),
+      }
+      tournaments = append(tournaments, tournament)
+    }
+
+    return tournaments
+  }
+
+  return get(ctx, fn)
 }
 
 func GetRoom(ctx context.Context, room_id int64) *Room {
-  conn, err := pool.Take(ctx)
+  fn := func (conn *sqlite.Conn) *Room {
+    stmt := conn.Prep("SELECT room_id, name FROM rooms WHERE room_id = $1")
+    stmt.SetInt64("$1", room_id)
 
-  if err != nil {
-    log.Printf("failed to take connection: %w\n", err)
-  }
-
-  defer pool.Put(conn)
-
-  stmt := conn.Prep("SELECT room_id, name FROM rooms WHERE room_id = $1")
-  stmt.SetInt64("$1", room_id)
-
-  row, err := stmt.Step()
-  if err != nil {
-    log.Printf("Error getting tournament: %s", err)
-    return nil
-  }
-  if !row {
-    log.Printf("No tournamnet found", err)
-    return nil
-  }
-
-  room := Room {
-    room_id: stmt.ColumnInt64(0),
-    name: stmt.ColumnText(1),
-  }
-
-  stmt.Reset()
-  return &room
-}
-
-func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
-conn, err := pool.Take(ctx)
-
-  if err != nil {
-    log.Printf("failed to take connection: %w\n", err)
-  }
-
-  defer pool.Put(conn)
-
-  stmt := conn.Prep("SELECT room_id, name FROM rooms WHERE tournament_id = $1")
-  stmt.SetInt64("$1", tournament_id)
-
-  rooms := make([]Room, 0)
-  for {
     row, err := stmt.Step()
     if err != nil {
-      log.Printf("Error getting tournaments: %s", err)
+      log.Printf("Error getting tournament: %s", err)
+      return nil
     }
     if !row {
-      break
+      log.Printf("No tournamnet found", err)
+      return nil
     }
 
     room := Room {
@@ -175,8 +143,36 @@ conn, err := pool.Take(ctx)
       name: stmt.ColumnText(1),
     }
 
-    rooms = append(rooms, room)
+    stmt.Reset()
+    return &room
   }
+  return get(ctx, fn)
+}
 
-  return rooms
+func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
+  fn := func (conn *sqlite.Conn) []Room {
+    stmt := conn.Prep("SELECT room_id, name FROM rooms WHERE tournament_id = $1")
+    stmt.SetInt64("$1", tournament_id)
+
+    rooms := make([]Room, 0)
+    for {
+      row, err := stmt.Step()
+      if err != nil {
+        log.Printf("Error getting tournaments: %s", err)
+      }
+      if !row {
+        break
+      }
+
+      room := Room {
+        room_id: stmt.ColumnInt64(0),
+        name: stmt.ColumnText(1),
+      }
+
+      rooms = append(rooms, room)
+    }
+
+    return rooms
+  }
+return get(ctx, fn)
 }
