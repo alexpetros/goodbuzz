@@ -16,9 +16,9 @@ func Render(w http.ResponseWriter, r *http.Request, title string, component temp
 }
 
 func ToString(component templ.Component) string {
-  var buff bytes.Buffer
-  component.Render(context.Background(), &buff)
-  return buff.String()
+	var buff bytes.Buffer
+	component.Render(context.Background(), &buff)
+	return buff.String()
 }
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
@@ -37,10 +37,10 @@ func ServerError(w http.ResponseWriter, r *http.Request) {
 }
 
 func FormatEvent(event_name string, data string) string {
-  return fmt.Sprintf("event: %s\ndata: %s\n\n", event_name, data)
+	return fmt.Sprintf("event: %s\ndata: %s\n\n", event_name, data)
 }
 
 func GetIntParam(r *http.Request, param_name string) (id int64, err error) {
-  param := r.PathValue(param_name)
+	param := r.PathValue(param_name)
 	return strconv.ParseInt(param, 10, 64)
 }

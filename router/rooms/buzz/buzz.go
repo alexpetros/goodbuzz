@@ -11,7 +11,7 @@ import (
 func Put(w http.ResponseWriter, r *http.Request) {
 	room_id, err := lib.GetIntParam(r, "id")
 	if err != nil {
-    lib.BadRequest(w, r)
+		lib.BadRequest(w, r)
 		return
 	}
 
@@ -38,7 +38,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 func Delete(w http.ResponseWriter, r *http.Request) {
 	room_id, err := lib.GetIntParam(r, "id")
 	if err != nil {
-    lib.BadRequest(w, r)
+		lib.BadRequest(w, r)
 		return
 	}
 

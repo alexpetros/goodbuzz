@@ -30,7 +30,7 @@ func (s BuzzerStatus) String() string {
 
 type Room struct {
 	room_id       int64
-  name          string
+	name          string
 	buzzer_status BuzzerStatus
 	players       map[chan string]struct{}
 	moderators    map[chan string]struct{}
@@ -41,7 +41,7 @@ var rooms = map[int64]*Room{}
 func NewRoom(room_id int64, name string) *Room {
 	return &Room{
 		room_id,
-    name,
+		name,
 		Unlocked,
 		make(map[chan string]struct{}),
 		make(map[chan string]struct{}),
@@ -49,30 +49,30 @@ func NewRoom(room_id int64, name string) *Room {
 }
 
 func getOrCreateRoom(room_id int64, name string) *Room {
-  room := rooms[room_id]
-  if room == nil {
-    room = NewRoom(room_id, name)
-    rooms[room_id] = room
-  }
+	room := rooms[room_id]
+	if room == nil {
+		room = NewRoom(room_id, name)
+		rooms[room_id] = room
+	}
 
-  return room
+	return room
 }
 
 func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
-    dbRooms := db.GetRoomsForTournament(ctx, tournament_id)
-    rooms := make([]Room, 0)
-    for _, dbRoom := range dbRooms {
-      newRoom := GetRoom(ctx, dbRoom.Id())
-      rooms = append(rooms, *newRoom)
-    }
+	dbRooms := db.GetRoomsForTournament(ctx, tournament_id)
+	rooms := make([]Room, 0)
+	for _, dbRoom := range dbRooms {
+		newRoom := GetRoom(ctx, dbRoom.Id())
+		rooms = append(rooms, *newRoom)
+	}
 
-    return rooms
+	return rooms
 }
 
 func GetRoom(ctx context.Context, room_id int64) *Room {
 	dbRoom := db.GetRoom(ctx, room_id)
-  room := getOrCreateRoom(dbRoom.Id(), dbRoom.Name())
-  return room
+	room := getOrCreateRoom(dbRoom.Id(), dbRoom.Name())
+	return room
 }
 
 func (r *Room) Id() int64 {
@@ -84,15 +84,15 @@ func (r *Room) Name() string {
 }
 
 func (r *Room) Url() string {
-  return fmt.Sprintf("/rooms/%d", r.room_id)
+	return fmt.Sprintf("/rooms/%d", r.room_id)
 }
 
 func (r *Room) PlayerUrl() string {
-  return fmt.Sprintf("/rooms/%d/player", r.room_id)
+	return fmt.Sprintf("/rooms/%d/player", r.room_id)
 }
 
 func (r *Room) ModeratorUrl() string {
-  return fmt.Sprintf("/rooms/%d/moderator", r.room_id)
+	return fmt.Sprintf("/rooms/%d/moderator", r.room_id)
 }
 
 func (r *Room) Status() BuzzerStatus {

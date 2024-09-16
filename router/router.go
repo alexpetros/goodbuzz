@@ -2,9 +2,9 @@ package router
 
 import (
 	"embed"
+	"goodbuzz/router/admin"
 	"goodbuzz/router/healthcheck"
 	"goodbuzz/router/index"
-	"goodbuzz/router/admin"
 	"goodbuzz/router/rooms/buzz"
 	"goodbuzz/router/rooms/moderator"
 	"goodbuzz/router/rooms/player"
