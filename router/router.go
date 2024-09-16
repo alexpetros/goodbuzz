@@ -23,6 +23,7 @@ func SetupRouter(mux *http.ServeMux) {
 
 	mux.HandleFunc("GET /{$}", index.Get)
 	mux.HandleFunc("GET /tournaments/{id}", tournaments.Get)
+	mux.HandleFunc("GET /tournaments/{id}/edit", tournaments.Edit)
 	mux.HandleFunc("DELETE /tournaments/{id}", tournaments.Delete)
 
 	mux.HandleFunc("GET /rooms/{id}/player", player.Get)

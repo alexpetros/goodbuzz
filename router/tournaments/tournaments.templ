@@ -1,14 +1,14 @@
 package tournaments
 
 import "net/http"
-import "strconv"
 import "fmt"
 
 import "goodbuzz/lib"
 import "goodbuzz/lib/db"
+import "goodbuzz/router/rooms"
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    param, error := strconv.Atoi(r.PathValue("id"))
+    param, error := lib.GetIntParam(r, "id")
     context := r.Context()
     tournament_id := int64(param)
 
@@ -19,11 +19,11 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
     tournament := db.GetTournament(r.Context(), tournament_id)
     rooms := db.GetRoomsForTournament(context, tournament_id)
-    content := index(tournament, rooms)
+    content := get(tournament, rooms)
     lib.Render(w, r, tournament.Name(), content)
 }
 
-templ index(tournament *db.Tournament, rooms []db.Room) {
+templ get(tournament *db.Tournament, rooms []db.Room) {
 <h1>{tournament.Name()}</h1>
 
 <p>
@@ -34,6 +34,49 @@ for _, room := range rooms {
   <li><a href={ templ.URL(fmt.Sprintf("/rooms/%d/player", room.Id())) }>{ room.Name() }</a></li>
 }
 </ul>
+</p>
+}
+
+func Edit(w http.ResponseWriter, r *http.Request) {
+    param, error := lib.GetIntParam(r, "id")
+    context := r.Context()
+    tournament_id := int64(param)
+
+    if error != nil {
+      http.NotFound(w, r)
+      return
+    }
+
+    tournament := db.GetTournament(context, tournament_id)
+    rooms := rooms.GetRoomsForTournament(context, tournament_id)
+    content := edit(tournament, rooms)
+    lib.Render(w, r, tournament.Name(), content)
+}
+
+templ edit(tournament *db.Tournament, rooms []rooms.Room) {
+<h1>{tournament.Name()}</h1>
+
+<p>
+<table class="tournaments">
+  for _, room := range rooms {
+    <tr>
+        <td>{ room.Name() }</td>
+        <td>
+          <a href={templ.URL(room.PlayerUrl())}>Join as Player</a>
+         </td><td>
+          <a href={templ.URL(room.ModeratorUrl())}>Join as Moderator</a>
+         </td>
+        <td>
+          <button
+            class="action delete"
+            hx-delete={room.Url()}
+            hx-confirm="Are you sure you want to delete this room?"
+            >Delete
+            </button>
+        </td>
+    </tr>
+  }
+</table>
 </p>
 }
 

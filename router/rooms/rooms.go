@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/lib/db"
-	"strconv"
 )
 
 type BuzzerStatus int
@@ -59,13 +58,19 @@ func getOrCreateRoom(room_id int64, name string) *Room {
   return room
 }
 
-func GetRoom(ctx context.Context, room_id string) *Room {
-	id, error := strconv.ParseInt(room_id, 10, 64)
-	if error != nil {
-		return nil
-	}
+func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
+    dbRooms := db.GetRoomsForTournament(ctx, tournament_id)
+    rooms := make([]Room, 0)
+    for _, dbRoom := range dbRooms {
+      newRoom := GetRoom(ctx, dbRoom.Id())
+      rooms = append(rooms, *newRoom)
+    }
 
-	dbRoom := db.GetRoom(ctx, id)
+    return rooms
+}
+
+func GetRoom(ctx context.Context, room_id int64) *Room {
+	dbRoom := db.GetRoom(ctx, room_id)
   room := getOrCreateRoom(dbRoom.Id(), dbRoom.Name())
   return room
 }
@@ -76,6 +81,18 @@ func (r *Room) Id() int64 {
 
 func (r *Room) Name() string {
 	return r.name
+}
+
+func (r *Room) Url() string {
+  return fmt.Sprintf("/rooms/%d", r.room_id)
+}
+
+func (r *Room) PlayerUrl() string {
+  return fmt.Sprintf("/rooms/%d/player", r.room_id)
+}
+
+func (r *Room) ModeratorUrl() string {
+  return fmt.Sprintf("/rooms/%d/moderator", r.room_id)
 }
 
 func (r *Room) Status() BuzzerStatus {

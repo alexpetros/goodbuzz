@@ -2,15 +2,20 @@ package buzz
 
 import (
 	"fmt"
+	"goodbuzz/lib"
 	"goodbuzz/router/rooms"
 	"io"
 	"net/http"
 )
 
 func Put(w http.ResponseWriter, r *http.Request) {
-	room_id := r.PathValue("id")
-	room := rooms.GetRoom(r.Context(), room_id)
+	room_id, err := lib.GetIntParam(r, "id")
+	if err != nil {
+    lib.BadRequest(w, r)
+		return
+	}
 
+	room := rooms.GetRoom(r.Context(), room_id)
 	if room == nil {
 		http.NotFound(w, r)
 		return
@@ -31,7 +36,12 @@ func Put(w http.ResponseWriter, r *http.Request) {
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
-	room_id := r.PathValue("id")
+	room_id, err := lib.GetIntParam(r, "id")
+	if err != nil {
+    lib.BadRequest(w, r)
+		return
+	}
+
 	room := rooms.GetRoom(r.Context(), room_id)
 
 	if room == nil {
