@@ -16,6 +16,12 @@ body {
   font-family: "Arial Black";
   font-style: italic;
   color: var(--logo-color);
+  user-select: none;
+  text-decoration: none;
+  display: block;
+  border-top: 2px solid var(--logo-color);
+  border-bottom: 2px solid var(--logo-color);
+  text-align: center;
 }
 
 .logo:visited {
