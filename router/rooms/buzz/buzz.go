@@ -9,7 +9,7 @@ import (
 
 func Put(w http.ResponseWriter, r *http.Request) {
 	room_id := r.PathValue("id")
-	room := rooms.GetRoom(room_id)
+	room := rooms.GetRoom(r.Context(), room_id)
 
 	if room == nil {
 		http.NotFound(w, r)
@@ -32,7 +32,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 
 func Delete(w http.ResponseWriter, r *http.Request) {
 	room_id := r.PathValue("id")
-	room := rooms.GetRoom(room_id)
+	room := rooms.GetRoom(r.Context(), room_id)
 
 	if room == nil {
 		http.NotFound(w, r)

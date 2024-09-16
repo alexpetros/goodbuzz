@@ -1,8 +1,10 @@
 package rooms
 
 import (
+	"context"
 	"fmt"
 	"goodbuzz/lib"
+	"goodbuzz/lib/db"
 	"strconv"
 )
 
@@ -29,37 +31,51 @@ func (s BuzzerStatus) String() string {
 
 type Room struct {
 	room_id       int64
+  name          string
 	buzzer_status BuzzerStatus
 	players       map[chan string]struct{}
 	moderators    map[chan string]struct{}
 }
 
-var TEST_ROOMS = map[int]*Room{
-	7:   NewRoom(7),
-	200: NewRoom(200),
-}
+var rooms = map[int64]*Room{}
 
-func NewRoom(room_id int64) *Room {
+func NewRoom(room_id int64, name string) *Room {
 	return &Room{
 		room_id,
+    name,
 		Unlocked,
 		make(map[chan string]struct{}),
 		make(map[chan string]struct{}),
 	}
 }
 
-func GetRoom(room_id string) *Room {
-	id, error := strconv.Atoi(room_id)
+func getOrCreateRoom(room_id int64, name string) *Room {
+  room := rooms[room_id]
+  if room == nil {
+    room = NewRoom(room_id, name)
+    rooms[room_id] = room
+  }
+
+  return room
+}
+
+func GetRoom(ctx context.Context, room_id string) *Room {
+	id, error := strconv.ParseInt(room_id, 10, 64)
 	if error != nil {
 		return nil
 	}
 
-	room := TEST_ROOMS[id]
-	return room
+	dbRoom := db.GetRoom(ctx, id)
+  room := getOrCreateRoom(dbRoom.Id(), dbRoom.Name())
+  return room
 }
 
 func (r *Room) Id() int64 {
 	return r.room_id
+}
+
+func (r *Room) Name() string {
+	return r.name
 }
 
 func (r *Room) Status() BuzzerStatus {
@@ -91,7 +107,7 @@ func (r *Room) Reset() {
 	}
 
 	for listener := range r.players {
-		fmt.Printf("Sending unlock message")
+		fmt.Println("Sending unlock message")
 		buzzer := lib.ToString(BuzzerButton(false))
 		listener <- lib.FormatEvent("log", "<div>Buzzer Unlocked<div>")
 		listener <- lib.FormatEvent("log", buzzer)
@@ -112,6 +128,10 @@ func (r *Room) AddPlayer() chan string {
 	return eventChan
 }
 
-func (r *Room) RemoveListener(listener chan string) {
+func (r *Room) RemoveModerator(listener chan string) {
 	delete(r.moderators, listener)
+}
+
+func (r *Room) RemovePlayer(listener chan string) {
+	delete(r.players, listener)
 }

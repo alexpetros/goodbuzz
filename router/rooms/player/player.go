@@ -8,7 +8,7 @@ import (
 
 func Live(w http.ResponseWriter, r *http.Request) {
 	param := r.PathValue("id")
-	room := rooms.GetRoom(param)
+	room := rooms.GetRoom(r.Context(), param)
 
 	if room == nil {
 		http.NotFound(w, r)
@@ -24,23 +24,27 @@ func Live(w http.ResponseWriter, r *http.Request) {
 
 	eventChan := room.AddPlayer()
 
-	// Delete client when they disconnect
-	defer func() {
-		room.RemoveListener(eventChan)
-		close(eventChan)
-	}()
+  // TODO send the current status to the newly connected
 
-	// Listen for client close and remove the client from the list
+
+	// Listen for client close and delete channel when it happens
 	notify := r.Context().Done()
 	go func() {
 		<-notify
 		fmt.Printf("Player disconnected from room %d\n", room.Id())
+		room.RemovePlayer(eventChan)
+		close(eventChan)
 	}()
 
 	// Continuously send data to the client
 	for {
 		data := <-eventChan
-		fmt.Printf("Sending data to player in room %d\n", room.Id())
+    // This is what's receieved from a closed channel
+    if data == "" {
+      break
+    }
+
+		fmt.Printf("Sending %s data to player in room %d\n", data, room.Id())
 		fmt.Fprintf(w, data)
 		w.(http.Flusher).Flush()
 	}

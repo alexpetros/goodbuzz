@@ -8,7 +8,7 @@ import "goodbuzz/router/rooms"
 
 func Get(w http.ResponseWriter, r *http.Request) {
     param :=  r.PathValue("id")
-    room := rooms.GetRoom(param)
+    room := rooms.GetRoom(r.Context(), param)
 
     if room == nil {
       http.NotFound(w, r)

@@ -1,15 +1,14 @@
 package player
 
 import "net/http"
-import "fmt"
 
 import "goodbuzz/lib"
 import "goodbuzz/router/rooms"
 
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    roomId :=  r.PathValue("id")
-    room := rooms.GetRoom(roomId)
+    param :=  r.PathValue("id")
+    room := rooms.GetRoom(r.Context(), param)
 
     if room == nil {
       http.NotFound(w, r)
@@ -21,9 +20,9 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 templ index(room *rooms.Room) {
-<title>Buzzer Room</title>
+<title>{ room.Name() }</title>
 
-<h1>Room #{fmt.Sprintf("%d", room.Id())}</h1>
+<h1>{room.Name()}</h1>
 
 @rooms.BuzzerButton(room.Status() != rooms.Unlocked)
 

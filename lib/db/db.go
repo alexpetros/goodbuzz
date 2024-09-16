@@ -117,6 +117,37 @@ func GetTournaments(ctx context.Context) []Tournament{
   return tournaments
 }
 
+func GetRoom(ctx context.Context, room_id int64) *Room {
+  conn, err := pool.Take(ctx)
+
+  if err != nil {
+    log.Printf("failed to take connection: %w\n", err)
+  }
+
+  defer pool.Put(conn)
+
+  stmt := conn.Prep("SELECT room_id, name FROM rooms WHERE room_id = $1")
+  stmt.SetInt64("$1", room_id)
+
+  row, err := stmt.Step()
+  if err != nil {
+    log.Printf("Error getting tournament: %s", err)
+    return nil
+  }
+  if !row {
+    log.Printf("No tournamnet found", err)
+    return nil
+  }
+
+  room := Room {
+    room_id: stmt.ColumnInt64(0),
+    name: stmt.ColumnText(1),
+  }
+
+  stmt.Reset()
+  return &room
+}
+
 func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
 conn, err := pool.Take(ctx)
 
