@@ -56,8 +56,8 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 templ edit(tournament *db.Tournament, rooms []rooms.Room) {
 <h1>{tournament.Name()}</h1>
 
-<p>
-<table class="tournaments">
+<h2>Rooms</h2>
+<table class="rooms">
   for _, room := range rooms {
     <tr>
         <td>{ room.Name() }</td>
@@ -77,6 +77,6 @@ templ edit(tournament *db.Tournament, rooms []rooms.Room) {
     </tr>
   }
 </table>
-</p>
+
 }
 

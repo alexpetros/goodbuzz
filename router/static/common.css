@@ -64,6 +64,19 @@ table.tournaments {
 
 }
 
+table.rooms {
+  width: 100%;
+
+  th {
+    text-align: left;
+  }
+
+  th, td {
+    padding: 5px;
+  }
+
+}
+
 button.action, a.action {
   background-color: #f7f7f7;
   border-radius: 2px;
