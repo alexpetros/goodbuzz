@@ -54,6 +54,10 @@ section.log {
 table.tournaments {
   width: min(90%, 400px);
 
+  th {
+    text-align: left;
+  }
+
   th, td {
     padding: 5px;
   }

@@ -12,6 +12,7 @@ import (
 type Tournament struct {
 	tournament_id int64
 	name          string
+	num_rooms     int64
 }
 
 func (t *Tournament) Id() int64 {
@@ -20,6 +21,10 @@ func (t *Tournament) Id() int64 {
 
 func (t *Tournament) Name() string {
 	return t.name
+}
+
+func (t *Tournament) NumRooms() int64 {
+	return t.num_rooms
 }
 
 func (t *Tournament) Url() string {
@@ -107,7 +112,12 @@ func GetTournament(ctx context.Context, id int64) *Tournament {
 
 func GetTournaments(ctx context.Context) []Tournament {
 	fn := func(conn *sqlite.Conn) []Tournament {
-		stmt := conn.Prep("SELECT tournament_id, name FROM tournaments")
+		stmt := conn.Prep(`
+			SELECT tournament_id, tournaments.name, count(room_id) as num_rooms
+			FROM tournaments
+			LEFT JOIN rooms USING (tournament_id)
+			GROUP BY tournament_id
+		`)
 
 		tournaments := make([]Tournament, 0)
 		for {
@@ -119,9 +129,10 @@ func GetTournaments(ctx context.Context) []Tournament {
 				break
 			}
 
-			tournament := Tournament{
+			tournament := Tournament {
 				tournament_id: stmt.ColumnInt64(0),
 				name:          stmt.ColumnText(1),
+				num_rooms:     stmt.ColumnInt64(2),
 			}
 			tournaments = append(tournaments, tournament)
 		}

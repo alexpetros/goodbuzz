@@ -3,6 +3,7 @@ package admin
 import "net/http"
 import "goodbuzz/lib"
 import "goodbuzz/lib/db"
+import "strconv"
 
 func Get(w http.ResponseWriter, r *http.Request) {
     tournaments := db.GetTournaments(r.Context())
@@ -12,23 +13,22 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
 templ index(tournaments []db.Tournament) {
 <h1>Admin Page</h1>
-<p>
-Welcome to the admin page.
-</p>
-
-<p>
-<a href="/">Return to home page</a>
-</p>
 
 <h2>Tournaments</h2>
 <table class="tournaments">
+  <tr>
+    <th>Name</th>
+    <th>Rooms</th>
+    <th></th>
+  </tr>
   for _, tournament := range tournaments {
     <tr>
-        <td>{ tournament.Name() }</td>
         <td>
-          <a href={templ.URL(tournament.Url())}>View</a>
-         </td><td>
-          <a href={templ.URL(tournament.EditUrl())}>Edit</a>
+          <a href={templ.URL(tournament.EditUrl())}>
+          { tournament.Name() } </a>
+         </td>
+         <td>
+          {strconv.FormatInt(tournament.NumRooms(), 10)}
          </td>
         <td>
           <button
