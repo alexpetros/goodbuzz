@@ -5,6 +5,12 @@ import (
 	"log"
 )
 
+func InitLogger(dev_mode bool) {
+	if dev_mode {
+		log.SetFlags(0)
+	}
+}
+
 func Debug (msg string, args ...any) {
 	message := fmt.Sprintf(msg, args...)
 	log.Printf("[DEBUG] %s", message)

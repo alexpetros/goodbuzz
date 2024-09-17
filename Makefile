@@ -8,18 +8,24 @@ DB_NAME=goodbuzz.db
 
 .PHONY: live
 live:
-	BUZZER_PROXY_PORT=$(PROXY_PORT) make -j2 live/templ live/air
+	GOODBUZZ_PROXY_PORT=$(PROXY_PORT) make -j2 live/templ live/air
 	@echo "Development mode is live\n Access application at http://localhost:$(PROXY_PORT)"
 
 .PHONY: templ
 templ:
 	templ generate
 
+.PHONY: dev
+dev:
+	make templ
+	go build
+	GOODBUZZ_PORT=8080 GOODBUZZ_DEV_MODE=true ./$(PROJECT_NAME)
+
 .PHONY: prod
 prod:
 	make templ
 	go build
-	BUZZER_PORT=8080 ./$(PROJECT_NAME)
+	GOODBUZZ_PORT=8080 ./$(PROJECT_NAME)
 
 .PHONY: live/templ
 live/templ:

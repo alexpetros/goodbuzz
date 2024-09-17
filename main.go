@@ -15,8 +15,11 @@ const DEFAULT_PORT = "3000"
 const SQLITE_FILE = "goodbuzz.db"
 
 func main() {
-	proxy_port := os.Getenv("BUZZER_PROXY_PORT")
-	port := os.Getenv("BUZZER_PORT")
+	proxy_port := os.Getenv("GOODBUZZ_PROXY_PORT")
+	port := os.Getenv("GOODBUZZ_PORT")
+
+	dev_mode := os.Getenv("GOODBUZZ_DEV_MODE") == "true" || proxy_port != ""
+	logger.InitLogger(dev_mode)
 
 	db.InitDb(SQLITE_FILE)
 	mux := http.NewServeMux()
