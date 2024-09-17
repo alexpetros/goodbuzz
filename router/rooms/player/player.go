@@ -49,7 +49,7 @@ func Live(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		fmt.Printf("Sending %s data to player in room %d\n", data, room.Id())
+		logger.Debug("Sending data to player in room %d:\n%s", room.Id(), data)
 		fmt.Fprintf(w, data)
 		w.(http.Flusher).Flush()
 	}

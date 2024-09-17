@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/lib/db"
+	"goodbuzz/lib/logger"
 )
 
 type BuzzerStatus int
@@ -124,7 +125,7 @@ func (r *Room) Reset() {
 	}
 
 	for listener := range r.players {
-		fmt.Println("Sending unlock message")
+		logger.Debug("Sending unlock message")
 		buzzer := lib.ToString(BuzzerButton(false))
 		listener <- lib.FormatEvent("log", "<div>Buzzer Unlocked<div>")
 		listener <- lib.FormatEvent("log", buzzer)

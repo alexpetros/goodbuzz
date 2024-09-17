@@ -46,7 +46,7 @@ func Live(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		fmt.Printf("Sending data to moderator in room %d\n", room.Id())
+		logger.Debug("Sending data to moderator in room %d:\n%s", room.Id(), data)
 		fmt.Fprintf(w, data)
 		w.(http.Flusher).Flush()
 	}
