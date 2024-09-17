@@ -3,7 +3,7 @@ package tournaments
 import (
 	"goodbuzz/lib"
 	"goodbuzz/lib/db"
-	"log"
+	"goodbuzz/lib/logger"
 	"net/http"
 )
 
@@ -11,7 +11,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	tournament_id, parse_err := lib.GetIntParam(r, "id")
 
 	if parse_err != nil {
-		log.Printf("WARN error parsing delete URL %s", parse_err)
+		logger.Warn("Error parsing delete URL %s", parse_err)
 		lib.BadRequest(w, r)
 		return
 	}

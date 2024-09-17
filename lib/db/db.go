@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
-	"log"
+	"goodbuzz/lib/logger"
 
 	"zombiezen.com/go/sqlite"
 	"zombiezen.com/go/sqlite/sqlitex"
@@ -59,7 +59,7 @@ func InitDb(filename string) {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal("Failed to initialize database: %w", err)
 	}
 
 	pool = dbpool
@@ -75,7 +75,7 @@ func run[T any](ctx context.Context, fn dbFn[T]) T {
 	conn, err := pool.Take(ctx)
 
 	if err != nil {
-		log.Printf("failed to take connection: %w\n", err)
+		logger.Error("Failed to take connection: %w", err)
 	}
 
 	defer pool.Put(conn)
@@ -90,11 +90,11 @@ func GetTournament(ctx context.Context, id int64) *Tournament {
 
 		row, err := stmt.Step()
 		if err != nil {
-			log.Printf("Error getting tournament: %s", err)
+			logger.Error("Error getting tournament: %w", err)
 			return nil
 		}
 		if !row {
-			log.Printf("No tournament found", err)
+			logger.Warn("Tournament %d not found found", id)
 			return nil
 		}
 
@@ -123,7 +123,7 @@ func GetTournaments(ctx context.Context) []Tournament {
 		for {
 			row, err := stmt.Step()
 			if err != nil {
-				log.Printf("Error getting tournaments: %s", err)
+				logger.Error("Error getting tournaments: %w", err)
 			}
 			if !row {
 				break
@@ -150,11 +150,11 @@ func GetRoom(ctx context.Context, room_id int64) *Room {
 
 		row, err := stmt.Step()
 		if err != nil {
-			log.Printf("Error getting tournament: %s", err)
+			logger.Error("Error getting room: %s", err)
 			return nil
 		}
 		if !row {
-			log.Printf("No tournamnet found", err)
+			logger.Warn("Room %d not found", room_id)
 			return nil
 		}
 
@@ -178,7 +178,7 @@ func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
 		for {
 			row, err := stmt.Step()
 			if err != nil {
-				log.Printf("Error getting tournaments: %s", err)
+				logger.Error("Error getting rooms for tournament: %s", err)
 			}
 			if !row {
 				break
@@ -204,7 +204,7 @@ func DeleteTournament(ctx context.Context, tournament_id int64) error {
 
 		_, err := stmt.Step()
 		if err != nil {
-			log.Printf("Error deleting tournament: %s", err)
+			logger.Error("Failed to delete tournament: %s", err)
 			return err
 		}
 

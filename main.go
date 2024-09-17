@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"goodbuzz/lib/db"
+	"goodbuzz/lib/logger"
 	"goodbuzz/router"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -29,9 +29,9 @@ func main() {
 	address := fmt.Sprintf("localhost:%s", port)
 
 	if proxy_port != "" {
-		log.Printf("Now listening at http://localhost:%s\n", proxy_port)
+		logger.Info("Now listening at http://localhost:%s\n", proxy_port)
 	} else {
-		log.Printf("Now listening at http://%s\n", address)
+		logger.Info("Now listening at http://%s\n", address)
 	}
 
 	// Start server inside goroutine so that we can listen for an interrupt in the main thread
@@ -39,9 +39,9 @@ func main() {
 		err := http.ListenAndServe(address, mux)
 
 		if errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("server closed")
+			logger.Info("Server closed")
 		} else if err != nil {
-			log.Fatalf("unexpected error from server: %s\n", err)
+			logger.Fatal("Unexpected error from server: %w", err)
 		}
 	}()
 
@@ -53,6 +53,6 @@ func main() {
 	<-quit
 
 	// Shut the server down and close the database properly
-	log.Println("Shutting server down")
+	logger.Info("Shutting server down")
 	db.Close()
 }

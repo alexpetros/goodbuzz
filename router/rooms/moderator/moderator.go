@@ -3,6 +3,7 @@ package moderator
 import (
 	"fmt"
 	"goodbuzz/lib"
+	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms"
 	"net/http"
 )
@@ -25,7 +26,7 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Connection", "keep-alive")
 
-	fmt.Printf("Moderator connected to room %d\n", room.Id())
+	logger.Info("Moderator connected to room %d\n", room.Id())
 
 	eventChan := room.AddModerator()
 

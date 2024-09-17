@@ -3,6 +3,7 @@ package player
 import (
 	"fmt"
 	"goodbuzz/lib"
+	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms"
 	"net/http"
 )
@@ -25,7 +26,7 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Connection", "keep-alive")
 
-	fmt.Printf("Player connected to room %d\n", room.Id())
+	logger.Info("Player connected to room %d\n", room.Id())
 
 	eventChan := room.AddPlayer()
 
