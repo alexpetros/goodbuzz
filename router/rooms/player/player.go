@@ -38,7 +38,6 @@ func Live(w http.ResponseWriter, r *http.Request) {
 		<-notify
 		fmt.Printf("Player disconnected from room %d\n", room.Id())
 		room.RemovePlayer(eventChan)
-		close(eventChan)
 	}()
 
 	// Continuously send data to the client

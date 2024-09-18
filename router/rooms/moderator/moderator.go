@@ -26,7 +26,7 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Connection", "keep-alive")
 
-	logger.Info("Moderator connected to room %d\n", room.Id())
+	logger.Info("Moderator connected to room %d", room.Id())
 
 	eventChan := room.AddModerator()
 
@@ -34,9 +34,8 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	notify := r.Context().Done()
 	go func() {
 		<-notify
-		fmt.Printf("Moderator disconnected from room %d\n", room.Id())
+		fmt.Printf("Moderator disconnected from room %d", room.Id())
 		room.RemoveModerator(eventChan)
-		close(eventChan)
 	}()
 
 	// Continuously send data to the client
