@@ -36,12 +36,12 @@ type channelMap struct {
 }
 
 func newChannelMap() *channelMap {
-	return &channelMap {
+	return &channelMap{
 		channels: make(map[chan string]struct{}),
 	}
 }
 
-func (cm *channelMap) new() (chan string) {
+func (cm *channelMap) new() chan string {
 	eventChan := make(chan string)
 	cm.Lock()
 	defer cm.Unlock()
@@ -78,17 +78,17 @@ type roomMap struct {
 	internal map[int64]*Room
 }
 
-var openRooms = roomMap {
+var openRooms = roomMap{
 	internal: make(map[int64]*Room),
 }
 
 func NewRoom(room_id int64, name string) *Room {
-	return &Room {
-		room_id: room_id,
-		name: name,
+	return &Room{
+		room_id:       room_id,
+		name:          name,
 		buzzer_status: Unlocked,
-		players: newChannelMap(),
-		moderators: newChannelMap(),
+		players:       newChannelMap(),
+		moderators:    newChannelMap(),
 	}
 }
 

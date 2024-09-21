@@ -129,7 +129,7 @@ func GetTournaments(ctx context.Context) []Tournament {
 				break
 			}
 
-			tournament := Tournament {
+			tournament := Tournament{
 				tournament_id: stmt.ColumnInt64(0),
 				name:          stmt.ColumnText(1),
 				num_rooms:     stmt.ColumnInt64(2),
