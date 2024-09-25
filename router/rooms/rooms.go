@@ -163,7 +163,7 @@ func (r *Room) BuzzRoom() {
 	r.players.RLock()
 	for listener := range r.players.channels {
 		buzzer := lib.ToString(BuzzerButton(true))
-		listener <- lib.FormatEvent("log", buzzer)
+		listener <- lib.FormatEvent("buzzer", buzzer)
 		listener <- lib.FormatEvent("log", "<div>Player Buzzed<div>")
 	}
 	r.players.RUnlock()
@@ -177,8 +177,8 @@ func (r *Room) Reset() {
 	r.moderators.sendToAll(moderatorStatus)
 
 	buzzer := lib.ToString(BuzzerButton(false))
+	r.players.sendToAll(lib.FormatEvent("buzzer", buzzer))
 	r.players.sendToAll(lib.FormatEvent("log", "<div>Buzzer Unlocked<div>"))
-	r.players.sendToAll(lib.FormatEvent("log", buzzer))
 }
 
 func (r *Room) AddModerator() chan string {

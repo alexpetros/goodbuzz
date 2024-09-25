@@ -5,7 +5,6 @@ templ BuzzerButton (isDisabled bool) {
     class="buzzer"
     id="buzzer"
     onclick="buzz()"
-    hx-swap-oob="outerHTML:.buzzer"
     disabled?={isDisabled}
   >
     if isDisabled {

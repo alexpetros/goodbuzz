@@ -26,10 +26,14 @@ func Get(w http.ResponseWriter, r *http.Request) {
 templ index(room *rooms.Room) {
 <h1>{room.Name()}</h1>
 
-@rooms.BuzzerButton(room.Status() != rooms.Unlocked)
+<main hx-ext="sse" sse-connect="./player/live">
+  <section sse-swap="buzzer" hx-swap="innerHTML">
+    @rooms.BuzzerButton(room.Status() != rooms.Unlocked)
+  </section>
 
-<section class="log" hx-ext="sse" sse-connect="./player/live" sse-swap="log" hx-swap="beforeend">
-</section>
+  <section sse-swap="log" hx-swap="beforeend"></section>
+</main>
+
 
 <script>
 function buzz() {
