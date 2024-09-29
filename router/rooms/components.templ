@@ -1,16 +1,25 @@
 package rooms
 
-templ BuzzerButton (isDisabled bool) {
-  <button
-    class="buzzer"
-    id="buzzer"
-    onclick="buzz()"
-    disabled?={isDisabled}
-  >
-    if isDisabled {
-      Waiting
-    } else {
-      Buzz
-    }
-  </button>
+templ LoadingBuzzer() {
+<button class="buzzer loading" disabled >
+  Loading...
+</button>
+}
+
+templ WaitingBuzzer() {
+<button class="buzzer locked" disabled >
+  Waiting
+</button>
+}
+
+templ LockedBuzzer() {
+<button class="buzzer locked" disabled >
+  Locked
+</button>
+}
+
+templ ReadyBuzzer() {
+<button class="buzzer" onclick="buzz()">
+  Buzz
+</button>
 }

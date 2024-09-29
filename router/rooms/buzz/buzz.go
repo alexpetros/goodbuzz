@@ -1,10 +1,8 @@
 package buzz
 
 import (
-	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/router/rooms"
-	"io"
 	"net/http"
 )
 
@@ -22,17 +20,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	}
 
 	room.BuzzRoom()
-	res := fmt.Sprintf(
-		`<button class="buzzer"
-             disabled
-             hx-get="/rooms/%d/status"
-             hx-trigger="every 500ms"
-             >Waiting...
-     </button>`,
-		room.Id(),
-	)
-
-	io.WriteString(w, res)
+	w.WriteHeader(204)
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {

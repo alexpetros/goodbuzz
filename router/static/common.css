@@ -1,7 +1,8 @@
 :root {
   --button-enabled-color: green;
   --button-pressed-color: darkgreen;
-  --button-disabled-color: red;
+  --button-loading-color: gray;
+  --button-locked-color: red;
   --logo-color: green;
 }
 
@@ -42,8 +43,12 @@ button.buzzer {
     background-color: var(--button-pressed-color);
   }
 
-  &:disabled {
-    background-color: var(--button-disabled-color)
+  &.locked {
+    background-color: var(--button-locked-color);
+  }
+
+  &.loading, &.waiting {
+    background-color: var(--button-loading-color);
   }
 }
 

@@ -28,7 +28,7 @@ templ index(room *rooms.Room) {
 
 <main hx-ext="sse" sse-connect="./player/live">
   <section sse-swap="buzzer" hx-swap="innerHTML">
-    @rooms.BuzzerButton(room.Status() != rooms.Unlocked)
+    @rooms.LoadingBuzzer()
   </section>
 
   <section sse-swap="log" hx-swap="beforeend"></section>
@@ -42,6 +42,7 @@ function buzz() {
 
   button.setAttribute('disabled', 'true')
   button.innerText = 'Waiting...'
+  button.classList.add('waiting')
 }
 </script>
 }

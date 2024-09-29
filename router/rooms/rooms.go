@@ -7,6 +7,8 @@ import (
 	"goodbuzz/lib/db"
 	"goodbuzz/lib/logger"
 	"sync"
+
+	"github.com/a-h/templ"
 )
 
 type BuzzerStatus int
@@ -162,7 +164,7 @@ func (r *Room) BuzzRoom() {
 
 	r.players.RLock()
 	for listener := range r.players.channels {
-		buzzer := lib.ToString(BuzzerButton(true))
+		buzzer := r.GetCurrentBuzzer()
 		listener <- lib.FormatEvent("buzzer", buzzer)
 		listener <- lib.FormatEvent("log", "<div>Player Buzzed<div>")
 	}
@@ -176,17 +178,43 @@ func (r *Room) Reset() {
 	moderatorStatus := lib.FormatEvent("status", "<span>Unlocked<span>")
 	r.moderators.sendToAll(moderatorStatus)
 
-	buzzer := lib.ToString(BuzzerButton(false))
+	buzzer := lib.ToString(ReadyBuzzer())
 	r.players.sendToAll(lib.FormatEvent("buzzer", buzzer))
 	r.players.sendToAll(lib.FormatEvent("log", "<div>Buzzer Unlocked<div>"))
 }
+
+func (r *Room) GetCurrentStatus() string {
+	buzzer := r.GetCurrentBuzzer()
+	return lib.FormatEvent("buzzer", buzzer)
+}
+
+func (r *Room) SendCurrentStatus(eventChan chan string) {
+	eventChan <- r.GetCurrentStatus()
+}
+
+func (r *Room) GetCurrentBuzzer() string {
+  var buzzer templ.Component
+
+	status  := r.buzzer_status
+  if status == Unlocked {
+    buzzer = ReadyBuzzer()
+  } else if status == Waiting {
+    buzzer = WaitingBuzzer()
+  } else if status == Locked {
+    buzzer = LockedBuzzer()
+  }
+
+  return lib.ToString(buzzer)
+}
+
 
 func (r *Room) AddModerator() chan string {
 	return r.moderators.new()
 }
 
 func (r *Room) AddPlayer() chan string {
-	return r.players.new()
+	eventChan := r.players.new()
+	return eventChan
 }
 
 func (r *Room) RemoveModerator(eventChan chan string) {
