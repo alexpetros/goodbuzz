@@ -21,6 +21,11 @@ func PlayerLogEvent(message string) string {
 }
 
 func ModeratorLogEvent(message string) string {
+	data := fmt.Sprintf("<div>%s<div>", message)
+	return formatEvent("log", data)
+}
+
+func ModeratorStatusEvent(message string) string {
 	data := fmt.Sprintf("<span>%s<span>", message)
 	return formatEvent("status", data)
 }

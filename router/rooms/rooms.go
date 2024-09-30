@@ -155,26 +155,20 @@ func GetRoom(ctx context.Context, room_id int64) *Room {
 // TODO need a way to ignore buzzes that came in before the reset
 func (r *Room) BuzzRoom() {
 	r.buzzer_status = Waiting
-	r.moderators.RLock()
-	for listener := range r.moderators.channels {
-		listener <- ModeratorLogEvent("Waiting")
-	}
-	r.moderators.RUnlock()
 
-	r.players.RLock()
-	for listener := range r.players.channels {
-		listener <- r.CurrentBuzzerEvent()
-		listener <- PlayerLogEvent("Player Buzzed")
-	}
-	r.players.RUnlock()
+	r.moderators.sendToAll(ModeratorStatusEvent("Waiting"))
+	r.moderators.sendToAll(ModeratorLogEvent("Player Buzzed"))
+
+	r.players.sendToAll(r.CurrentBuzzerEvent())
+	r.players.sendToAll(PlayerLogEvent("Player Buzzed"))
 }
 
 func (r *Room) Reset() {
 	logger.Debug("Sending unlock message")
 	r.buzzer_status = Unlocked
 
-	moderatorStatus := ModeratorLogEvent("Unlocked")
-	r.moderators.sendToAll(moderatorStatus)
+	r.moderators.sendToAll(ModeratorStatusEvent("Unlocked"))
+	r.moderators.sendToAll(ModeratorLogEvent("Buzzer Unlocked"))
 
 	r.players.sendToAll(BuzzerEvent(ReadyBuzzer()))
 	r.players.sendToAll(PlayerLogEvent("Buzzer Unlocked"))

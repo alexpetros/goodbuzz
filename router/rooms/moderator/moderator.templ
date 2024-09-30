@@ -28,10 +28,12 @@ func Get(w http.ResponseWriter, r *http.Request) {
 templ index(title string, room *rooms.Room) {
 <h1>{title}</h1>
 
-<section class="live" hx-swap="innerHTML">
+<main hx-ext="sse" sse-connect="./moderator/live">
+
+<section>
   <h2>Live View</h2>
   <p>Buzzer Status:
-  <span class="buzzer-status" hx-ext="sse" sse-connect="./moderator/live" sse-swap="status">
+  <span class="buzzer-status" sse-swap="status" hx-swap="innerHTML">
     { room.StatusString() }
   </span>
   </p>
@@ -41,5 +43,12 @@ templ index(title string, room *rooms.Room) {
   <h2>Controls</h2>
   <button hx-delete={ fmt.Sprintf("/rooms/%d/buzz", room.Id()) }>Reset</button>
 </section>
+
+<section sse-swap="log" hx-swap="beforeend">
+  <h2>Log</h2>
+</section>
+
+</main>
+
 }
 
