@@ -59,11 +59,10 @@ func (cm *channelMap) delete(eventChan chan string) {
 }
 
 func (cm *channelMap) sendToAll(messages ...string) {
+	message := CombineEvents(messages)
 	cm.RLock()
 	for listener := range cm.channels {
-		for _, message := range messages {
-			listener <- message
-		}
+		listener <- message
 	}
 	cm.RUnlock()
 }
@@ -164,7 +163,7 @@ func (r *Room) BuzzRoom() {
 	)
 
 	r.players.sendToAll(
-		r.CurrentBuzzerEvent(),
+		r.PlayerInitializeEvent(),
 		PlayerLogEvent("Player Buzzed"),
 	)
 }
@@ -184,10 +183,6 @@ func (r *Room) Reset() {
 	)
 }
 
-func (r *Room) CurrentBuzzerEvent() string {
-	return PlayerBuzzerEvent(r.GetCurrentBuzzer())
-}
-
 func (r *Room) CurrentPlayersEvent() string {
 	names := make([]string, len(r.players.channels))
 	for i := 0; i < len(r.players.channels); i++ {
@@ -195,10 +190,6 @@ func (r *Room) CurrentPlayersEvent() string {
 	}
 
 	return ModeratorPlayerListEvent(names)
-}
-
-func (r *Room) SendCurrentStatus(eventChan chan string) {
-	eventChan <- r.CurrentBuzzerEvent()
 }
 
 func (r *Room) GetCurrentBuzzer() templ.Component {
@@ -214,10 +205,6 @@ func (r *Room) GetCurrentBuzzer() templ.Component {
 	}
 
 	return buzzer
-}
-
-func (r *Room) ModeratorInitializeEvent() string {
-	return r.CurrentPlayersEvent()
 }
 
 func (r *Room) AddModerator() chan string {
@@ -237,4 +224,14 @@ func (r *Room) RemoveModerator(eventChan chan string) {
 func (r *Room) RemovePlayer(eventChan chan string) {
 	r.players.delete(eventChan)
 	r.moderators.sendToAll(r.CurrentPlayersEvent())
+}
+
+func (r *Room) PlayerInitializeEvent() string {
+	buzzer := PlayerBuzzerEvent(r.GetCurrentBuzzer())
+	return buzzer
+}
+
+func (r *Room) ModeratorInitializeEvent() string {
+	players := r.CurrentPlayersEvent()
+	return players
 }

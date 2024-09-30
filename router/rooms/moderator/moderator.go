@@ -9,12 +9,12 @@ import (
 )
 
 func Live(w http.ResponseWriter, r *http.Request) {
-	room_id, err := lib.GetIntParam(r, "id")
+	roomId, err := lib.GetIntParam(r, "id")
 	if err != nil {
 		lib.BadRequest(w, r)
 		return
 	}
-	room := rooms.GetRoom(r.Context(), room_id)
+	room := rooms.GetRoom(r.Context(), roomId)
 
 	if room == nil {
 		http.NotFound(w, r)

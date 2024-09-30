@@ -9,12 +9,12 @@ import (
 )
 
 func Live(w http.ResponseWriter, r *http.Request) {
-	room_id, err := lib.GetIntParam(r, "id")
+	roomId, err := lib.GetIntParam(r, "id")
 	if err != nil {
 		lib.BadRequest(w, r)
 		return
 	}
-	room := rooms.GetRoom(r.Context(), room_id)
+	room := rooms.GetRoom(r.Context(), roomId)
 
 	if room == nil {
 		http.NotFound(w, r)
@@ -39,15 +39,15 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	// Send initial status
-	event := room.CurrentBuzzerEvent()
+	event := room.PlayerInitializeEvent()
 	logger.Debug("Sending data to player in room %d:\n%s", room.Id(), event)
-	fmt.Fprintf(w, event)
+	_, _ = fmt.Fprintf(w, event)
 	w.(http.Flusher).Flush()
 
 	// Continuously send data to the client
 	for {
 		data := <-eventChan
-		// This is what's receieved from a closed channel
+		// This is what's received from a closed channel
 		if data == "" {
 			break
 		}
