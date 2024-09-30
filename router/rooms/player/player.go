@@ -39,7 +39,7 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	// Send initial status
-	event := room.GetCurrentStatus()
+	event := room.CurrentBuzzerEvent()
 	logger.Debug("Sending data to player in room %d:\n%s", room.Id(), event)
 	fmt.Fprintf(w, event)
 	w.(http.Flusher).Flush()

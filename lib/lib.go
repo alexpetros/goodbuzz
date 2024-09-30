@@ -3,7 +3,6 @@ package lib
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -34,10 +33,6 @@ func BadRequest(w http.ResponseWriter, r *http.Request) {
 func ServerError(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(500)
 	io.WriteString(w, "<h1>500 Internal Server Error</h1><p><a href=/>Return home</a>")
-}
-
-func FormatEvent(event_name string, data string) string {
-	return fmt.Sprintf("event: %s\ndata: %s\n\n", event_name, data)
 }
 
 func GetIntParam(r *http.Request, param_name string) (id int64, err error) {

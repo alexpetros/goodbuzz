@@ -26,12 +26,15 @@ func Get(w http.ResponseWriter, r *http.Request) {
 templ index(room *rooms.Room) {
 <h1>{room.Name()}</h1>
 
-<main hx-ext="sse" sse-connect="./player/live">
-  <section sse-swap="buzzer" hx-swap="innerHTML">
-    @rooms.LoadingBuzzer()
+<main hx-ext="sse" sse-connect="./player/live" class="player">
+  <section>
+    <h2>Buzzer</h2>
+    <div sse-swap="buzzer" hx-swap="innerHTML">@rooms.LoadingBuzzer()</div>
   </section>
 
-  <section sse-swap="log" hx-swap="beforeend"></section>
+  <section sse-swap="log" hx-swap="beforeend">
+    <h2>Log</h2>
+  </section>
 </main>
 
 

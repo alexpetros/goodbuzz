@@ -3,7 +3,6 @@ package rooms
 import (
 	"context"
 	"fmt"
-	"goodbuzz/lib"
 	"goodbuzz/lib/db"
 	"goodbuzz/lib/logger"
 	"sync"
@@ -94,6 +93,34 @@ func NewRoom(room_id int64, name string) *Room {
 	}
 }
 
+func (r *Room) Id() int64 {
+	return r.room_id
+}
+
+func (r *Room) Name() string {
+	return r.name
+}
+
+func (r *Room) Url() string {
+	return fmt.Sprintf("/rooms/%d", r.room_id)
+}
+
+func (r *Room) PlayerUrl() string {
+	return fmt.Sprintf("/rooms/%d/player", r.room_id)
+}
+
+func (r *Room) ModeratorUrl() string {
+	return fmt.Sprintf("/rooms/%d/moderator", r.room_id)
+}
+
+func (r *Room) Status() BuzzerStatus {
+	return r.buzzer_status
+}
+
+func (r *Room) StatusString() string {
+	return r.buzzer_status.String()
+}
+
 func getOrCreateRoom(room_id int64, name string) *Room {
 	openRooms.Lock()
 	room := openRooms.internal[room_id]
@@ -125,48 +152,19 @@ func GetRoom(ctx context.Context, room_id int64) *Room {
 	return room
 }
 
-func (r *Room) Id() int64 {
-	return r.room_id
-}
-
-func (r *Room) Name() string {
-	return r.name
-}
-
-func (r *Room) Url() string {
-	return fmt.Sprintf("/rooms/%d", r.room_id)
-}
-
-func (r *Room) PlayerUrl() string {
-	return fmt.Sprintf("/rooms/%d/player", r.room_id)
-}
-
-func (r *Room) ModeratorUrl() string {
-	return fmt.Sprintf("/rooms/%d/moderator", r.room_id)
-}
-
-func (r *Room) Status() BuzzerStatus {
-	return r.buzzer_status
-}
-
-func (r *Room) StatusString() string {
-	return r.buzzer_status.String()
-}
-
 // TODO need a way to ignore buzzes that came in before the reset
 func (r *Room) BuzzRoom() {
 	r.buzzer_status = Waiting
 	r.moderators.RLock()
 	for listener := range r.moderators.channels {
-		listener <- lib.FormatEvent("status", "<span>Waiting<span>")
+		listener <- ModeratorLogEvent("Waiting")
 	}
 	r.moderators.RUnlock()
 
 	r.players.RLock()
 	for listener := range r.players.channels {
-		buzzer := r.GetCurrentBuzzer()
-		listener <- lib.FormatEvent("buzzer", buzzer)
-		listener <- lib.FormatEvent("log", "<div>Player Buzzed<div>")
+		listener <- r.CurrentBuzzerEvent()
+		listener <- PlayerLogEvent("Player Buzzed")
 	}
 	r.players.RUnlock()
 }
@@ -175,38 +173,35 @@ func (r *Room) Reset() {
 	logger.Debug("Sending unlock message")
 	r.buzzer_status = Unlocked
 
-	moderatorStatus := lib.FormatEvent("status", "<span>Unlocked<span>")
+	moderatorStatus := ModeratorLogEvent("Unlocked")
 	r.moderators.sendToAll(moderatorStatus)
 
-	buzzer := lib.ToString(ReadyBuzzer())
-	r.players.sendToAll(lib.FormatEvent("buzzer", buzzer))
-	r.players.sendToAll(lib.FormatEvent("log", "<div>Buzzer Unlocked<div>"))
+	r.players.sendToAll(BuzzerEvent(ReadyBuzzer()))
+	r.players.sendToAll(PlayerLogEvent("Buzzer Unlocked"))
 }
 
-func (r *Room) GetCurrentStatus() string {
-	buzzer := r.GetCurrentBuzzer()
-	return lib.FormatEvent("buzzer", buzzer)
+func (r *Room) CurrentBuzzerEvent() string {
+	return BuzzerEvent(r.GetCurrentBuzzer())
 }
 
 func (r *Room) SendCurrentStatus(eventChan chan string) {
-	eventChan <- r.GetCurrentStatus()
+	eventChan <- r.CurrentBuzzerEvent()
 }
 
-func (r *Room) GetCurrentBuzzer() string {
-  var buzzer templ.Component
+func (r *Room) GetCurrentBuzzer() templ.Component {
+	var buzzer templ.Component
 
-	status  := r.buzzer_status
-  if status == Unlocked {
-    buzzer = ReadyBuzzer()
-  } else if status == Waiting {
-    buzzer = WaitingBuzzer()
-  } else if status == Locked {
-    buzzer = LockedBuzzer()
-  }
+	status := r.buzzer_status
+	if status == Unlocked {
+		buzzer = ReadyBuzzer()
+	} else if status == Waiting {
+		buzzer = WaitingBuzzer()
+	} else if status == Locked {
+		buzzer = LockedBuzzer()
+	}
 
-  return lib.ToString(buzzer)
+	return buzzer
 }
-
 
 func (r *Room) AddModerator() chan string {
 	return r.moderators.new()
