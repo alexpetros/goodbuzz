@@ -179,13 +179,22 @@ func (r *Room) Reset() {
 	)
 
 	r.players.sendToAll(
-		BuzzerEvent(ReadyBuzzer()),
+		PlayerBuzzerEvent(ReadyBuzzer()),
 		PlayerLogEvent("Buzzer Unlocked"),
 	)
 }
 
 func (r *Room) CurrentBuzzerEvent() string {
-	return BuzzerEvent(r.GetCurrentBuzzer())
+	return PlayerBuzzerEvent(r.GetCurrentBuzzer())
+}
+
+func (r *Room) CurrentPlayersEvent() string {
+	names := make([]string, len(r.players.channels))
+	for i := 0; i < len(r.players.channels); i++ {
+		names[i] = fmt.Sprintf("Player %d", i+1)
+	}
+
+	return ModeratorPlayerListEvent(names)
 }
 
 func (r *Room) SendCurrentStatus(eventChan chan string) {
@@ -207,12 +216,17 @@ func (r *Room) GetCurrentBuzzer() templ.Component {
 	return buzzer
 }
 
+func (r *Room) ModeratorInitializeEvent() string {
+	return r.CurrentPlayersEvent()
+}
+
 func (r *Room) AddModerator() chan string {
 	return r.moderators.new()
 }
 
 func (r *Room) AddPlayer() chan string {
 	eventChan := r.players.new()
+	r.moderators.sendToAll(r.CurrentPlayersEvent())
 	return eventChan
 }
 
@@ -222,4 +236,5 @@ func (r *Room) RemoveModerator(eventChan chan string) {
 
 func (r *Room) RemovePlayer(eventChan chan string) {
 	r.players.delete(eventChan)
+	r.moderators.sendToAll(r.CurrentPlayersEvent())
 }

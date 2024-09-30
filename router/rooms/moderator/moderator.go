@@ -38,6 +38,12 @@ func Live(w http.ResponseWriter, r *http.Request) {
 		room.RemoveModerator(eventChan)
 	}()
 
+	// Send initial status
+	event := room.ModeratorInitializeEvent()
+	logger.Debug("Sending data to moderator in room %d:\n%s", room.Id(), event)
+	fmt.Fprintf(w, event)
+	w.(http.Flusher).Flush()
+
 	// Continuously send data to the client
 	for {
 		data := <-eventChan
