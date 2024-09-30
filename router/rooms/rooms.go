@@ -212,6 +212,8 @@ func (r *Room) AddModerator() chan string {
 }
 
 func (r *Room) AddPlayer() chan string {
+	// Note: if you try to send any events in this function, it will deadlock
+	// because the function that calls hasn't set up any listeners yet
 	return r.players.new()
 }
 
