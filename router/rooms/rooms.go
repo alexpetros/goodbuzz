@@ -58,10 +58,12 @@ func (cm *channelMap) delete(eventChan chan string) {
 	close(eventChan)
 }
 
-func (cm *channelMap) sendToAll(message string) {
+func (cm *channelMap) sendToAll(messages ...string) {
 	cm.RLock()
 	for listener := range cm.channels {
-		listener <- message
+		for _, message := range messages {
+			listener <- message
+		}
 	}
 	cm.RUnlock()
 }
@@ -156,22 +158,30 @@ func GetRoom(ctx context.Context, room_id int64) *Room {
 func (r *Room) BuzzRoom() {
 	r.buzzer_status = Waiting
 
-	r.moderators.sendToAll(ModeratorStatusEvent("Waiting"))
-	r.moderators.sendToAll(ModeratorLogEvent("Player Buzzed"))
+	r.moderators.sendToAll(
+		ModeratorStatusEvent("Waiting"),
+		ModeratorLogEvent("Player Buzzed"),
+	)
 
-	r.players.sendToAll(r.CurrentBuzzerEvent())
-	r.players.sendToAll(PlayerLogEvent("Player Buzzed"))
+	r.players.sendToAll(
+		r.CurrentBuzzerEvent(),
+		PlayerLogEvent("Player Buzzed"),
+	)
 }
 
 func (r *Room) Reset() {
 	logger.Debug("Sending unlock message")
 	r.buzzer_status = Unlocked
 
-	r.moderators.sendToAll(ModeratorStatusEvent("Unlocked"))
-	r.moderators.sendToAll(ModeratorLogEvent("Buzzer Unlocked"))
+	r.moderators.sendToAll(
+		ModeratorStatusEvent("Unlocked"),
+		ModeratorLogEvent("Buzzer Unlocked"),
+	)
 
-	r.players.sendToAll(BuzzerEvent(ReadyBuzzer()))
-	r.players.sendToAll(PlayerLogEvent("Buzzer Unlocked"))
+	r.players.sendToAll(
+		BuzzerEvent(ReadyBuzzer()),
+		PlayerLogEvent("Buzzer Unlocked"),
+	)
 }
 
 func (r *Room) CurrentBuzzerEvent() string {
