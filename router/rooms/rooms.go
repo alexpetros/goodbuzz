@@ -69,11 +69,11 @@ func (cm *channelMap) sendToAll(messages ...string) {
 }
 
 type Room struct {
-	room_id       int64
-	name          string
-	buzzer_status BuzzerStatus
-	players       *channelMap
-	moderators    *channelMap
+	roomId       int64
+	name         string
+	buzzerStatus BuzzerStatus
+	players      *channelMap
+	moderators   *channelMap
 }
 
 type roomMap struct {
@@ -85,18 +85,18 @@ var openRooms = roomMap{
 	internal: make(map[int64]*Room),
 }
 
-func NewRoom(room_id int64, name string) *Room {
+func NewRoom(roomId int64, name string) *Room {
 	return &Room{
-		room_id:       room_id,
-		name:          name,
-		buzzer_status: Unlocked,
-		players:       newChannelMap(),
-		moderators:    newChannelMap(),
+		roomId:       roomId,
+		name:         name,
+		buzzerStatus: Unlocked,
+		players:      newChannelMap(),
+		moderators:   newChannelMap(),
 	}
 }
 
 func (r *Room) Id() int64 {
-	return r.room_id
+	return r.roomId
 }
 
 func (r *Room) Name() string {
@@ -104,23 +104,23 @@ func (r *Room) Name() string {
 }
 
 func (r *Room) Url() string {
-	return fmt.Sprintf("/rooms/%d", r.room_id)
+	return fmt.Sprintf("/rooms/%d", r.roomId)
 }
 
 func (r *Room) PlayerUrl() string {
-	return fmt.Sprintf("/rooms/%d/player", r.room_id)
+	return fmt.Sprintf("/rooms/%d/player", r.roomId)
 }
 
 func (r *Room) ModeratorUrl() string {
-	return fmt.Sprintf("/rooms/%d/moderator", r.room_id)
+	return fmt.Sprintf("/rooms/%d/moderator", r.roomId)
 }
 
 func (r *Room) Status() BuzzerStatus {
-	return r.buzzer_status
+	return r.buzzerStatus
 }
 
 func (r *Room) StatusString() string {
-	return r.buzzer_status.String()
+	return r.buzzerStatus.String()
 }
 
 func getOrCreateRoom(room_id int64, name string) *Room {
@@ -137,8 +137,8 @@ func getOrCreateRoom(room_id int64, name string) *Room {
 	return room
 }
 
-func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
-	dbRooms := db.GetRoomsForTournament(ctx, tournament_id)
+func GetRoomsForTournament(ctx context.Context, tournamentId int64) []Room {
+	dbRooms := db.GetRoomsForTournament(ctx, tournamentId)
 	rooms := make([]Room, 0)
 	for _, dbRoom := range dbRooms {
 		newRoom := GetRoom(ctx, dbRoom.Id())
@@ -148,15 +148,15 @@ func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
 	return rooms
 }
 
-func GetRoom(ctx context.Context, room_id int64) *Room {
-	dbRoom := db.GetRoom(ctx, room_id)
+func GetRoom(ctx context.Context, roomId int64) *Room {
+	dbRoom := db.GetRoom(ctx, roomId)
 	room := getOrCreateRoom(dbRoom.Id(), dbRoom.Name())
 	return room
 }
 
 // TODO need a way to ignore buzzes that came in before the reset
 func (r *Room) BuzzRoom() {
-	r.buzzer_status = Waiting
+	r.buzzerStatus = Waiting
 
 	r.moderators.sendToAll(
 		ModeratorStatusEvent("Waiting"),
@@ -171,7 +171,7 @@ func (r *Room) BuzzRoom() {
 
 func (r *Room) Reset() {
 	logger.Debug("Sending unlock message")
-	r.buzzer_status = Unlocked
+	r.buzzerStatus = Unlocked
 
 	r.moderators.sendToAll(
 		ModeratorStatusEvent("Unlocked"),
@@ -195,7 +195,7 @@ func (r *Room) SendCurrentStatus(eventChan chan string) {
 func (r *Room) GetCurrentBuzzer() templ.Component {
 	var buzzer templ.Component
 
-	status := r.buzzer_status
+	status := r.buzzerStatus
 	if status == Unlocked {
 		buzzer = ReadyBuzzer()
 	} else if status == Waiting {
