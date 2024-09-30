@@ -59,7 +59,7 @@ func (cm *channelMap) delete(eventChan chan string) {
 }
 
 func (cm *channelMap) sendToAll(messages ...string) {
-	message := CombineEvents(messages)
+	message := CombineEvents(messages...)
 	cm.RLock()
 	for listener := range cm.channels {
 		listener <- message
@@ -212,9 +212,7 @@ func (r *Room) AddModerator() chan string {
 }
 
 func (r *Room) AddPlayer() chan string {
-	eventChan := r.players.new()
-	r.moderators.sendToAll(r.CurrentPlayersEvent())
-	return eventChan
+	return r.players.new()
 }
 
 func (r *Room) RemoveModerator(eventChan chan string) {
@@ -223,10 +221,14 @@ func (r *Room) RemoveModerator(eventChan chan string) {
 
 func (r *Room) RemovePlayer(eventChan chan string) {
 	r.players.delete(eventChan)
+	r.players.sendToAll(r.CurrentPlayersEvent())
 	r.moderators.sendToAll(r.CurrentPlayersEvent())
 }
 
 func (r *Room) PlayerInitializeEvent() string {
+	r.players.sendToAll(r.CurrentPlayersEvent())
+	r.moderators.sendToAll(r.CurrentPlayersEvent())
+
 	buzzer := PlayerBuzzerEvent(r.GetCurrentBuzzer())
 	return buzzer
 }

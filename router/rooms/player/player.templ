@@ -32,6 +32,11 @@ templ index(room *rooms.Room) {
     <div sse-swap="buzzer" hx-swap="innerHTML">@rooms.LoadingBuzzer()</div>
   </section>
 
+  <section>
+    <h2>Players</h2>
+    <ul sse-swap="players" hx-swap="innerHTML"></ul>
+  </section>
+
   <section sse-swap="log" hx-swap="beforeend">
     <h2>Log</h2>
   </section>

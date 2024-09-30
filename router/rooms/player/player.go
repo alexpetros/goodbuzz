@@ -32,28 +32,32 @@ func Live(w http.ResponseWriter, r *http.Request) {
 
 	// Listen for client close and delete channel when it happens
 	notify := r.Context().Done()
+	closeConn := make(chan string)
 	go func() {
 		<-notify
 		fmt.Printf("Player disconnected from room %d\n", room.Id())
 		room.RemovePlayer(eventChan)
+		closeConn <- "END"
+	}()
+
+	// Continuously send data to the client
+	go func() {
+		for {
+			data := <-eventChan
+			// This is what's received from a closed channel
+			if data == "" {
+				break
+			}
+
+			logger.Debug("Sending data to player in room %d:\n%s", room.Id(), data)
+			fmt.Fprintf(w, data)
+			w.(http.Flusher).Flush()
+		}
 	}()
 
 	// Send initial status
-	event := room.PlayerInitializeEvent()
-	logger.Debug("Sending data to player in room %d:\n%s", room.Id(), event)
-	_, _ = fmt.Fprintf(w, event)
-	w.(http.Flusher).Flush()
+	eventChan <- room.PlayerInitializeEvent()
 
-	// Continuously send data to the client
-	for {
-		data := <-eventChan
-		// This is what's received from a closed channel
-		if data == "" {
-			break
-		}
-
-		logger.Debug("Sending data to player in room %d:\n%s", room.Id(), data)
-		fmt.Fprintf(w, data)
-		w.(http.Flusher).Flush()
-	}
+	// Wait for cleanup to happen and then close the connection
+	<-closeConn
 }
