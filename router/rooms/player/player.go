@@ -8,6 +8,29 @@ import (
 	"net/http"
 )
 
+func Put(w http.ResponseWriter, r *http.Request) {
+	roomId, paramErr := lib.GetIntParam(r, "id")
+	if paramErr != nil {
+		lib.BadRequest(w, r)
+		return
+	}
+	room := rooms.GetRoom(r.Context(), roomId)
+
+	if room == nil {
+		lib.NotFound(w, r)
+		return
+	}
+
+	formErr := r.ParseForm()
+	if formErr != nil {
+		lib.BadRequest(w, r)
+	}
+
+	name := r.PostFormValue("name")
+	logger.Info(name)
+	lib.NoContent(w, r)
+}
+
 func Live(w http.ResponseWriter, r *http.Request) {
 	roomId, err := lib.GetIntParam(r, "id")
 	if err != nil {

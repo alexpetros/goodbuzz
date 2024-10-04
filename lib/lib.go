@@ -20,6 +20,10 @@ func ToString(component templ.Component) string {
 	return buff.String()
 }
 
+func NoContent(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(204)
+}
+
 func NotFound(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(404)
 	io.WriteString(w, "<h1>404 Not Found</h1><p><a href=/>Return home</a>")

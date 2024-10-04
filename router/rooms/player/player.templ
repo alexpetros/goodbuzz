@@ -34,6 +34,10 @@ templ index(room *rooms.Room) {
 
   <section>
     <h2>Players</h2>
+    <form hx-put="./player">
+      <label>Name: <input type="text" name="name"></label>
+      <button>Set</button>
+    </form>
     <ul sse-swap="players" hx-swap="innerHTML"></ul>
   </section>
 
