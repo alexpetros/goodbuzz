@@ -5,14 +5,18 @@ import (
 	"sync"
 )
 
-type UserMap[T any] struct {
-	sync.RWMutex
-	channels map[chan string]T
+type User interface {
+	Channel() chan string
 }
 
-func NewUserMap[T any]() *UserMap[T] {
+type UserMap[T User] struct {
+	sync.RWMutex
+	users map[string]T
+}
+
+func NewUserMap[T User]() *UserMap[T] {
 	return &UserMap[T]{
-		channels: make(map[chan string]T),
+		users: make(map[string]T),
 	}
 }
 
@@ -21,33 +25,31 @@ func (um *UserMap[T]) SendToAll(messages ...string) {
 	um.RLock()
 	defer um.RUnlock()
 
-	for listener := range um.channels {
-		listener <- message
+	for _, user := range um.users {
+		user.Channel() <- message
 	}
 }
 
-func (um *UserMap[T]) New(user T) chan string {
-	eventChan := make(chan string)
+func (um *UserMap[T]) Insert(token string, user T) {
 	um.Lock()
 	defer um.Unlock()
-
-	um.channels[eventChan] = user
-	return eventChan
+	um.users[token] = user
 }
 
-func (um *UserMap[T]) Get(eventChan chan string) T {
+func (um *UserMap[T]) Get(token string) T {
 	um.RLock()
 	defer um.RUnlock()
-	return um.channels[eventChan]
+	return um.users[token]
 }
 
-func (um *UserMap[T]) Delete(eventChan chan string) {
+func (um *UserMap[T]) CloseAndDelete(token string) {
 	um.Lock()
 	defer um.Unlock()
-	delete(um.channels, eventChan)
-	close(eventChan)
+	user := um.users[token]
+	close(user.Channel())
+	delete(um.users, token)
 }
 
 func (um *UserMap[T]) NumUsers() int {
-	return len(um.channels)
+	return len(um.users)
 }

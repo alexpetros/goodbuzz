@@ -9,6 +9,8 @@ import (
 	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms/events"
 	"goodbuzz/router/rooms/users"
+	"io"
+	"net/http"
 )
 
 type BuzzerStatus int
@@ -41,10 +43,21 @@ type Room struct {
 }
 
 type player struct {
-	name  string
-	token string
+	name    string
+	channel chan string
 }
-type moderator struct{}
+
+func (player player) Channel() chan string {
+	return player.channel
+}
+
+type moderator struct {
+	channel chan string
+}
+
+func (moderator moderator) Channel() chan string {
+	return moderator.channel
+}
 
 var openRooms = newRoomMap()
 
@@ -76,8 +89,8 @@ func (r *Room) StatusString() string {
 	return r.buzzerStatus.String()
 }
 
-func (r *Room) getPlayer(eventChan chan string) player {
-	player := r.players.Get(eventChan)
+func (r *Room) getPlayer(token string) player {
+	player := r.players.Get(token)
 	return player
 }
 
@@ -156,39 +169,95 @@ func (r *Room) GetCurrentBuzzer() templ.Component {
 	return buzzer
 }
 
-func (r *Room) AddModerator() chan string {
-	moderator := moderator{}
-	return r.moderators.New(moderator)
-}
-
-func (r *Room) AddPlayer() chan string {
+func (r *Room) CreatePlayer(w io.Writer, notify <-chan struct{}) chan struct{} {
 	// Note: do not to send any events to the channel in this function, it will deadlock
 	// because the function that calls hasn't set up any listeners yet
 	token := uuid.New().String()
-	player := player{"Test", token}
-	return r.players.New(player)
-}
+	eventChan := make(chan string)
+	player := player{"Test", eventChan}
+	r.players.Insert(token, player)
 
-func (r *Room) RemoveModerator(eventChan chan string) {
-	r.moderators.Delete(eventChan)
-}
+	// Listen for client close and delete channel when it happens
+	closeChan := make(chan struct{})
+	go func() {
+		<-notify
+		fmt.Printf("Player disconnected from room %d\n", r.Id())
+		r.RemovePlayer(token)
+		closeChan <- struct{}{}
+	}()
 
-func (r *Room) RemovePlayer(eventChan chan string) {
-	r.players.Delete(eventChan)
+	// Continuously send data to the client
+	go func() {
+		for {
+			data := <-eventChan
+			// This is what's received from a closed channel
+			if data == "" {
+				break
+			}
+
+			logger.Debug("Sending data to player in room %d:\n%s", r.Id(), data)
+			_, err := fmt.Fprintf(w, data)
+			if err != nil {
+				logger.Error("Failed to send data to player in room %d:\n%s", r.Id(), data)
+			}
+			w.(http.Flusher).Flush()
+		}
+	}()
+
+	// Initialize Player
 	r.players.SendToAll(r.CurrentPlayersEvent())
 	r.moderators.SendToAll(r.CurrentPlayersEvent())
+
+	tokenInput := TokenInput(token)
+
+	player.channel <- events.PlayerBuzzerEvent(r.GetCurrentBuzzer())
+	player.channel <- events.TokenEvent(tokenInput)
+
+	return closeChan
 }
 
-func (r *Room) InitializePlayer(eventChan chan string) {
-	r.players.SendToAll(r.CurrentPlayersEvent())
-	r.moderators.SendToAll(r.CurrentPlayersEvent())
+func (r *Room) CreateModerator(w io.Writer, notify <-chan struct{}) chan struct{} {
+	token := uuid.New().String()
+	eventChan := make(chan string)
+	moderator := moderator{eventChan}
+	r.moderators.Insert(token, moderator)
 
-	eventChan <- events.PlayerBuzzerEvent(r.GetCurrentBuzzer())
-	player := r.getPlayer(eventChan)
-	tokenInput := TokenInput(player.token)
-	eventChan <- events.TokenEvent(tokenInput)
-}
+	closeChan := make(chan struct{})
+	go func() {
+		<-notify
+		fmt.Printf("Moderator disconnected from room %d", r.Id())
+		r.RemoveModerator(token)
+		closeChan <- struct{}{}
+	}()
 
-func (r *Room) InitializeModerator(eventChan chan string) {
+	// Continuously send data to the client
+	go func() {
+		for {
+			data := <-eventChan
+			if data == "" {
+				break
+			}
+
+			logger.Debug("Sending data to moderator in room %d:\n%s", r.Id(), data)
+			_, err2 := fmt.Fprintf(w, data)
+			if err2 != nil {
+				logger.Error("Failed to send data to moderatorr in room %d:\n%s", r.Id(), data)
+			}
+			w.(http.Flusher).Flush()
+		}
+	}()
+
+	// Initialize Moderator
 	eventChan <- r.CurrentPlayersEvent()
+	return closeChan
+}
+
+func (r *Room) RemoveModerator(token string) {
+	r.moderators.CloseAndDelete(token)
+}
+
+func (r *Room) RemovePlayer(token string) {
+	r.players.CloseAndDelete(token)
+	r.players.SendToAll(r.CurrentPlayersEvent())
+	r.moderators.SendToAll(r.CurrentPlayersEvent())
 }

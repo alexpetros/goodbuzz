@@ -1,7 +1,6 @@
 package player
 
 import (
-	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms"
@@ -52,38 +51,8 @@ func Live(w http.ResponseWriter, r *http.Request) {
 
 	logger.Info("Player connected to room %d\n", room.Id())
 
-	eventChan := room.AddPlayer()
-
-	// Listen for client close and delete channel when it happens
 	notify := r.Context().Done()
-	closeConn := make(chan string)
-	go func() {
-		<-notify
-		fmt.Printf("Player disconnected from room %d\n", room.Id())
-		room.RemovePlayer(eventChan)
-		closeConn <- "END"
-	}()
-
-	// Continuously send data to the client
-	go func() {
-		for {
-			data := <-eventChan
-			// This is what's received from a closed channel
-			if data == "" {
-				break
-			}
-
-			logger.Debug("Sending data to player in room %d:\n%s", room.Id(), data)
-			_, err := fmt.Fprintf(w, data)
-			if err != nil {
-				logger.Error("Failed to send data to player in room %d:\n%s", room.Id(), data)
-			}
-			w.(http.Flusher).Flush()
-		}
-	}()
-
-	// Send initial status
-	room.InitializePlayer(eventChan)
+	closeConn := room.CreatePlayer(w, notify)
 
 	// Wait for cleanup to happen and then close the connection
 	<-closeConn
