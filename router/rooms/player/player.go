@@ -50,10 +50,10 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Connection", "keep-alive")
 
 	logger.Info("Player connected to room %d\n", room.Id())
-
-	notify := r.Context().Done()
-	closeConn := room.CreatePlayer(w, notify)
+	token, closeConn := room.CreatePlayer(w, r)
 
 	// Wait for cleanup to happen and then close the connection
 	<-closeConn
+	room.RemovePlayer(token)
+
 }

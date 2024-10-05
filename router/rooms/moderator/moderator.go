@@ -1,6 +1,7 @@
 package moderator
 
 import (
+	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms"
@@ -25,12 +26,12 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Connection", "keep-alive")
 
-	logger.Info("Moderator connected to room %d", room.Id())
-
 	// Listen for client close and remove the client from the list
-	notify := r.Context().Done()
-	closeConn := room.CreateModerator(w, notify)
+	logger.Info("Moderator connected to room %d", room.Id())
+	token, closeConn := room.CreateModerator(w, r)
 
 	// Wait for cleanup to happen and then close the connection
 	<-closeConn
+	fmt.Printf("Moderator disconnected from room %d", room.Id())
+	room.RemoveModerator(token)
 }

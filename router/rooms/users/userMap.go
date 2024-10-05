@@ -1,12 +1,44 @@
 package users
 
 import (
+	"fmt"
 	"goodbuzz/lib"
+	"net/http"
 	"sync"
 )
 
 type User interface {
 	Channel() chan string
+}
+
+func CreateUser(w http.ResponseWriter, r *http.Request) (chan string, chan struct{}) {
+	notify := r.Context().Done()
+	eventChan := make(chan string)
+	closeChan := make(chan struct{})
+
+	go func() {
+		<-notify
+		closeChan <- struct{}{}
+	}()
+
+	// Continuously send data to the client
+	go func() {
+		for {
+			data := <-eventChan
+			if data == "" {
+				break
+			}
+
+			//logger.Debug("Sending data to moderator in room %d:\n%s", room.Id(), data)
+			_, err2 := fmt.Fprintf(w, data)
+			if err2 != nil {
+				//logger.Error("Failed to send data to moderatorr in room %d:\n%s", room.Id(), data)
+			}
+			w.(http.Flusher).Flush()
+		}
+	}()
+
+	return eventChan, closeChan
 }
 
 type UserMap[T User] struct {

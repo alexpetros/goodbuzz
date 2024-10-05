@@ -9,7 +9,6 @@ import (
 	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms/events"
 	"goodbuzz/router/rooms/users"
-	"io"
 	"net/http"
 )
 
@@ -169,87 +168,34 @@ func (r *Room) GetCurrentBuzzer() templ.Component {
 	return buzzer
 }
 
-func (r *Room) CreatePlayer(w io.Writer, notify <-chan struct{}) chan struct{} {
-	// Note: do not to send any events to the channel in this function, it will deadlock
-	// because the function that calls hasn't set up any listeners yet
+func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, chan struct{}) {
+	eventChan, closeChan := users.CreateUser(w, r)
+
 	token := uuid.New().String()
-	eventChan := make(chan string)
+	tokenInput := TokenInput(token)
 	player := player{"Test", eventChan}
-	r.players.Insert(token, player)
-
-	// Listen for client close and delete channel when it happens
-	closeChan := make(chan struct{})
-	go func() {
-		<-notify
-		fmt.Printf("Player disconnected from room %d\n", r.Id())
-		r.RemovePlayer(token)
-		closeChan <- struct{}{}
-	}()
-
-	// Continuously send data to the client
-	go func() {
-		for {
-			data := <-eventChan
-			// This is what's received from a closed channel
-			if data == "" {
-				break
-			}
-
-			logger.Debug("Sending data to player in room %d:\n%s", r.Id(), data)
-			_, err := fmt.Fprintf(w, data)
-			if err != nil {
-				logger.Error("Failed to send data to player in room %d:\n%s", r.Id(), data)
-			}
-			w.(http.Flusher).Flush()
-		}
-	}()
+	room.players.Insert(token, player)
 
 	// Initialize Player
-	r.players.SendToAll(r.CurrentPlayersEvent())
-	r.moderators.SendToAll(r.CurrentPlayersEvent())
+	room.players.SendToAll(room.CurrentPlayersEvent())
+	room.moderators.SendToAll(room.CurrentPlayersEvent())
 
-	tokenInput := TokenInput(token)
-
-	player.channel <- events.PlayerBuzzerEvent(r.GetCurrentBuzzer())
+	player.channel <- events.PlayerBuzzerEvent(room.GetCurrentBuzzer())
 	player.channel <- events.TokenEvent(tokenInput)
 
-	return closeChan
+	return token, closeChan
 }
 
-func (r *Room) CreateModerator(w io.Writer, notify <-chan struct{}) chan struct{} {
-	token := uuid.New().String()
-	eventChan := make(chan string)
-	moderator := moderator{eventChan}
-	r.moderators.Insert(token, moderator)
-
-	closeChan := make(chan struct{})
-	go func() {
-		<-notify
-		fmt.Printf("Moderator disconnected from room %d", r.Id())
-		r.RemoveModerator(token)
-		closeChan <- struct{}{}
-	}()
-
-	// Continuously send data to the client
-	go func() {
-		for {
-			data := <-eventChan
-			if data == "" {
-				break
-			}
-
-			logger.Debug("Sending data to moderator in room %d:\n%s", r.Id(), data)
-			_, err2 := fmt.Fprintf(w, data)
-			if err2 != nil {
-				logger.Error("Failed to send data to moderatorr in room %d:\n%s", r.Id(), data)
-			}
-			w.(http.Flusher).Flush()
-		}
-	}()
-
+func (room *Room) CreateModerator(w http.ResponseWriter, r *http.Request) (string, chan struct{}) {
 	// Initialize Moderator
-	eventChan <- r.CurrentPlayersEvent()
-	return closeChan
+	eventChan, closeChan := users.CreateUser(w, r)
+
+	token := uuid.New().String()
+	moderator := moderator{eventChan}
+	room.moderators.Insert(token, moderator)
+
+	eventChan <- room.CurrentPlayersEvent()
+	return token, closeChan
 }
 
 func (r *Room) RemoveModerator(token string) {
