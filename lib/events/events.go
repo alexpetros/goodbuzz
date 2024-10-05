@@ -1,9 +1,10 @@
-package rooms
+package events
 
 import (
 	"fmt"
 	"github.com/a-h/templ"
 	"goodbuzz/lib"
+	"goodbuzz/lib/components"
 	"strings"
 )
 
@@ -52,6 +53,6 @@ func ModeratorLogEvent(message string) string {
 }
 
 func TokenEvent(token string) string {
-	data := lib.ToString(TokenInput(token))
+	data := lib.ToString(components.TokenInput(token))
 	return formatEvent("token", data)
 }

@@ -3,12 +3,13 @@ package rooms
 import (
 	"context"
 	"fmt"
+	"github.com/a-h/templ"
 	"github.com/google/uuid"
 	"goodbuzz/lib/db"
+	"goodbuzz/lib/events"
+	"goodbuzz/lib/components"
 	"goodbuzz/lib/logger"
-	"sync"
-
-	"github.com/a-h/templ"
+	"goodbuzz/router/rooms/users"
 )
 
 type BuzzerStatus int
@@ -36,8 +37,8 @@ type Room struct {
 	roomId       int64
 	name         string
 	buzzerStatus BuzzerStatus
-	players      *userMap[player]
-	moderators   *userMap[moderator]
+	players      *users.UserMap[player]
+	moderators   *users.UserMap[moderator]
 }
 
 type player struct {
@@ -46,24 +47,7 @@ type player struct {
 }
 type moderator struct{}
 
-type roomMap struct {
-	sync.Mutex
-	internal map[int64]*Room
-}
-
-var openRooms = roomMap{
-	internal: make(map[int64]*Room),
-}
-
-func NewRoom(roomId int64, name string) *Room {
-	return &Room{
-		roomId:       roomId,
-		name:         name,
-		buzzerStatus: Unlocked,
-		players:      newUserMap[player](),
-		moderators:   newUserMap[moderator](),
-	}
-}
+var openRooms = newRoomMap()
 
 func (r *Room) Id() int64 {
 	return r.roomId
@@ -94,22 +78,8 @@ func (r *Room) StatusString() string {
 }
 
 func (r *Room) getPlayer(eventChan chan string) player {
-	player := r.players.get(eventChan)
+	player := r.players.Get(eventChan)
 	return player
-}
-
-func getOrCreateRoom(roomId int64, name string) *Room {
-	openRooms.Lock()
-	room := openRooms.internal[roomId]
-	if room == nil {
-		room = NewRoom(roomId, name)
-		openRooms.internal[roomId] = room
-	} else if room.name != name {
-		room.name = name
-	}
-	openRooms.Unlock()
-
-	return room
 }
 
 func GetRoomsForTournament(ctx context.Context, tournamentId int64) []Room {
@@ -125,7 +95,7 @@ func GetRoomsForTournament(ctx context.Context, tournamentId int64) []Room {
 
 func GetRoom(ctx context.Context, roomId int64) *Room {
 	dbRoom := db.GetRoom(ctx, roomId)
-	room := getOrCreateRoom(dbRoom.Id(), dbRoom.Name())
+	room := openRooms.getOrCreateRoom(dbRoom.Id(), dbRoom.Name())
 	return room
 }
 
@@ -133,14 +103,14 @@ func GetRoom(ctx context.Context, roomId int64) *Room {
 func (r *Room) BuzzRoom() {
 	r.buzzerStatus = Waiting
 
-	r.moderators.sendToAll(
-		ModeratorStatusEvent("Waiting"),
-		ModeratorLogEvent("Player Buzzed"),
+	r.moderators.SendToAll(
+		events.ModeratorStatusEvent("Waiting"),
+		events.ModeratorLogEvent("Player Buzzed"),
 	)
 
-	r.players.sendToAll(
-		PlayerBuzzerEvent(LockedBuzzer()),
-		PlayerLogEvent("Player Buzzed"),
+	r.players.SendToAll(
+		events.PlayerBuzzerEvent(components.LockedBuzzer()),
+		events.PlayerLogEvent("Player Buzzed"),
 	)
 }
 
@@ -148,24 +118,24 @@ func (r *Room) Reset() {
 	logger.Debug("Sending unlock message")
 	r.buzzerStatus = Unlocked
 
-	r.moderators.sendToAll(
-		ModeratorStatusEvent("Unlocked"),
-		ModeratorLogEvent("Buzzer Unlocked"),
+	r.moderators.SendToAll(
+		events.ModeratorStatusEvent("Unlocked"),
+		events.ModeratorLogEvent("Buzzer Unlocked"),
 	)
 
-	r.players.sendToAll(
-		PlayerBuzzerEvent(ReadyBuzzer()),
-		PlayerLogEvent("Buzzer Unlocked"),
+	r.players.SendToAll(
+		events.PlayerBuzzerEvent(components.ReadyBuzzer()),
+		events.PlayerLogEvent("Buzzer Unlocked"),
 	)
 }
 
 func (r *Room) CurrentPlayersEvent() string {
-	names := make([]string, len(r.players.channels))
-	for i := 0; i < len(r.players.channels); i++ {
+	names := make([]string, r.players.NumUsers())
+	for i := 0; i < r.players.NumUsers(); i++ {
 		names[i] = fmt.Sprintf("Player %d", i+1)
 	}
 
-	return ModeratorPlayerListEvent(names)
+	return events.ModeratorPlayerListEvent(names)
 }
 
 func (r *Room) GetCurrentBuzzer() templ.Component {
@@ -173,11 +143,11 @@ func (r *Room) GetCurrentBuzzer() templ.Component {
 
 	status := r.buzzerStatus
 	if status == Unlocked {
-		buzzer = ReadyBuzzer()
+		buzzer = components.ReadyBuzzer()
 	} else if status == Waiting {
-		buzzer = WaitingBuzzer()
+		buzzer = components.WaitingBuzzer()
 	} else if status == Locked {
-		buzzer = LockedBuzzer()
+		buzzer = components.LockedBuzzer()
 	}
 
 	return buzzer
@@ -185,7 +155,7 @@ func (r *Room) GetCurrentBuzzer() templ.Component {
 
 func (r *Room) AddModerator() chan string {
 	moderator := moderator{}
-	return r.moderators.new(moderator)
+	return r.moderators.New(moderator)
 }
 
 func (r *Room) AddPlayer() chan string {
@@ -193,26 +163,26 @@ func (r *Room) AddPlayer() chan string {
 	// because the function that calls hasn't set up any listeners yet
 	token := uuid.New().String()
 	player := player{"Test", token}
-	return r.players.new(player)
+	return r.players.New(player)
 }
 
 func (r *Room) RemoveModerator(eventChan chan string) {
-	r.moderators.delete(eventChan)
+	r.moderators.Delete(eventChan)
 }
 
 func (r *Room) RemovePlayer(eventChan chan string) {
-	r.players.delete(eventChan)
-	r.players.sendToAll(r.CurrentPlayersEvent())
-	r.moderators.sendToAll(r.CurrentPlayersEvent())
+	r.players.Delete(eventChan)
+	r.players.SendToAll(r.CurrentPlayersEvent())
+	r.moderators.SendToAll(r.CurrentPlayersEvent())
 }
 
 func (r *Room) InitializePlayer(eventChan chan string) {
-	r.players.sendToAll(r.CurrentPlayersEvent())
-	r.moderators.sendToAll(r.CurrentPlayersEvent())
+	r.players.SendToAll(r.CurrentPlayersEvent())
+	r.moderators.SendToAll(r.CurrentPlayersEvent())
 
-	eventChan <- PlayerBuzzerEvent(r.GetCurrentBuzzer())
+	eventChan <- events.PlayerBuzzerEvent(r.GetCurrentBuzzer())
 	player := r.getPlayer(eventChan)
-	eventChan <- TokenEvent(player.token)
+	eventChan <- events.TokenEvent(player.token)
 }
 
 func (r *Room) InitializeModerator(eventChan chan string) {

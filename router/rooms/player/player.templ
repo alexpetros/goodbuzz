@@ -3,6 +3,7 @@ package player
 import "net/http"
 
 import "goodbuzz/lib"
+import "goodbuzz/lib/components"
 import "goodbuzz/router/rooms"
 
 
@@ -43,7 +44,7 @@ For more, see: https://htmx.org/attributes/hx-include/
   <input type="hidden" name="token" value="" sse-swap="token" hx-swap="outerHTML">
   <section>
     <h2>Buzzer</h2>
-    <div sse-swap="buzzer" hx-swap="innerHTML">@rooms.LoadingBuzzer()</div>
+    <div sse-swap="buzzer" hx-swap="innerHTML">@components.LoadingBuzzer()</div>
   </section>
 
   <section>
