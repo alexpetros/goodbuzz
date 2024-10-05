@@ -82,7 +82,7 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	// Send initial status
-	room.InitalizePlayer(eventChan)
+	room.InitializePlayer(eventChan)
 
 	// Wait for cleanup to happen and then close the connection
 	<-closeConn

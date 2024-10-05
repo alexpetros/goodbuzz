@@ -3,12 +3,12 @@ package rooms
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"goodbuzz/lib/db"
 	"goodbuzz/lib/logger"
 	"sync"
 
 	"github.com/a-h/templ"
-	"github.com/google/uuid"
 )
 
 type BuzzerStatus int
@@ -32,61 +32,19 @@ func (s BuzzerStatus) String() string {
 	return "Unknown"
 }
 
-type player struct {
-	name  string
-	token string
-}
-
-type channelMap struct {
-	sync.RWMutex
-	channels map[chan string]player
-}
-
-func newChannelMap() *channelMap {
-	return &channelMap{
-		channels: make(map[chan string]player),
-	}
-}
-
-func (cm *channelMap) new() chan string {
-	eventChan := make(chan string)
-	cm.Lock()
-	defer cm.Unlock()
-
-	token := uuid.New().String()
-	cm.channels[eventChan] = player{"Test", token}
-	return eventChan
-}
-
-func (cm *channelMap) getPlayer(eventChan chan string) player {
-	cm.RLock()
-	defer cm.RUnlock()
-	return cm.channels[eventChan]
-}
-
-func (cm *channelMap) delete(eventChan chan string) {
-	cm.Lock()
-	defer cm.Unlock()
-	delete(cm.channels, eventChan)
-	close(eventChan)
-}
-
-func (cm *channelMap) sendToAll(messages ...string) {
-	message := CombineEvents(messages...)
-	cm.RLock()
-	for listener := range cm.channels {
-		listener <- message
-	}
-	cm.RUnlock()
-}
-
 type Room struct {
 	roomId       int64
 	name         string
 	buzzerStatus BuzzerStatus
-	players      *channelMap
-	moderators   *channelMap
+	players      *userMap[player]
+	moderators   *userMap[moderator]
 }
+
+type player struct {
+	name  string
+	token string
+}
+type moderator struct{}
 
 type roomMap struct {
 	sync.Mutex
@@ -102,8 +60,8 @@ func NewRoom(roomId int64, name string) *Room {
 		roomId:       roomId,
 		name:         name,
 		buzzerStatus: Unlocked,
-		players:      newChannelMap(),
-		moderators:   newChannelMap(),
+		players:      newUserMap[player](),
+		moderators:   newUserMap[moderator](),
 	}
 }
 
@@ -136,7 +94,7 @@ func (r *Room) StatusString() string {
 }
 
 func (r *Room) getPlayer(eventChan chan string) player {
-	player := r.players.getPlayer(eventChan)
+	player := r.players.get(eventChan)
 	return player
 }
 
@@ -226,13 +184,16 @@ func (r *Room) GetCurrentBuzzer() templ.Component {
 }
 
 func (r *Room) AddModerator() chan string {
-	return r.moderators.new()
+	moderator := moderator{}
+	return r.moderators.new(moderator)
 }
 
 func (r *Room) AddPlayer() chan string {
-	// Note: if you try to send any events in this function, it will deadlock
+	// Note: do not to send any events to the channel in this function, it will deadlock
 	// because the function that calls hasn't set up any listeners yet
-	return r.players.new()
+	token := uuid.New().String()
+	player := player{"Test", token}
+	return r.players.new(player)
 }
 
 func (r *Room) RemoveModerator(eventChan chan string) {
@@ -245,7 +206,7 @@ func (r *Room) RemovePlayer(eventChan chan string) {
 	r.moderators.sendToAll(r.CurrentPlayersEvent())
 }
 
-func (r *Room) InitalizePlayer(eventChan chan string) {
+func (r *Room) InitializePlayer(eventChan chan string) {
 	r.players.sendToAll(r.CurrentPlayersEvent())
 	r.moderators.sendToAll(r.CurrentPlayersEvent())
 
