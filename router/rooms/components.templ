@@ -23,3 +23,7 @@ templ ReadyBuzzer() {
   Buzz
 </button>
 }
+
+templ TokenInput(token string) {
+  <input type="hidden" name="token" value={token} sse-swap="token" hx-swap="outerHTML">
+}

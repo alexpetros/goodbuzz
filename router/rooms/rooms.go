@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/a-h/templ"
+	"github.com/google/uuid"
 )
 
 type BuzzerStatus int
@@ -31,14 +32,19 @@ func (s BuzzerStatus) String() string {
 	return "Unknown"
 }
 
+type player struct {
+	name string
+	token string
+}
+
 type channelMap struct {
 	sync.RWMutex
-	channels map[chan string]struct{}
+	channels map[chan string]player
 }
 
 func newChannelMap() *channelMap {
 	return &channelMap{
-		channels: make(map[chan string]struct{}),
+		channels: make(map[chan string]player),
 	}
 }
 
@@ -47,8 +53,15 @@ func (cm *channelMap) new() chan string {
 	cm.Lock()
 	defer cm.Unlock()
 
-	cm.channels[eventChan] = struct{}{}
+	token := uuid.New().String()
+	cm.channels[eventChan] = player{ "Test", token }
 	return eventChan
+}
+
+func (cm *channelMap) getPlayer(eventChan chan string) player {
+	cm.RLock()
+	defer cm.RUnlock()
+	return cm.channels[eventChan]
 }
 
 func (cm *channelMap) delete(eventChan chan string) {
@@ -122,6 +135,11 @@ func (r *Room) StatusString() string {
 	return r.buzzerStatus.String()
 }
 
+func (r *Room) getPlayer(eventChan chan string) player {
+	player := r.players.getPlayer(eventChan)
+	return player
+}
+
 func getOrCreateRoom(room_id int64, name string) *Room {
 	openRooms.Lock()
 	room := openRooms.internal[room_id]
@@ -163,7 +181,7 @@ func (r *Room) BuzzRoom() {
 	)
 
 	r.players.sendToAll(
-		r.PlayerInitializeEvent(),
+		PlayerBuzzerEvent(LockedBuzzer()),
 		PlayerLogEvent("Player Buzzed"),
 	)
 }
@@ -227,12 +245,13 @@ func (r *Room) RemovePlayer(eventChan chan string) {
 	r.moderators.sendToAll(r.CurrentPlayersEvent())
 }
 
-func (r *Room) PlayerInitializeEvent() string {
+func (r *Room) InitalizePlayer(eventChan chan string) {
 	r.players.sendToAll(r.CurrentPlayersEvent())
 	r.moderators.sendToAll(r.CurrentPlayersEvent())
 
-	buzzer := PlayerBuzzerEvent(r.GetCurrentBuzzer())
-	return buzzer
+	eventChan <- PlayerBuzzerEvent(r.GetCurrentBuzzer())
+	player := r.getPlayer(eventChan)
+	eventChan <- TokenEvent(player.token)
 }
 
 func (r *Room) ModeratorInitializeEvent() string {

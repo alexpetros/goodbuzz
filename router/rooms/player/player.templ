@@ -26,7 +26,21 @@ func Get(w http.ResponseWriter, r *http.Request) {
 templ index(room *rooms.Room) {
 <h1>{room.Name()}</h1>
 
-<main hx-ext="sse" sse-connect="./player/live" class="player">
+<!--
+Slightly advanced hx-include usage here.
+hx-include is inherited by all its children (so everything in <main>), and each of those children
+will look for the closest ancestor <input name=token> to include in their requests
+
+For more, see: https://htmx.org/attributes/hx-include/
+-->
+<main
+  class="player"
+  hx-ext="sse"
+  hx-include="closest [name=token]"
+  sse-connect="./player/live"
+>
+  <!-- Upon connection, the server will send a new token and replace this-->
+  <input type="hidden" name="token" value="" sse-swap="token" hx-swap="outerHTML">
   <section>
     <h2>Buzzer</h2>
     <div sse-swap="buzzer" hx-swap="innerHTML">@rooms.LoadingBuzzer()</div>
@@ -55,6 +69,11 @@ function buzz() {
   button.setAttribute('disabled', 'true')
   button.innerText = 'Waiting...'
   button.classList.add('waiting')
+}
+
+function setToken(token) {
+  const main = document.querySelector('main')
+  main.setAttribute('token', token)
 }
 </script>
 }

@@ -50,3 +50,8 @@ func ModeratorLogEvent(message string) string {
 	data := fmt.Sprintf("<div>%s<div>", message)
 	return formatEvent("log", data)
 }
+
+func TokenEvent(token string) string {
+	data := lib.ToString(TokenInput(token))
+	return formatEvent("token", data)
+}
