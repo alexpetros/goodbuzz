@@ -1,7 +1,6 @@
 package moderator
 
 import (
-	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms"
@@ -32,6 +31,6 @@ func Live(w http.ResponseWriter, r *http.Request) {
 
 	// Wait for cleanup to happen and then close the connection
 	<-closeConn
-	fmt.Printf("Moderator disconnected from room %d", room.Id())
+	logger.Info("Moderator disconnected from room %d", room.Id())
 	room.RemoveModerator(token)
 }

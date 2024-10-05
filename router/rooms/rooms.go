@@ -109,6 +109,7 @@ func GetRoomsForTournament(ctx context.Context, tournamentId int64) []Room {
 }
 
 func GetRoom(ctx context.Context, roomId int64) *Room {
+	// TODO handle case where this is nil
 	dbRoom := db.GetRoom(ctx, roomId)
 	room := openRooms.getOrCreateRoom(dbRoom.Id(), dbRoom.Name())
 	return room
@@ -187,13 +188,13 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 }
 
 func (room *Room) CreateModerator(w http.ResponseWriter, r *http.Request) (string, chan struct{}) {
-	// Initialize Moderator
 	eventChan, closeChan := users.CreateUser(w, r)
 
 	token := uuid.New().String()
 	moderator := moderator{eventChan}
 	room.moderators.Insert(token, moderator)
 
+	// Initialize Moderator
 	eventChan <- room.CurrentPlayersEvent()
 	return token, closeChan
 }

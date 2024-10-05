@@ -32,7 +32,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) (chan string, chan struc
 			//logger.Debug("Sending data to moderator in room %d:\n%s", room.Id(), data)
 			_, err2 := fmt.Fprintf(w, data)
 			if err2 != nil {
-				//logger.Error("Failed to send data to moderatorr in room %d:\n%s", room.Id(), data)
+				//logger.Error("Failed to send data to moderator in room %d:\n%s", room.Id(), data)
 			}
 			w.(http.Flusher).Flush()
 		}

@@ -54,6 +54,7 @@ func Live(w http.ResponseWriter, r *http.Request) {
 
 	// Wait for cleanup to happen and then close the connection
 	<-closeConn
+	logger.Info("Player disconnected from room %d", room.Id())
 	room.RemovePlayer(token)
 
 }
