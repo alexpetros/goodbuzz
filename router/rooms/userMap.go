@@ -15,34 +15,34 @@ func newUserMap[T any]() *userMap[T] {
 	}
 }
 
-func (cm *userMap[T]) sendToAll(messages ...string) {
+func (um *userMap[T]) sendToAll(messages ...string) {
 	message := CombineEvents(messages...)
-	cm.RLock()
-	defer cm.RUnlock()
+	um.RLock()
+	defer um.RUnlock()
 
-	for listener := range cm.channels {
+	for listener := range um.channels {
 		listener <- message
 	}
 }
 
-func (cm *userMap[T]) new(user T) chan string {
+func (um *userMap[T]) new(user T) chan string {
 	eventChan := make(chan string)
-	cm.Lock()
-	defer cm.Unlock()
+	um.Lock()
+	defer um.Unlock()
 
-	cm.channels[eventChan] = user
+	um.channels[eventChan] = user
 	return eventChan
 }
 
-func (cm *userMap[T]) get(eventChan chan string) T {
-	cm.RLock()
-	defer cm.RUnlock()
-	return cm.channels[eventChan]
+func (um *userMap[T]) get(eventChan chan string) T {
+	um.RLock()
+	defer um.RUnlock()
+	return um.channels[eventChan]
 }
 
-func (cm *userMap[T]) delete(eventChan chan string) {
-	cm.Lock()
-	defer cm.Unlock()
-	delete(cm.channels, eventChan)
+func (um *userMap[T]) delete(eventChan chan string) {
+	um.Lock()
+	defer um.Unlock()
+	delete(um.channels, eventChan)
 	close(eventChan)
 }

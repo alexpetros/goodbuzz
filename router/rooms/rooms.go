@@ -98,12 +98,12 @@ func (r *Room) getPlayer(eventChan chan string) player {
 	return player
 }
 
-func getOrCreateRoom(room_id int64, name string) *Room {
+func getOrCreateRoom(roomId int64, name string) *Room {
 	openRooms.Lock()
-	room := openRooms.internal[room_id]
+	room := openRooms.internal[roomId]
 	if room == nil {
-		room = NewRoom(room_id, name)
-		openRooms.internal[room_id] = room
+		room = NewRoom(roomId, name)
+		openRooms.internal[roomId] = room
 	} else if room.name != name {
 		room.name = name
 	}
