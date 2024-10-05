@@ -3,7 +3,6 @@ package player
 import "net/http"
 
 import "goodbuzz/lib"
-import "goodbuzz/lib/components"
 import "goodbuzz/router/rooms"
 
 
@@ -28,23 +27,20 @@ templ index(room *rooms.Room) {
 <h1>{room.Name()}</h1>
 
 <!--
-Slightly advanced hx-include usage here.
-hx-include is inherited by all its children (so everything in <main>), and each of those children
-will look for the closest ancestor <input name=token> to include in their requests
-
+Note that hx-include is inherited by all its children (so everything in <main>)
 For more, see: https://htmx.org/attributes/hx-include/
 -->
 <main
   class="player"
   hx-ext="sse"
-  hx-include="closest [name=token]"
+  hx-include="[name=token]"
   sse-connect="./player/live"
 >
   <!-- Upon connection, the server will send a new token and replace this-->
   <input type="hidden" name="token" value="" sse-swap="token" hx-swap="outerHTML">
   <section>
     <h2>Buzzer</h2>
-    <div sse-swap="buzzer" hx-swap="innerHTML">@components.LoadingBuzzer()</div>
+    <div sse-swap="buzzer" hx-swap="innerHTML">LoadingBuzzer()</div>
   </section>
 
   <section>

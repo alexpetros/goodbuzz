@@ -1,7 +1,7 @@
 package users
 
 import (
-	"goodbuzz/lib/events"
+	"goodbuzz/lib"
 	"sync"
 )
 
@@ -17,7 +17,7 @@ func NewUserMap[T any]() *UserMap[T] {
 }
 
 func (um *UserMap[T]) SendToAll(messages ...string) {
-	message := events.CombineEvents(messages...)
+	message := lib.CombineEvents(messages...)
 	um.RLock()
 	defer um.RUnlock()
 

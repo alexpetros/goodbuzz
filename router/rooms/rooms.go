@@ -6,9 +6,8 @@ import (
 	"github.com/a-h/templ"
 	"github.com/google/uuid"
 	"goodbuzz/lib/db"
-	"goodbuzz/lib/events"
-	"goodbuzz/lib/components"
 	"goodbuzz/lib/logger"
+	"goodbuzz/router/rooms/events"
 	"goodbuzz/router/rooms/users"
 )
 
@@ -82,6 +81,10 @@ func (r *Room) getPlayer(eventChan chan string) player {
 	return player
 }
 
+//func (r *Room) SetPlayerName(token string, name string) {
+//	player := r.players.Get(eventChan)
+//}
+
 func GetRoomsForTournament(ctx context.Context, tournamentId int64) []Room {
 	dbRooms := db.GetRoomsForTournament(ctx, tournamentId)
 	rooms := make([]Room, 0)
@@ -109,7 +112,7 @@ func (r *Room) BuzzRoom() {
 	)
 
 	r.players.SendToAll(
-		events.PlayerBuzzerEvent(components.LockedBuzzer()),
+		events.PlayerBuzzerEvent(LockedBuzzer()),
 		events.PlayerLogEvent("Player Buzzed"),
 	)
 }
@@ -124,7 +127,7 @@ func (r *Room) Reset() {
 	)
 
 	r.players.SendToAll(
-		events.PlayerBuzzerEvent(components.ReadyBuzzer()),
+		events.PlayerBuzzerEvent(ReadyBuzzer()),
 		events.PlayerLogEvent("Buzzer Unlocked"),
 	)
 }
@@ -143,11 +146,11 @@ func (r *Room) GetCurrentBuzzer() templ.Component {
 
 	status := r.buzzerStatus
 	if status == Unlocked {
-		buzzer = components.ReadyBuzzer()
+		buzzer = ReadyBuzzer()
 	} else if status == Waiting {
-		buzzer = components.WaitingBuzzer()
+		buzzer = WaitingBuzzer()
 	} else if status == Locked {
-		buzzer = components.LockedBuzzer()
+		buzzer = LockedBuzzer()
 	}
 
 	return buzzer
@@ -182,7 +185,8 @@ func (r *Room) InitializePlayer(eventChan chan string) {
 
 	eventChan <- events.PlayerBuzzerEvent(r.GetCurrentBuzzer())
 	player := r.getPlayer(eventChan)
-	eventChan <- events.TokenEvent(player.token)
+	tokenInput := TokenInput(player.token)
+	eventChan <- events.TokenEvent(tokenInput)
 }
 
 func (r *Room) InitializeModerator(eventChan chan string) {

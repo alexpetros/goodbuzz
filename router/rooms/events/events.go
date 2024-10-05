@@ -4,36 +4,22 @@ import (
 	"fmt"
 	"github.com/a-h/templ"
 	"goodbuzz/lib"
-	"goodbuzz/lib/components"
 	"strings"
 )
 
-func formatEvent(eventName string, data string) string {
-	return fmt.Sprintf("event: %s\ndata: %s\n\n", eventName, data)
-}
-
-func CombineEvents(events ...string) string {
-	var sb strings.Builder
-	for _, message := range events {
-		sb.WriteString(message)
-	}
-
-	return sb.String()
-}
-
 func PlayerBuzzerEvent(buzzer templ.Component) string {
 	data := lib.ToString(buzzer)
-	return formatEvent("buzzer", data)
+	return lib.FormatEvent("buzzer", data)
 }
 
 func PlayerLogEvent(message string) string {
 	data := fmt.Sprintf("<div>%s</div>", message)
-	return formatEvent("log", data)
+	return lib.FormatEvent("log", data)
 }
 
 func ModeratorStatusEvent(message string) string {
 	data := fmt.Sprintf("<span>%s<span>", message)
-	return formatEvent("status", data)
+	return lib.FormatEvent("status", data)
 }
 
 func ModeratorPlayerListEvent(players []string) string {
@@ -44,15 +30,15 @@ func ModeratorPlayerListEvent(players []string) string {
 		sb.WriteString(li)
 	}
 
-	return formatEvent("players", sb.String())
+	return lib.FormatEvent("players", sb.String())
 }
 
 func ModeratorLogEvent(message string) string {
 	data := fmt.Sprintf("<div>%s<div>", message)
-	return formatEvent("log", data)
+	return lib.FormatEvent("log", data)
 }
 
-func TokenEvent(token string) string {
-	data := lib.ToString(components.TokenInput(token))
-	return formatEvent("token", data)
+func TokenEvent(token templ.Component) string {
+	data := lib.ToString(token)
+	return lib.FormatEvent("token", data)
 }
