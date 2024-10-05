@@ -33,7 +33,7 @@ func (s BuzzerStatus) String() string {
 }
 
 type player struct {
-	name string
+	name  string
 	token string
 }
 
@@ -54,7 +54,7 @@ func (cm *channelMap) new() chan string {
 	defer cm.Unlock()
 
 	token := uuid.New().String()
-	cm.channels[eventChan] = player{ "Test", token }
+	cm.channels[eventChan] = player{"Test", token}
 	return eventChan
 }
 
@@ -254,7 +254,6 @@ func (r *Room) InitalizePlayer(eventChan chan string) {
 	eventChan <- TokenEvent(player.token)
 }
 
-func (r *Room) ModeratorInitializeEvent() string {
-	players := r.CurrentPlayersEvent()
-	return players
+func (r *Room) InitializeModerator(eventChan chan string) {
+	eventChan <- r.CurrentPlayersEvent()
 }

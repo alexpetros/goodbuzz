@@ -73,7 +73,10 @@ func Live(w http.ResponseWriter, r *http.Request) {
 			}
 
 			logger.Debug("Sending data to player in room %d:\n%s", room.Id(), data)
-			fmt.Fprintf(w, data)
+			_, err := fmt.Fprintf(w, data)
+			if err != nil {
+				logger.Error("Failed to send data to player in room %d:\n%s", room.Id(), data)
+			}
 			w.(http.Flusher).Flush()
 		}
 	}()
