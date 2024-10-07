@@ -25,9 +25,9 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		lib.BadRequest(w, r)
 	}
 
-	//token := r.PostFormValue("token")
-	//name := r.PostFormValue("name")
-	////room.SetPlayerName(token, name)
+	token := r.PostFormValue("token")
+	name := r.PostFormValue("name")
+	room.SetPlayerName(token, name)
 	lib.NoContent(w, r)
 }
 

@@ -83,5 +83,19 @@ func (um *UserMap[T]) CloseAndDelete(token string) {
 }
 
 func (um *UserMap[T]) NumUsers() int {
+	um.RLock()
+	defer um.RUnlock()
 	return len(um.users)
+}
+
+func (um *UserMap[T]) GetUsers() []T {
+	um.RLock()
+	defer um.RUnlock()
+
+	res := make([]T, 0)
+	for _, value := range um.users {
+		res = append(res, value)
+	}
+
+	return res
 }

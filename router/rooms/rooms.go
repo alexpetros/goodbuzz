@@ -93,9 +93,13 @@ func (r *Room) getPlayer(token string) player {
 	return player
 }
 
-//func (r *Room) SetPlayerName(token string, name string) {
-//	player := r.players.Get(eventChan)
-//}
+func (r *Room) SetPlayerName(token string, name string) {
+	player := r.players.Get(token)
+	player.name = name
+	logger.Debug(player)
+	r.players.SendToAll(r.CurrentPlayersEvent())
+	r.moderators.SendToAll(r.CurrentPlayersEvent())
+}
 
 func GetRoomsForTournament(ctx context.Context, tournamentId int64) []Room {
 	dbRooms := db.GetRoomsForTournament(ctx, tournamentId)
@@ -146,11 +150,16 @@ func (r *Room) Reset() {
 }
 
 func (r *Room) CurrentPlayersEvent() string {
-	names := make([]string, r.players.NumUsers())
-	for i := 0; i < r.players.NumUsers(); i++ {
-		names[i] = fmt.Sprintf("Player %d", i+1)
+
+	users := r.players.GetUsers()
+	names := make([]string, len(users))
+	logger.Debug("%v", r.players.NumUsers())
+	logger.Debug("%v", users)
+	for _, player := range users {
+		names = append(names, player.name)
 	}
 
+	logger.Debug("%v", names)
 	return events.ModeratorPlayerListEvent(names)
 }
 
