@@ -59,13 +59,10 @@ For more, see: https://htmx.org/attributes/hx-include/
 
 
 <script>
-function buzz() {
-  const button = document.querySelector('.buzzer')
-  fetch(`./buzz`, { method: 'PUT' })
-
-  button.setAttribute('disabled', 'true')
-  button.innerText = 'Waiting...'
-  button.classList.add('waiting')
+function disableBuzzer() {
+  this.setAttribute('disabled', 'true')
+  this.innerText = 'Waiting...'
+  this.classList.add('waiting')
 }
 
 function setNameCookie() {

@@ -19,7 +19,9 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	room.BuzzRoom()
+	token := r.PostFormValue("token")
+
+	room.BuzzRoom(token)
 	w.WriteHeader(204)
 }
 

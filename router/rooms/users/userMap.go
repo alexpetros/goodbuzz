@@ -71,7 +71,8 @@ func (um *UserMap[T]) Insert(token string, user T) {
 func (um *UserMap[T]) Get(token string) T {
 	um.RLock()
 	defer um.RUnlock()
-	return um.users[token]
+	user := um.users[token]
+	return user
 }
 
 func (um *UserMap[T]) CloseAndDelete(token string) {

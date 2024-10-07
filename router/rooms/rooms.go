@@ -89,7 +89,11 @@ func (r *Room) StatusString() string {
 }
 
 func (r *Room) getPlayer(token string) *player {
-	return r.players.Get(token)
+	player := r.players.Get(token)
+	if player == nil {
+		logger.Error("Returning nil player for token %v")
+	}
+	return player
 }
 
 func (r *Room) SetPlayerName(token string, name string) {
@@ -118,17 +122,21 @@ func GetRoom(ctx context.Context, roomId int64) *Room {
 }
 
 // TODO need a way to ignore buzzes that came in before the reset
-func (r *Room) BuzzRoom() {
+func (r *Room) BuzzRoom(token string) {
+	logger.Debug("Buzzing room for player with token: %s", token)
+
 	r.buzzerStatus = Waiting
+	player := r.getPlayer(token)
+	logMessage := fmt.Sprintf("%s Buzzed", player.name)
 
 	r.moderators.SendToAll(
 		events.ModeratorStatusEvent("Waiting"),
-		events.ModeratorLogEvent("Player Buzzed"),
+		events.ModeratorLogEvent(logMessage),
 	)
 
 	r.players.SendToAll(
 		events.PlayerBuzzerEvent(LockedBuzzer()),
-		events.PlayerLogEvent("Player Buzzed"),
+		events.PlayerLogEvent(logMessage),
 	)
 }
 

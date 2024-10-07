@@ -19,7 +19,7 @@ templ LockedBuzzer() {
 }
 
 templ ReadyBuzzer() {
-<button class="buzzer" onclick="buzz()">
+<button class="buzzer" hx-put="./buzz" hx-on::before-request="disableBuzzer()">
   Buzz
 </button>
 }
