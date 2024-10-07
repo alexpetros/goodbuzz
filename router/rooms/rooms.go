@@ -178,7 +178,16 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 
 	token := uuid.New().String()
 	tokenInput := TokenInput(token)
-	player := player{"Test", eventChan}
+
+	nameCookie, err := r.Cookie("name")
+	var name string
+	if (err != nil) {
+		name = "New Player"
+	} else {
+		name = nameCookie.Value
+	}
+	player := player{name, eventChan}
+
 	room.players.Insert(token, &player)
 
 	// Initialize Player

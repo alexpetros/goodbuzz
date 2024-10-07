@@ -45,7 +45,7 @@ For more, see: https://htmx.org/attributes/hx-include/
 
   <section>
     <h2>Players</h2>
-    <form hx-put="./player">
+    <form hx-put="./player" hx-on::before-request="setNameCookie()">
       <label>Name: <input type="text" name="name"></label>
       <button>Set</button>
     </form>
@@ -68,9 +68,10 @@ function buzz() {
   button.classList.add('waiting')
 }
 
-function setToken(token) {
-  const main = document.querySelector('main')
-  main.setAttribute('token', token)
+function setNameCookie() {
+  const input = event.target.querySelector('input[name=name]')
+  document.cookie = `name=${input.value}`
 }
+
 </script>
 }

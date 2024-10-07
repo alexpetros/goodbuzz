@@ -56,5 +56,4 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	<-closeConn
 	logger.Info("Player disconnected from room %d", room.Id())
 	room.RemovePlayer(token)
-
 }
