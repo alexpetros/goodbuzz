@@ -37,8 +37,8 @@ type Room struct {
 	roomId       int64
 	name         string
 	buzzerStatus BuzzerStatus
-	players      *users.UserMap[player]
-	moderators   *users.UserMap[moderator]
+	players      *users.UserMap[*player]
+	moderators   *users.UserMap[*moderator]
 }
 
 type player struct {
@@ -88,15 +88,13 @@ func (r *Room) StatusString() string {
 	return r.buzzerStatus.String()
 }
 
-func (r *Room) getPlayer(token string) player {
-	player := r.players.Get(token)
-	return player
+func (r *Room) getPlayer(token string) *player {
+	return r.players.Get(token)
 }
 
 func (r *Room) SetPlayerName(token string, name string) {
 	player := r.players.Get(token)
 	player.name = name
-	logger.Debug(player)
 	r.players.SendToAll(r.CurrentPlayersEvent())
 	r.moderators.SendToAll(r.CurrentPlayersEvent())
 }
@@ -153,13 +151,10 @@ func (r *Room) CurrentPlayersEvent() string {
 
 	users := r.players.GetUsers()
 	names := make([]string, len(users))
-	logger.Debug("%v", r.players.NumUsers())
-	logger.Debug("%v", users)
-	for _, player := range users {
-		names = append(names, player.name)
+	for i, player := range users {
+		names[i] = player.name
 	}
 
-	logger.Debug("%v", names)
 	return events.ModeratorPlayerListEvent(names)
 }
 
@@ -184,7 +179,7 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 	token := uuid.New().String()
 	tokenInput := TokenInput(token)
 	player := player{"Test", eventChan}
-	room.players.Insert(token, player)
+	room.players.Insert(token, &player)
 
 	// Initialize Player
 	room.players.SendToAll(room.CurrentPlayersEvent())
@@ -201,7 +196,7 @@ func (room *Room) CreateModerator(w http.ResponseWriter, r *http.Request) (strin
 
 	token := uuid.New().String()
 	moderator := moderator{eventChan}
-	room.moderators.Insert(token, moderator)
+	room.moderators.Insert(token, &moderator)
 
 	// Initialize Moderator
 	eventChan <- room.CurrentPlayersEvent()
