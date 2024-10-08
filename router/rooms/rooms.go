@@ -3,7 +3,6 @@ package rooms
 import (
 	"context"
 	"fmt"
-	"github.com/a-h/templ"
 	"github.com/google/uuid"
 	"goodbuzz/lib/db"
 	"goodbuzz/lib/logger"
@@ -135,7 +134,7 @@ func (r *Room) BuzzRoom(token string) {
 	)
 
 	r.players.SendToAll(
-		events.PlayerBuzzerEvent(LockedBuzzer()),
+		events.LockedBuzzerEvent(),
 		events.PlayerLogEvent(logMessage),
 	)
 }
@@ -150,7 +149,7 @@ func (r *Room) Reset() {
 	)
 
 	r.players.SendToAll(
-		events.PlayerBuzzerEvent(ReadyBuzzer()),
+		events.ReadyBuzzerEvent(),
 		events.PlayerLogEvent("Buzzer Unlocked"),
 	)
 }
@@ -166,16 +165,16 @@ func (r *Room) CurrentPlayersEvent() string {
 	return events.ModeratorPlayerListEvent(names)
 }
 
-func (r *Room) GetCurrentBuzzer() templ.Component {
-	var buzzer templ.Component
+func (r *Room) CurrentBuzzerEvent() string {
+	var buzzer string
 
 	status := r.buzzerStatus
 	if status == Unlocked {
-		buzzer = ReadyBuzzer()
+		buzzer = events.ReadyBuzzerEvent()
 	} else if status == Waiting {
-		buzzer = WaitingBuzzer()
+		buzzer = events.WaitingBuzzerEvent()
 	} else if status == Locked {
-		buzzer = LockedBuzzer()
+		buzzer = events.LockedBuzzerEvent()
 	}
 
 	return buzzer
@@ -185,11 +184,10 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 	eventChan, closeChan := users.CreateUser(w, r)
 
 	token := uuid.New().String()
-	tokenInput := TokenInput(token)
 
 	nameCookie, err := r.Cookie("name")
 	var name string
-	if (err != nil) {
+	if err != nil {
 		name = "New Player"
 	} else {
 		name = nameCookie.Value
@@ -202,8 +200,8 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 	room.players.SendToAll(room.CurrentPlayersEvent())
 	room.moderators.SendToAll(room.CurrentPlayersEvent())
 
-	player.channel <- events.PlayerBuzzerEvent(room.GetCurrentBuzzer())
-	player.channel <- events.TokenEvent(tokenInput)
+	player.channel <- room.CurrentBuzzerEvent()
+	player.channel <- events.TokenEvent(token)
 
 	return token, closeChan
 }

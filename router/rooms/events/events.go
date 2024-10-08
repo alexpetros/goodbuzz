@@ -2,14 +2,24 @@ package events
 
 import (
 	"fmt"
-	"github.com/a-h/templ"
 	"goodbuzz/lib"
 	"strings"
 )
 
-func PlayerBuzzerEvent(buzzer templ.Component) string {
-	data := lib.ToString(buzzer)
-	return lib.FormatEventString("buzzer", data)
+func LoadingBuzzerEvent() string {
+	return lib.FormatEventComponent("buzzer", LoadingBuzzer())
+}
+
+func WaitingBuzzerEvent() string {
+	return lib.FormatEventComponent("buzzer", WaitingBuzzer())
+}
+
+func LockedBuzzerEvent() string {
+	return lib.FormatEventComponent("buzzer", LockedBuzzer())
+}
+
+func ReadyBuzzerEvent() string {
+	return lib.FormatEventComponent("buzzer", ReadyBuzzer())
 }
 
 func PlayerLogEvent(message string) string {
@@ -38,7 +48,7 @@ func ModeratorLogEvent(message string) string {
 	return lib.FormatEventString("log", data)
 }
 
-func TokenEvent(token templ.Component) string {
-	data := lib.ToString(token)
+func TokenEvent(token string) string {
+	data := lib.ToString(TokenInput(token))
 	return lib.FormatEventString("token", data)
 }
