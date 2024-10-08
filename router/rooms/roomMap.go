@@ -1,7 +1,7 @@
 package rooms
 
 import (
-	"goodbuzz/router/rooms/maps"
+	"goodbuzz/router/rooms/users"
 	"sync"
 )
 
@@ -15,8 +15,8 @@ func (roomMap *roomMap) newRoom(roomId int64, name string) *Room {
 		roomId:       roomId,
 		name:         name,
 		buzzerStatus: Unlocked,
-		players:      users.NewUserMap[*player](),
-		moderators:   users.NewUserMap[*moderator](),
+		players:      users.NewUserMap[*users.Player](),
+		moderators:   users.NewUserMap[*users.Moderator](),
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	"goodbuzz/lib/db"
 	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms/events"
-	"goodbuzz/router/rooms/maps"
+	"goodbuzz/router/rooms/users"
 	"net/http"
 )
 
@@ -36,25 +36,8 @@ type Room struct {
 	roomId       int64
 	name         string
 	buzzerStatus BuzzerStatus
-	players      *users.UserMap[*player]
-	moderators   *users.UserMap[*moderator]
-}
-
-type player struct {
-	name    string
-	channel chan string
-}
-
-func (player player) Channel() chan string {
-	return player.channel
-}
-
-type moderator struct {
-	channel chan string
-}
-
-func (moderator moderator) Channel() chan string {
-	return moderator.channel
+	players      *users.UserMap[*users.Player]
+	moderators   *users.UserMap[*users.Moderator]
 }
 
 var openRooms = newRoomMap()
@@ -72,11 +55,11 @@ func (room *Room) Url() string {
 }
 
 func (room *Room) PlayerUrl() string {
-	return fmt.Sprintf("/rooms/%d/player", room.roomId)
+	return fmt.Sprintf("/rooms/%d/Player", room.roomId)
 }
 
 func (room *Room) ModeratorUrl() string {
-	return fmt.Sprintf("/rooms/%d/moderator", room.roomId)
+	return fmt.Sprintf("/rooms/%d/Moderator", room.roomId)
 }
 
 func (room *Room) Status() BuzzerStatus {
@@ -87,13 +70,13 @@ func (room *Room) StatusString() string {
 	return room.buzzerStatus.String()
 }
 
-func (room *Room) getPlayer(token string) *player {
+func (room *Room) getPlayer(token string) *users.Player {
 	return room.players.Get(token)
 }
 
 func (room *Room) SetPlayerName(token string, name string) {
 	player := room.players.Get(token)
-	player.name = name
+	player.SetName(name)
 	room.players.SendToAll(room.CurrentPlayersEvent())
 	room.moderators.SendToAll(room.CurrentPlayersEvent())
 }
@@ -118,15 +101,15 @@ func GetRoom(ctx context.Context, roomId int64) *Room {
 
 // TODO need a way to ignore buzzes that came in before the reset
 func (room *Room) BuzzRoom(token string) {
-	logger.Debug("Buzzing room for player with token: %s", token)
+	logger.Debug("Buzzing room for Player with token: %s", token)
 
 	room.buzzerStatus = Waiting
 	player := room.getPlayer(token)
 	if player == nil {
-		logger.Error("nil player returned for token %v")
+		logger.Error("nil Player returned for token %v")
 		return
 	}
-	logMessage := fmt.Sprintf("%s Buzzed", player.name)
+	logMessage := fmt.Sprintf("%s Buzzed", player.Name())
 
 	room.moderators.SendToAll(
 		events.ModeratorStatusEvent("Waiting"),
@@ -158,7 +141,7 @@ func (room *Room) CurrentPlayersEvent() string {
 	users := room.players.GetUsers()
 	names := make([]string, len(users))
 	for i, player := range users {
-		names[i] = player.name
+		names[i] = player.Name()
 	}
 
 	return events.ModeratorPlayerListEvent(names)
@@ -191,16 +174,16 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 	} else {
 		name = nameCookie.Value
 	}
-	player := player{name, eventChan}
+	player := users.NewPlayer(name, eventChan)
 
-	room.players.Insert(token, &player)
+	room.players.Insert(token, player)
 
 	// Initialize Player
 	room.players.SendToAll(room.CurrentPlayersEvent())
 	room.moderators.SendToAll(room.CurrentPlayersEvent())
 
-	player.channel <- room.CurrentBuzzerEvent()
-	player.channel <- events.TokenEvent(token)
+	player.Channel() <- room.CurrentBuzzerEvent()
+	player.Channel() <- events.TokenEvent(token)
 
 	return token, closeChan
 }
@@ -209,8 +192,8 @@ func (room *Room) CreateModerator(w http.ResponseWriter, r *http.Request) (strin
 	eventChan, closeChan := users.CreateUser(w, r)
 
 	token := uuid.New().String()
-	moderator := moderator{eventChan}
-	room.moderators.Insert(token, &moderator)
+	moderator := users.NewModerator(eventChan)
+	room.moderators.Insert(token, moderator)
 
 	// Initialize Moderator
 	eventChan <- room.CurrentPlayersEvent()
