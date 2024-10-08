@@ -51,7 +51,7 @@ func ModeratorLogEvent(message string) string {
 
 func ModeratorPlayerControlsEvent(players []*users.Player) string {
 	component := ModeratorPlayerControls(players)
-	return lib.FormatEventComponent("players", component)
+	return lib.FormatEventComponent("controls", component)
 }
 
 func TokenEvent(token string) string {

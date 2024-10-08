@@ -46,7 +46,7 @@ templ index(title string, room *rooms.Room) {
 
 <section>
   <h2>Players</h2>
-  <ul sse-swap="players" hx-swap="innerHTML"></ul>
+  <table sse-swap="controls" hx-swap="outerHTML"></table>
 </section>
 
 <section sse-swap="log" hx-swap="beforeend">

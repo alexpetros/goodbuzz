@@ -31,7 +31,16 @@ templ TokenInput(token string) {
 }
 
 templ ModeratorPlayerControls(players []*users.Player) {
-	for _, player := range players {
-		<li>{player.Name()}</li>
-	}
+  <table sse-swap="controls" hx-swap="outerHTML">
+    <tr>
+      <th>Player</th>
+      <th></th>
+    </tr>
+    for _, player := range players {
+    <tr>
+      <td>{player.Name()}</td>
+      <td><button>Lock</button></td>
+    </tr>
+    }
+  </table>
 }

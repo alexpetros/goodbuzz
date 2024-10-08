@@ -13,7 +13,7 @@ func (player Player) Name() string {
 	return player.name
 }
 
-func (player Player) SetName(name string) {
+func (player *Player) SetName(name string) {
 	player.name = name
 }
 

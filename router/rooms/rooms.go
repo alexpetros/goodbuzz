@@ -75,10 +75,11 @@ func (room *Room) getPlayer(token string) *users.Player {
 }
 
 func (room *Room) SetPlayerName(token string, name string) {
+	logger.Debug("Setting %s name to %s", token, name)
 	player := room.players.Get(token)
 	player.SetName(name)
 	room.players.SendToAll(room.CurrentPlayersEvent())
-	room.moderators.SendToAll(room.CurrentPlayersEvent())
+	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(room.players.GetUsers()))
 }
 
 func GetRoomsForTournament(ctx context.Context, tournamentId int64) []Room {
@@ -196,7 +197,7 @@ func (room *Room) CreateModerator(w http.ResponseWriter, r *http.Request) (strin
 	room.moderators.Insert(token, moderator)
 
 	// Initialize Moderator
-	eventChan <- room.CurrentPlayersEvent()
+	eventChan <- events.ModeratorPlayerControlsEvent(room.players.GetUsers())
 	return token, closeChan
 }
 
@@ -207,5 +208,5 @@ func (room *Room) RemoveModerator(token string) {
 func (room *Room) RemovePlayer(token string) {
 	room.players.CloseAndDelete(token)
 	room.players.SendToAll(room.CurrentPlayersEvent())
-	room.moderators.SendToAll(room.CurrentPlayersEvent())
+	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(room.players.GetUsers()))
 }
