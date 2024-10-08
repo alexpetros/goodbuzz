@@ -1,6 +1,7 @@
 package events
 
 import "goodbuzz/router/rooms/users"
+import "fmt"
 
 templ LoadingBuzzer() {
 <button class="buzzer loading" disabled >
@@ -35,11 +36,17 @@ templ ModeratorPlayerControls(players []*users.Player) {
     <tr>
       <th>Player</th>
       <th></th>
+      <th></th>
     </tr>
     for _, player := range players {
     <tr>
       <td>{player.Name()}</td>
-      <td><button>Lock</button></td>
+      <td>{player.StatusString()}</td>
+      <td>
+        <button hx-delete={fmt.Sprintf("./locks/%s", player.Token())}>
+          Unlock
+        </button>
+      </td>
     </tr>
     }
   </table>

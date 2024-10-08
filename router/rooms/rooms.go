@@ -81,6 +81,13 @@ func (room *Room) unlockAll() {
 	})
 }
 
+func (room *Room) UnlockPlayer(token string) {
+	logger.Debug("Unlocking player %s", token)
+	room.players.Get(token).Unlock()
+	room.sendBuzzerUpdates()
+	room.sendPlayerListUpdates()
+}
+
 func (room *Room) SetPlayerName(token string, name string) {
 	logger.Debug("Setting %s name to %s", token, name)
 	player := room.players.Get(token)
@@ -129,7 +136,9 @@ func (room *Room) ResetAll() {
 	room.buzzerStatus = Unlocked
 	room.buzzes = make([]string, 0)
 	room.unlockAll()
+
 	room.sendBuzzerUpdates()
+	room.sendPlayerListUpdates()
 	room.sendLogUpdates("Buzzer Unlocked")
 }
 
@@ -145,7 +154,9 @@ func (room *Room) ResetSome() {
 	}
 
 	room.buzzes = make([]string, 0)
+
 	room.sendBuzzerUpdates()
+	room.sendPlayerListUpdates()
 	room.sendLogUpdates("Buzzer Unlocked")
 }
 
@@ -176,7 +187,7 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 	} else {
 		name = nameCookie.Value
 	}
-	player := users.NewPlayer(name, eventChan)
+	player := users.NewPlayer(name, token, eventChan)
 
 	room.players.Insert(token, player)
 
