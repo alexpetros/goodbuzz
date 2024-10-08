@@ -9,17 +9,17 @@ import (
 
 func PlayerBuzzerEvent(buzzer templ.Component) string {
 	data := lib.ToString(buzzer)
-	return lib.FormatEvent("buzzer", data)
+	return lib.FormatEventString("buzzer", data)
 }
 
 func PlayerLogEvent(message string) string {
 	data := fmt.Sprintf("<div>%s</div>", message)
-	return lib.FormatEvent("log", data)
+	return lib.FormatEventString("log", data)
 }
 
 func ModeratorStatusEvent(message string) string {
 	data := fmt.Sprintf("<span>%s<span>", message)
-	return lib.FormatEvent("status", data)
+	return lib.FormatEventString("status", data)
 }
 
 func ModeratorPlayerListEvent(players []string) string {
@@ -30,15 +30,15 @@ func ModeratorPlayerListEvent(players []string) string {
 		sb.WriteString(li)
 	}
 
-	return lib.FormatEvent("players", sb.String())
+	return lib.FormatEventString("players", sb.String())
 }
 
 func ModeratorLogEvent(message string) string {
 	data := fmt.Sprintf("<div>%s<div>", message)
-	return lib.FormatEvent("log", data)
+	return lib.FormatEventString("log", data)
 }
 
 func TokenEvent(token templ.Component) string {
 	data := lib.ToString(token)
-	return lib.FormatEvent("token", data)
+	return lib.FormatEventString("token", data)
 }
