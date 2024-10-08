@@ -78,8 +78,14 @@ func (room *Room) SetPlayerName(token string, name string) {
 	logger.Debug("Setting %s name to %s", token, name)
 	player := room.players.Get(token)
 	player.SetName(name)
-	room.players.SendToAll(room.CurrentPlayersEvent())
-	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(room.players.GetUsers()))
+	room.updatePlayerLists()
+}
+
+func (room *Room) updatePlayerLists() {
+	users := room.players.GetUsers()
+
+	room.players.SendToAll(events.PlayerListEvent(users))
+	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(users))
 }
 
 func GetRoomsForTournament(ctx context.Context, tournamentId int64) []Room {
@@ -138,16 +144,6 @@ func (room *Room) Reset() {
 	)
 }
 
-func (room *Room) CurrentPlayersEvent() string {
-	users := room.players.GetUsers()
-	names := make([]string, len(users))
-	for i, player := range users {
-		names[i] = player.Name()
-	}
-
-	return events.PlayerListEvent(names)
-}
-
 func (room *Room) CurrentBuzzerEvent() string {
 	var buzzer string
 
@@ -180,8 +176,7 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 	room.players.Insert(token, player)
 
 	// Initialize Player
-	room.players.SendToAll(room.CurrentPlayersEvent())
-	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(room.players.GetUsers()))
+	room.updatePlayerLists()
 
 	player.Channel() <- room.CurrentBuzzerEvent()
 	player.Channel() <- events.TokenEvent(token)
@@ -207,6 +202,5 @@ func (room *Room) RemoveModerator(token string) {
 
 func (room *Room) RemovePlayer(token string) {
 	room.players.CloseAndDelete(token)
-	room.players.SendToAll(room.CurrentPlayersEvent())
-	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(room.players.GetUsers()))
+	room.updatePlayerLists()
 }

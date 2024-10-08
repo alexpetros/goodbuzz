@@ -33,11 +33,11 @@ func ModeratorStatusEvent(message string) string {
 	return lib.FormatEventString("status", data)
 }
 
-func PlayerListEvent(players []string) string {
+func PlayerListEvent(players []*users.Player) string {
 	var sb strings.Builder
 
-	for _, name := range players {
-		li := fmt.Sprintf("<li>%s", name)
+	for _, player := range players {
+		li := fmt.Sprintf("<li>%s", player.Name())
 		sb.WriteString(li)
 	}
 
