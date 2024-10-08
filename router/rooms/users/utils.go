@@ -14,12 +14,17 @@ func (player Player) Name() string {
 	return player.name
 }
 
-func (player *Player) SetName(name string) {
-	player.name = name
+func (player Player) IsLocked() bool {
+	return player.is_locked
 }
+
 
 func (player Player) Channel() chan string {
 	return player.channel
+}
+
+func (player *Player) SetName(name string) {
+	player.name = name
 }
 
 type Moderator struct {
