@@ -3,6 +3,7 @@ package users
 import (
 	"fmt"
 	"goodbuzz/lib"
+	"goodbuzz/lib/logger"
 	"net/http"
 	"sync"
 )
@@ -34,7 +35,12 @@ func CreateUser(w http.ResponseWriter, r *http.Request) (chan string, chan struc
 			if err2 != nil {
 				//logger.Error("Failed to send data to moderator in room %d:\n%s", room.Id(), data)
 			}
-			w.(http.Flusher).Flush()
+
+			if w != nil {
+				w.(http.Flusher).Flush()
+			} else {
+				logger.Warn("write to socket after connection closed")
+			}
 		}
 	}()
 
