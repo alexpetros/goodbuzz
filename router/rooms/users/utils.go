@@ -3,10 +3,11 @@ package users
 type Player struct {
 	name    string
 	channel chan string
+	is_locked bool
 }
 
 func NewPlayer(name string, channel chan string) *Player {
-	return &Player{name, channel}
+	return &Player{name, channel, false}
 }
 
 func (player Player) Name() string {

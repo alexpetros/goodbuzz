@@ -78,10 +78,15 @@ func (room *Room) SetPlayerName(token string, name string) {
 	logger.Debug("Setting %s name to %s", token, name)
 	player := room.players.Get(token)
 	player.SetName(name)
-	room.updatePlayerLists()
+	room.sendPlayerListUpdates()
 }
 
-func (room *Room) updatePlayerLists() {
+func (room *Room) sendLogUpdate(message string) {
+	room.moderators.SendToAll(events.ModeratorLogEvent(message))
+	room.players.SendToAll(events.PlayerLogEvent(message))
+}
+
+func (room *Room) sendPlayerListUpdates() {
 	users := room.players.GetUsers()
 
 	room.players.SendToAll(events.PlayerListEvent(users))
@@ -110,38 +115,28 @@ func GetRoom(ctx context.Context, roomId int64) *Room {
 func (room *Room) BuzzRoom(token string) {
 	logger.Debug("Buzzing room for Player with token: %s", token)
 
-	room.buzzerStatus = Waiting
 	player := room.getPlayer(token)
 	if player == nil {
 		logger.Error("nil Player returned for token %v")
 		return
 	}
+	room.buzzerStatus = Locked
+
+	room.moderators.SendToAll(events.ModeratorStatusEvent("Waiting"))
+	room.players.SendToAll(events.LockedBuzzerEvent())
+
 	logMessage := fmt.Sprintf("%s Buzzed", player.Name())
-
-	room.moderators.SendToAll(
-		events.ModeratorStatusEvent("Waiting"),
-		events.ModeratorLogEvent(logMessage),
-	)
-
-	room.players.SendToAll(
-		events.LockedBuzzerEvent(),
-		events.PlayerLogEvent(logMessage),
-	)
+	room.sendLogUpdate(logMessage)
 }
 
 func (room *Room) Reset() {
 	logger.Debug("Sending unlock message")
 	room.buzzerStatus = Unlocked
 
-	room.moderators.SendToAll(
-		events.ModeratorStatusEvent("Unlocked"),
-		events.ModeratorLogEvent("Buzzer Unlocked"),
-	)
+	room.moderators.SendToAll(events.ModeratorStatusEvent("Unlocked"))
+	room.players.SendToAll(events.ReadyBuzzerEvent())
 
-	room.players.SendToAll(
-		events.ReadyBuzzerEvent(),
-		events.PlayerLogEvent("Buzzer Unlocked"),
-	)
+	room.sendLogUpdate("Buzzer Unlocked")
 }
 
 func (room *Room) CurrentBuzzerEvent() string {
@@ -176,10 +171,9 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 	room.players.Insert(token, player)
 
 	// Initialize Player
-	room.updatePlayerLists()
-
-	player.Channel() <- room.CurrentBuzzerEvent()
+	room.sendPlayerListUpdates()
 	player.Channel() <- events.TokenEvent(token)
+	player.Channel() <- room.CurrentBuzzerEvent()
 
 	return token, closeChan
 }
@@ -202,5 +196,5 @@ func (room *Room) RemoveModerator(token string) {
 
 func (room *Room) RemovePlayer(token string) {
 	room.players.CloseAndDelete(token)
-	room.updatePlayerLists()
+	room.sendPlayerListUpdates()
 }
