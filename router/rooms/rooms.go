@@ -71,10 +71,6 @@ func (room *Room) StatusString() string {
 	return room.buzzerStatus.String()
 }
 
-func (room *Room) getPlayer(token string) *users.Player {
-	return room.players.Get(token)
-}
-
 func (room *Room) lockPlayer(token string) {
 	room.players.Get(token).Lock()
 }
@@ -114,11 +110,12 @@ func GetRoom(ctx context.Context, roomId int64) *Room {
 func (room *Room) BuzzRoom(token string) {
 	logger.Debug("Buzzing room for Player with token: %s", token)
 
-	player := room.getPlayer(token)
+	player := room.players.Get(token)
 	if player == nil {
 		logger.Error("nil Player returned for token %v")
 		return
 	}
+
 	room.buzzerStatus = Locked
 	room.buzzes = append(room.buzzes, token)
 	logMessage := fmt.Sprintf("%s Buzzed", player.Name())

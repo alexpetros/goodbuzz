@@ -26,6 +26,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) (chan string, chan struc
 	go func() {
 		for {
 			data := <-eventChan
+			// Upon receiving the zero value (""), the channel is closed, so break the loop
 			if data == "" {
 				break
 			}
@@ -92,9 +93,8 @@ func (um *UserMap[T]) Run(fn func(T)) {
 func (um *UserMap[T]) CloseAndDelete(token string) {
 	um.Lock()
 	defer um.Unlock()
-	// Commenting this out because channels auto-close when they get garbage-collected
-	// user := um.users[token]
-	// close(user.Channel())
+	user := um.users[token]
+	close(user.Channel())
 	delete(um.users, token)
 }
 
