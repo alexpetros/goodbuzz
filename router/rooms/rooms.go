@@ -89,11 +89,7 @@ func (r *Room) StatusString() string {
 }
 
 func (r *Room) getPlayer(token string) *player {
-	player := r.players.Get(token)
-	if player == nil {
-		logger.Error("Returning nil player for token %v")
-	}
-	return player
+	return r.players.Get(token)
 }
 
 func (r *Room) SetPlayerName(token string, name string) {
@@ -127,6 +123,10 @@ func (r *Room) BuzzRoom(token string) {
 
 	r.buzzerStatus = Waiting
 	player := r.getPlayer(token)
+	if player == nil {
+		logger.Error("nil player returned for token %v")
+		return
+	}
 	logMessage := fmt.Sprintf("%s Buzzed", player.name)
 
 	r.moderators.SendToAll(
