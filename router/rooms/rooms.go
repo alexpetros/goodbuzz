@@ -7,7 +7,7 @@ import (
 	"goodbuzz/lib/db"
 	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms/events"
-	"goodbuzz/router/rooms/users"
+	"goodbuzz/router/rooms/maps"
 	"net/http"
 )
 
@@ -59,43 +59,43 @@ func (moderator moderator) Channel() chan string {
 
 var openRooms = newRoomMap()
 
-func (r *Room) Id() int64 {
-	return r.roomId
+func (room *Room) Id() int64 {
+	return room.roomId
 }
 
-func (r *Room) Name() string {
-	return r.name
+func (room *Room) Name() string {
+	return room.name
 }
 
-func (r *Room) Url() string {
-	return fmt.Sprintf("/rooms/%d", r.roomId)
+func (room *Room) Url() string {
+	return fmt.Sprintf("/rooms/%d", room.roomId)
 }
 
-func (r *Room) PlayerUrl() string {
-	return fmt.Sprintf("/rooms/%d/player", r.roomId)
+func (room *Room) PlayerUrl() string {
+	return fmt.Sprintf("/rooms/%d/player", room.roomId)
 }
 
-func (r *Room) ModeratorUrl() string {
-	return fmt.Sprintf("/rooms/%d/moderator", r.roomId)
+func (room *Room) ModeratorUrl() string {
+	return fmt.Sprintf("/rooms/%d/moderator", room.roomId)
 }
 
-func (r *Room) Status() BuzzerStatus {
-	return r.buzzerStatus
+func (room *Room) Status() BuzzerStatus {
+	return room.buzzerStatus
 }
 
-func (r *Room) StatusString() string {
-	return r.buzzerStatus.String()
+func (room *Room) StatusString() string {
+	return room.buzzerStatus.String()
 }
 
-func (r *Room) getPlayer(token string) *player {
-	return r.players.Get(token)
+func (room *Room) getPlayer(token string) *player {
+	return room.players.Get(token)
 }
 
-func (r *Room) SetPlayerName(token string, name string) {
-	player := r.players.Get(token)
+func (room *Room) SetPlayerName(token string, name string) {
+	player := room.players.Get(token)
 	player.name = name
-	r.players.SendToAll(r.CurrentPlayersEvent())
-	r.moderators.SendToAll(r.CurrentPlayersEvent())
+	room.players.SendToAll(room.CurrentPlayersEvent())
+	room.moderators.SendToAll(room.CurrentPlayersEvent())
 }
 
 func GetRoomsForTournament(ctx context.Context, tournamentId int64) []Room {
@@ -117,46 +117,45 @@ func GetRoom(ctx context.Context, roomId int64) *Room {
 }
 
 // TODO need a way to ignore buzzes that came in before the reset
-func (r *Room) BuzzRoom(token string) {
+func (room *Room) BuzzRoom(token string) {
 	logger.Debug("Buzzing room for player with token: %s", token)
 
-	r.buzzerStatus = Waiting
-	player := r.getPlayer(token)
+	room.buzzerStatus = Waiting
+	player := room.getPlayer(token)
 	if player == nil {
 		logger.Error("nil player returned for token %v")
 		return
 	}
 	logMessage := fmt.Sprintf("%s Buzzed", player.name)
 
-	r.moderators.SendToAll(
+	room.moderators.SendToAll(
 		events.ModeratorStatusEvent("Waiting"),
 		events.ModeratorLogEvent(logMessage),
 	)
 
-	r.players.SendToAll(
+	room.players.SendToAll(
 		events.LockedBuzzerEvent(),
 		events.PlayerLogEvent(logMessage),
 	)
 }
 
-func (r *Room) Reset() {
+func (room *Room) Reset() {
 	logger.Debug("Sending unlock message")
-	r.buzzerStatus = Unlocked
+	room.buzzerStatus = Unlocked
 
-	r.moderators.SendToAll(
+	room.moderators.SendToAll(
 		events.ModeratorStatusEvent("Unlocked"),
 		events.ModeratorLogEvent("Buzzer Unlocked"),
 	)
 
-	r.players.SendToAll(
+	room.players.SendToAll(
 		events.ReadyBuzzerEvent(),
 		events.PlayerLogEvent("Buzzer Unlocked"),
 	)
 }
 
-func (r *Room) CurrentPlayersEvent() string {
-
-	users := r.players.GetUsers()
+func (room *Room) CurrentPlayersEvent() string {
+	users := room.players.GetUsers()
 	names := make([]string, len(users))
 	for i, player := range users {
 		names[i] = player.name
@@ -165,10 +164,10 @@ func (r *Room) CurrentPlayersEvent() string {
 	return events.ModeratorPlayerListEvent(names)
 }
 
-func (r *Room) CurrentBuzzerEvent() string {
+func (room *Room) CurrentBuzzerEvent() string {
 	var buzzer string
 
-	status := r.buzzerStatus
+	status := room.buzzerStatus
 	if status == Unlocked {
 		buzzer = events.ReadyBuzzerEvent()
 	} else if status == Waiting {
@@ -218,12 +217,12 @@ func (room *Room) CreateModerator(w http.ResponseWriter, r *http.Request) (strin
 	return token, closeChan
 }
 
-func (r *Room) RemoveModerator(token string) {
-	r.moderators.CloseAndDelete(token)
+func (room *Room) RemoveModerator(token string) {
+	room.moderators.CloseAndDelete(token)
 }
 
-func (r *Room) RemovePlayer(token string) {
-	r.players.CloseAndDelete(token)
-	r.players.SendToAll(r.CurrentPlayersEvent())
-	r.moderators.SendToAll(r.CurrentPlayersEvent())
+func (room *Room) RemovePlayer(token string) {
+	room.players.CloseAndDelete(token)
+	room.players.SendToAll(room.CurrentPlayersEvent())
+	room.moderators.SendToAll(room.CurrentPlayersEvent())
 }

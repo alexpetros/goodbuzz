@@ -1,7 +1,7 @@
 package rooms
 
 import (
-	"goodbuzz/router/rooms/users"
+	"goodbuzz/router/rooms/maps"
 	"sync"
 )
 
