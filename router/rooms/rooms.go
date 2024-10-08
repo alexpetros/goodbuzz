@@ -144,7 +144,7 @@ func (room *Room) CurrentPlayersEvent() string {
 		names[i] = player.Name()
 	}
 
-	return events.ModeratorPlayerListEvent(names)
+	return events.PlayerListEvent(names)
 }
 
 func (room *Room) CurrentBuzzerEvent() string {
@@ -180,7 +180,7 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 
 	// Initialize Player
 	room.players.SendToAll(room.CurrentPlayersEvent())
-	room.moderators.SendToAll(room.CurrentPlayersEvent())
+	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(room.players.GetUsers()))
 
 	player.Channel() <- room.CurrentBuzzerEvent()
 	player.Channel() <- events.TokenEvent(token)

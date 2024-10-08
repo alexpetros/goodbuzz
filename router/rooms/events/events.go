@@ -3,6 +3,7 @@ package events
 import (
 	"fmt"
 	"goodbuzz/lib"
+	"goodbuzz/router/rooms/users"
 	"strings"
 )
 
@@ -32,7 +33,7 @@ func ModeratorStatusEvent(message string) string {
 	return lib.FormatEventString("status", data)
 }
 
-func ModeratorPlayerListEvent(players []string) string {
+func PlayerListEvent(players []string) string {
 	var sb strings.Builder
 
 	for _, name := range players {
@@ -46,6 +47,11 @@ func ModeratorPlayerListEvent(players []string) string {
 func ModeratorLogEvent(message string) string {
 	data := fmt.Sprintf("<div>%s<div>", message)
 	return lib.FormatEventString("log", data)
+}
+
+func ModeratorPlayerControlsEvent(players []*users.Player) string {
+	component := ModeratorPlayerControls(players)
+	return lib.FormatEventComponent("players", component)
 }
 
 func TokenEvent(token string) string {

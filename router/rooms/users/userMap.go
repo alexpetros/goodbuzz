@@ -99,7 +99,7 @@ func (um *UserMap[T]) GetUsers() []T {
 	um.RLock()
 	defer um.RUnlock()
 
-	res := make([]T, 0)
+	res := make([]T, 0, len(um.users))
 	for _, value := range um.users {
 		res = append(res, value)
 	}

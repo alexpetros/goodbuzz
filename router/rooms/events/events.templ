@@ -1,5 +1,7 @@
 package events
 
+import "goodbuzz/router/rooms/users"
+
 templ LoadingBuzzer() {
 <button class="buzzer loading" disabled >
   Loading...
@@ -26,4 +28,10 @@ templ ReadyBuzzer() {
 
 templ TokenInput(token string) {
   <input type="hidden" name="token" value={token} sse-swap="token" hx-swap="outerHTML">
+}
+
+templ ModeratorPlayerControls(players []*users.Player) {
+	for _, player := range players {
+		<li>{player.Name()}</li>
+	}
 }
