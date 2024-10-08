@@ -10,21 +10,28 @@ func NewPlayer(name string, channel chan string) *Player {
 	return &Player{name, channel, false}
 }
 
-func (player Player) Name() string {
+func (player *Player) Name() string {
 	return player.name
 }
 
-func (player Player) IsLocked() bool {
+func (player *Player) IsLocked() bool {
 	return player.is_locked
 }
 
-
-func (player Player) Channel() chan string {
+func (player *Player) Channel() chan string {
 	return player.channel
 }
 
 func (player *Player) SetName(name string) {
 	player.name = name
+}
+
+func (player *Player) Lock() {
+	player.is_locked = true
+}
+
+func (player *Player) Unlock() {
+	player.is_locked = false
 }
 
 type Moderator struct {

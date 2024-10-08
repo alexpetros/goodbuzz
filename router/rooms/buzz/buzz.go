@@ -2,6 +2,7 @@ package buzz
 
 import (
 	"goodbuzz/lib"
+	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms"
 	"net/http"
 )
@@ -39,6 +40,18 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	room.Reset()
+	query := r.URL.Query()
+	mode := query.Get("mode")
+
+	if mode == "all" {
+		room.ResetAll()
+	} else if mode == "partial" {
+		room.ResetSome()
+	} else {
+		logger.Warn("bad request with mode %s", mode)
+		lib.BadRequest(w, r)
+		return
+	}
+
 	w.WriteHeader(204)
 }

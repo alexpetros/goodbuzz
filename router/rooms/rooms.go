@@ -35,6 +35,7 @@ func (s BuzzerStatus) String() string {
 type Room struct {
 	roomId       int64
 	name         string
+	buzzes 			 []string
 	buzzerStatus BuzzerStatus
 	players      *users.UserMap[*users.Player]
 	moderators   *users.UserMap[*users.Moderator]
@@ -74,36 +75,21 @@ func (room *Room) getPlayer(token string) *users.Player {
 	return room.players.Get(token)
 }
 
+func (room *Room) lockPlayer(token string) {
+	room.players.Get(token).Lock()
+}
+
+func (room *Room) unlockAll() {
+	room.players.Run(func (player *users.Player) {
+		player.Unlock()
+	})
+}
+
 func (room *Room) SetPlayerName(token string, name string) {
 	logger.Debug("Setting %s name to %s", token, name)
 	player := room.players.Get(token)
 	player.SetName(name)
 	room.sendPlayerListUpdates()
-}
-
-func (room *Room) sendLogUpdates(message string) {
-	room.moderators.SendToAll(events.ModeratorLogEvent(message))
-	room.players.SendToAll(events.PlayerLogEvent(message))
-}
-
-func (room *Room) sendBuzzerUpdates() {
-	for _, player := range room.players.GetUsers() {
-		if player.IsLocked() {
-			player.Channel() <- events.LockedBuzzerEvent()
-		} else {
-			player.Channel() <- room.CurrentBuzzerEvent()
-		}
-	}
-
-	statusString := room.buzzerStatus.String()
-	room.moderators.SendToAll(events.ModeratorStatusEvent(statusString))
-}
-
-func (room *Room) sendPlayerListUpdates() {
-	users := room.players.GetUsers()
-
-	room.players.SendToAll(events.PlayerListEvent(users))
-	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(users))
 }
 
 func GetRoomsForTournament(ctx context.Context, tournamentId int64) []Room {
@@ -134,16 +120,34 @@ func (room *Room) BuzzRoom(token string) {
 		return
 	}
 	room.buzzerStatus = Locked
+	room.buzzes = append(room.buzzes, token)
 	logMessage := fmt.Sprintf("%s Buzzed", player.Name())
 
 	room.sendBuzzerUpdates()
 	room.sendLogUpdates(logMessage)
 }
 
-func (room *Room) Reset() {
-	logger.Debug("Sending unlock message")
+func (room *Room) ResetAll() {
+	logger.Debug("Resetting all buzzers")
+	room.buzzerStatus = Unlocked
+	room.buzzes = make([]string, 0)
+	room.unlockAll()
+	room.sendBuzzerUpdates()
+	room.sendLogUpdates("Buzzer Unlocked")
+}
+
+func (room *Room) ResetSome() {
+	logger.Debug("Resetting some buzzers")
 	room.buzzerStatus = Unlocked
 
+	if len(room.buzzes) < 1 {
+		logger.Info("room %s was reset with no active buzzes", room.name)
+	} else {
+		token := room.buzzes[0]
+		room.lockPlayer(token)
+	}
+
+	room.buzzes = make([]string, 0)
 	room.sendBuzzerUpdates()
 	room.sendLogUpdates("Buzzer Unlocked")
 }
@@ -207,3 +211,32 @@ func (room *Room) RemovePlayer(token string) {
 	room.players.CloseAndDelete(token)
 	room.sendPlayerListUpdates()
 }
+
+/**
+* Functions for pushing updates to the connected clients
+* */
+func (room *Room) sendLogUpdates(message string) {
+	room.moderators.SendToAll(events.ModeratorLogEvent(message))
+	room.players.SendToAll(events.PlayerLogEvent(message))
+}
+
+func (room *Room) sendBuzzerUpdates() {
+	for _, player := range room.players.GetUsers() {
+		if player.IsLocked() {
+			player.Channel() <- events.LockedBuzzerEvent()
+		} else {
+			player.Channel() <- room.CurrentBuzzerEvent()
+		}
+	}
+
+	statusString := room.buzzerStatus.String()
+	room.moderators.SendToAll(events.ModeratorStatusEvent(statusString))
+}
+
+func (room *Room) sendPlayerListUpdates() {
+	users := room.players.GetUsers()
+
+	room.players.SendToAll(events.PlayerListEvent(users))
+	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(users))
+}
+

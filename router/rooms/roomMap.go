@@ -14,6 +14,7 @@ func (roomMap *roomMap) newRoom(roomId int64, name string) *Room {
 	return &Room{
 		roomId:       roomId,
 		name:         name,
+		buzzes:				make([]string, 0),
 		buzzerStatus: Unlocked,
 		players:      users.NewUserMap[*users.Player](),
 		moderators:   users.NewUserMap[*users.Moderator](),

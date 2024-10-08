@@ -81,11 +81,20 @@ func (um *UserMap[T]) Get(token string) T {
 	return user
 }
 
+func (um *UserMap[T]) Run(fn func(T)) {
+	um.RLock()
+	defer um.RUnlock()
+	for _, user := range um.users {
+		fn(user)
+	}
+}
+
 func (um *UserMap[T]) CloseAndDelete(token string) {
 	um.Lock()
 	defer um.Unlock()
-	user := um.users[token]
-	close(user.Channel())
+	// Commenting this out because channels auto-close when they get garbage-collected
+	// user := um.users[token]
+	// close(user.Channel())
 	delete(um.users, token)
 }
 
