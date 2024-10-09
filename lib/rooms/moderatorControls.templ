@@ -2,6 +2,7 @@ package rooms
 
 import (
     "fmt"
+    "time"
     "goodbuzz/lib"
     "goodbuzz/lib/rooms/users"
 )
@@ -12,7 +13,10 @@ func ModeratorStatusEvent(message string) string {
 }
 
 func ModeratorLogEvent(message string) string {
-	data := fmt.Sprintf("<div>%s<div>", message)
+  now := time.Now().UTC()
+  display := now.Format("03:04:05.000")
+  datetime := now.Format("2006-01-02T03:04:05.000")
+	data := fmt.Sprintf("<div><time datetime=%s>%s</time> %s</div>", datetime, display, message)
 	return lib.FormatEventString("log", data)
 }
 
