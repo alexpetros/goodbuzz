@@ -4,6 +4,7 @@ import "net/http"
 
 import "goodbuzz/lib"
 import "goodbuzz/router/rooms"
+import "goodbuzz/router/rooms/events"
 
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +41,7 @@ For more, see: https://htmx.org/attributes/hx-include/
   <input type="hidden" name="token" value="" sse-swap="token" hx-swap="outerHTML">
   <section>
     <h2>Buzzer</h2>
-    <div sse-swap="buzzer" hx-swap="innerHTML">LoadingBuzzer()</div>
+    <div sse-swap="buzzer" hx-swap="innerHTML">@events.LoadingBuzzer()</div>
   </section>
 
   <section>

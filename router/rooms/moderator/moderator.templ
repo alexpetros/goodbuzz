@@ -37,16 +37,13 @@ templ index(title string, room *rooms.Room) {
     { room.StatusString() }
   </span>
   </p>
-</section>
 
-<section>
-  <h2>Controls</h2>
   <button hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=all", room.Id()) }>Full Reset</button>
   <button hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", room.Id()) }>Partial Reset</button>
 </section>
 
-<section>
-  <h2>Players</h2>
+<section class="controls">
+  <h2>Player Controls</h2>
   <table sse-swap="controls" hx-swap="outerHTML"></table>
 </section>
 

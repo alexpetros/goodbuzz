@@ -33,20 +33,18 @@ templ TokenInput(token string) {
 
 templ ModeratorPlayerControls(players []*users.Player) {
   <table sse-swap="controls" hx-swap="outerHTML">
-    <tr>
-      <th>Player</th>
-      <th></th>
-      <th></th>
-    </tr>
     for _, player := range players {
     <tr>
-      <td>{player.Name()}</td>
-      <td>{player.StatusString()}</td>
       <td>
+      if player.IsLocked() {
         <button hx-delete={fmt.Sprintf("./locks/%s", player.Token())}>
           Unlock
         </button>
+      } else {
+        <button disabled>Ready</button>
+      }
       </td>
+      <td>{player.Name()}</td>
     </tr>
     }
   </table>
