@@ -4,7 +4,7 @@ import "net/http"
 import "fmt"
 
 import "goodbuzz/lib"
-import "goodbuzz/router/rooms"
+import "goodbuzz/lib/rooms"
 
 func Get(w http.ResponseWriter, r *http.Request) {
     room_id, err := lib.GetIntParam(r, "id")
@@ -21,11 +21,11 @@ func Get(w http.ResponseWriter, r *http.Request) {
     }
 
     title := fmt.Sprintf("%s - Moderator", room.Name())
-    content := index(title, room)
+    content := index(title, room.Id())
     lib.Render(w, r, title, content)
 }
 
-templ index(title string, room *rooms.Room) {
+templ index(title string, roomId int64) {
 <h1>{title}</h1>
 
 <main hx-ext="sse" sse-connect="./moderator/live">
@@ -34,19 +34,11 @@ templ index(title string, room *rooms.Room) {
   <h2>Live View</h2>
   <p>
   Buzzer Status:
-  <span class="buzzer-status" sse-swap="status" hx-swap="innerHTML">
-    if room.Status() == rooms.Unlocked {
-      <span class="unlocked">Unlocked</span>
-    } else if room.Status() == rooms.Locked {
-      <span class="locked">Locked</span>
-    } else {
-      <span class="waiting">waiting</span>
-    }
-  </span>
+  <span class="buzzer-status" sse-swap="status" hx-swap="innerHTML"></span>
   </p>
 
-  <button hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=all", room.Id()) }>Full Reset</button>
-  <button hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", room.Id()) }>Partial Reset</button>
+  <button hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=all", roomId) }>Full Reset</button>
+  <button hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", roomId) }>Partial Reset</button>
 </section>
 
 <section class="controls">

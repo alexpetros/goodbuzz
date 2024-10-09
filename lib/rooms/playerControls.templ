@@ -1,0 +1,58 @@
+package rooms
+
+import (
+    "fmt"
+    "strings"
+    "goodbuzz/lib"
+    "goodbuzz/lib/rooms/users"
+)
+
+func PlayerLogEvent(message string) string {
+	data := fmt.Sprintf("<div>%s</div>", message)
+	return lib.FormatEventString("log", data)
+}
+
+func PlayerListEvent(players []*users.Player) string {
+	var sb strings.Builder
+
+	for _, player := range players {
+		li := fmt.Sprintf("<li>%s", player.Name())
+		sb.WriteString(li)
+	}
+
+	return lib.FormatEventString("players", sb.String())
+}
+
+func WaitingBuzzerEvent() string {
+	return lib.FormatEventComponent("buzzer", WaitingBuzzer())
+}
+
+func LockedBuzzerEvent() string {
+	return lib.FormatEventComponent("buzzer", LockedBuzzer())
+}
+
+func ReadyBuzzerEvent() string {
+	return lib.FormatEventComponent("buzzer", ReadyBuzzer())
+}
+
+templ TokenInput(token string) {
+  <input type="hidden" name="token" value={token} sse-swap="token" hx-swap="outerHTML">
+}
+
+templ WaitingBuzzer() {
+<button class="buzzer locked" disabled >
+  Waiting
+</button>
+}
+
+templ LockedBuzzer() {
+<button class="buzzer locked" disabled >
+  Locked
+</button>
+}
+
+templ ReadyBuzzer() {
+<button class="buzzer" hx-put="./buzz" hx-on::before-request="disableBuzzer()">
+  Buzz
+</button>
+}

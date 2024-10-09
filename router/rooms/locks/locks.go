@@ -2,10 +2,9 @@ package locks
 
 import (
 	"goodbuzz/lib"
-	"goodbuzz/router/rooms"
+	"goodbuzz/lib/rooms"
 	"net/http"
 )
-
 
 func Delete(w http.ResponseWriter, r *http.Request) {
 	room_id, err := lib.GetIntParam(r, "id")
@@ -29,4 +28,5 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 
 	room.UnlockPlayer(token)
 
-	w.WriteHeader(204)}
+	w.WriteHeader(204)
+}

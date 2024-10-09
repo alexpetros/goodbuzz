@@ -1,0 +1,57 @@
+package rooms
+
+import (
+    "fmt"
+    "goodbuzz/lib"
+    "goodbuzz/lib/rooms/users"
+)
+
+func ModeratorStatusEvent(message string) string {
+	data := fmt.Sprintf("<span>%s<span>", message)
+	return lib.FormatEventString("status", data)
+}
+
+func ModeratorLogEvent(message string) string {
+	data := fmt.Sprintf("<div>%s<div>", message)
+	return lib.FormatEventString("log", data)
+}
+
+func ModeratorPlayerControlsEvent(players []*users.Player) string {
+	component := ModeratorPlayerControls(players)
+	return lib.FormatEventComponent("controls", component)
+}
+
+func TokenEvent(token string) string {
+	data := lib.ToString(TokenInput(token))
+	return lib.FormatEventString("token", data)
+}
+
+
+templ ModeratorPlayerControls(players []*users.Player) {
+  <table>
+    for _, player := range players {
+    <tr>
+      <td>{player.Name()}</td>
+      <td>
+      if player.IsLocked() {
+        <button hx-delete={fmt.Sprintf("./locks/%s", player.Token())}>
+          Unlock
+        </button>
+      } else {
+        <button disabled>Unlock</button>
+      }
+      </td>
+    </tr>
+    }
+  </table>
+}
+
+templ BuzzerStatusSpan(room Room) {
+if room.Status() == Unlocked {
+      <span class="unlocked">Unlocked</span>
+    } else if room.Status() == Locked {
+      <span class="locked">Locked</span>
+    } else {
+      <span class="waiting">waiting</span>
+    }
+}

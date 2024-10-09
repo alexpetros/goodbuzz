@@ -3,7 +3,7 @@ package buzz
 import (
 	"goodbuzz/lib"
 	"goodbuzz/lib/logger"
-	"goodbuzz/router/rooms"
+	"goodbuzz/lib/rooms"
 	"net/http"
 )
 

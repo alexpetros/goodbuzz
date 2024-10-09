@@ -1,9 +1,9 @@
 package users
 
 type Player struct {
-	name    string
-	token		string
-	channel chan string
+	name      string
+	token     string
+	channel   chan string
 	is_locked bool
 }
 
@@ -45,16 +45,4 @@ func (player *Player) Lock() {
 
 func (player *Player) Unlock() {
 	player.is_locked = false
-}
-
-type Moderator struct {
-	channel chan string
-}
-
-func NewModerator(channel chan string) *Moderator {
-	return &Moderator{channel}
-}
-
-func (moderator Moderator) Channel() chan string {
-	return moderator.channel
 }
