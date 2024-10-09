@@ -28,7 +28,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 templ index(title string, roomId int64) {
 <h1>{title}</h1>
 
-<main hx-ext="sse" sse-connect="./moderator/live">
+<main class="moderator" hx-ext="sse" sse-connect="./moderator/live">
 
 <section>
   <h2>Live View</h2>
@@ -46,7 +46,7 @@ templ index(title string, roomId int64) {
   <div sse-swap="controls" hx-swap="innerHTML"></div>
 </section>
 
-<section sse-swap="log" hx-swap="beforeend">
+<section class="log" sse-swap="log" hx-swap="beforeend">
   <h2>Log</h2>
 </section>
 

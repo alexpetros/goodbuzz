@@ -1,4 +1,5 @@
 :root {
+  --text-secondary: gray;
   --button-enabled-color: green;
   --button-pressed-color: darkgreen;
   --button-loading-color: gray;
@@ -110,14 +111,26 @@ a.button {
 }
 
 /** Moderator CSS */
-main {
+main.moderator {
   display: grid;
   grid-template-columns: 2fr 1fr;
-}
 
-.controls table {
-  tr {
+  .controls tr {
     display: grid;
     grid-template-columns: 2fr 1fr;
   }
+
+  .log time {
+    color: var(--text-secondary);
+    margin-right: 10px;
+
+    &::before {
+      content: '['
+    }
+
+    &::after {
+      content: ']'
+    }
+  }
+
 }
