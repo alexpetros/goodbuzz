@@ -112,12 +112,12 @@ a.button {
 /** Moderator CSS */
 main {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
 }
 
 .controls table {
   tr {
     display: grid;
-    grid-template-columns: 70px 1fr;
+    grid-template-columns: 2fr 1fr;
   }
 }

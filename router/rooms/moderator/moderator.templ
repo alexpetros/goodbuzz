@@ -32,9 +32,16 @@ templ index(title string, room *rooms.Room) {
 
 <section>
   <h2>Live View</h2>
-  <p>Buzzer Status:
+  <p>
+  Buzzer Status:
   <span class="buzzer-status" sse-swap="status" hx-swap="innerHTML">
-    { room.StatusString() }
+    if room.Status() == rooms.Unlocked {
+      <span class="unlocked">Unlocked</span>
+    } else if room.Status() == rooms.Locked {
+      <span class="locked">Locked</span>
+    } else {
+      <span class="waiting">waiting</span>
+    }
   </span>
   </p>
 
@@ -44,7 +51,7 @@ templ index(title string, room *rooms.Room) {
 
 <section class="controls">
   <h2>Player Controls</h2>
-  <table sse-swap="controls" hx-swap="outerHTML"></table>
+  <div sse-swap="controls" hx-swap="innerHTML"></div>
 </section>
 
 <section sse-swap="log" hx-swap="beforeend">

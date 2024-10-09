@@ -37,7 +37,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) (chan string, chan struc
 				//logger.Error("Failed to send data to moderator in room %d:\n%s", room.Id(), data)
 			}
 
-			if w != nil {
+			if w != nil && w.(http.Flusher) != nil {
 				w.(http.Flusher).Flush()
 			} else {
 				logger.Warn("write to socket after connection closed")
