@@ -11,6 +11,7 @@ body {
   max-width: 800px;
   padding: 15px 10px;
   margin: 0 auto;
+  scrollbar-gutter: stable;
 }
 
 .logo {
@@ -115,12 +116,24 @@ main.moderator {
   display: grid;
   grid-template-columns: 2fr 1fr;
 
-  .controls tr {
+  .players tr {
     display: grid;
     grid-template-columns: 2fr 1fr;
   }
 
+  .log-container {
+    height: 15rem;
+    overflow-y: scroll;
+    border: 1px solid black;
+    scrollbar-gutter: stable;
+  }
+
+  .log {
+    grid-columns: 1 / 3;
+  }
+
   .log time {
+    font-family: monospace;
     color: var(--text-secondary);
     margin-right: 10px;
 
@@ -132,5 +145,4 @@ main.moderator {
       content: ']'
     }
   }
-
 }

@@ -30,7 +30,7 @@ templ index(title string, roomId int64) {
 
 <main class="moderator" hx-ext="sse" sse-connect="./moderator/live">
 
-<section>
+<section class="live-view">
   <h2>Live View</h2>
   <p>
   Buzzer Status:
@@ -41,13 +41,19 @@ templ index(title string, roomId int64) {
   <button hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", roomId) }>Partial Reset</button>
 </section>
 
-<section class="controls">
+<section class="players">
   <h2>Player Controls</h2>
   <div sse-swap="controls" hx-swap="innerHTML"></div>
 </section>
 
-<section class="log" sse-swap="log" hx-swap="beforeend">
+<section class="log">
   <h2>Log</h2>
+  <div
+    class="log-container"
+    sse-swap="log"
+    hx-swap="beforeend"
+    hx-on::after-swap="this.lastChild.scrollIntoView()"
+  ></div>
 </section>
 
 </main>
