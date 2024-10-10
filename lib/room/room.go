@@ -137,7 +137,7 @@ func (room *Room) ResetAll() {
 	room.resetToken = uuid.NewString()
 	room.sendBuzzerUpdates()
 	room.sendPlayerListUpdates()
-	room.log("Buzzer Unlocked")
+	room.log("Buzzer unlocked for everyone")
 }
 
 func (room *Room) ResetSome() {
@@ -156,7 +156,7 @@ func (room *Room) ResetSome() {
 	room.resetToken = uuid.NewString()
 	room.sendBuzzerUpdates()
 	room.sendPlayerListUpdates()
-	room.log("Buzzer Unlocked")
+	room.log("Buzzer unlocked for some players")
 }
 
 func (room *Room) CurrentBuzzerEvent() string {

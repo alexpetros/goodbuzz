@@ -55,9 +55,17 @@ For more, see: https://htmx.org/attributes/hx-include/
     <ul sse-swap="players" hx-swap="innerHTML"></ul>
   </section>
 
-  <section sse-swap="log" hx-swap="beforeend">
+
+  <section class="logs">
     <h2>Log</h2>
+    <div
+      class="log-container"
+      sse-swap="log"
+      hx-swap="beforeend"
+      hx-on::after-swap="this.scrollTop = this.lastChild.offsetTop"
+    ></div>
   </section>
+
 </main>
 
 

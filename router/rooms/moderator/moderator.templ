@@ -46,13 +46,13 @@ templ index(title string, roomId int64) {
   <div sse-swap="controls" hx-swap="innerHTML"></div>
 </section>
 
-<section class="log">
+<section class="logs">
   <h2>Log</h2>
   <div
     class="log-container"
     sse-swap="log"
     hx-swap="beforeend"
-    hx-on::after-swap="this.lastChild.scrollIntoView()"
+    hx-on::after-swap="this.scrollTop = this.lastChild.offsetTop"
   ></div>
 </section>
 

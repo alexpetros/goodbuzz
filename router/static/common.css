@@ -111,16 +111,8 @@ a.button {
   text-decoration: none;
 }
 
-/** Moderator CSS */
-main.moderator {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
 
-  .players tr {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-  }
-
+section.logs {
   .log-container {
     height: 15rem;
     overflow-y: scroll;
@@ -128,11 +120,7 @@ main.moderator {
     scrollbar-gutter: stable;
   }
 
-  .log {
-    grid-columns: 1 / 3;
-  }
-
-  .log time {
+  time {
     font-family: monospace;
     color: var(--text-secondary);
     margin-right: 10px;
@@ -144,5 +132,21 @@ main.moderator {
     &::after {
       content: ']'
     }
+  }
+}
+
+
+/** Moderator CSS */
+main.moderator {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+
+  section.logs {
+    grid-columns: 1 / 3;
+  }
+
+  .players tr {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
   }
 }
