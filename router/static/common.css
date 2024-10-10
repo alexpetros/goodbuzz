@@ -159,3 +159,13 @@ main.moderator {
     grid-template-columns: 2fr 1fr;
   }
 }
+
+@media (max-width: 900px) {
+  main.player, main.moderator {
+    grid-template-columns: 1fr;
+
+    section.logs {
+      grid-column: unset;
+    }
+  }
+}
