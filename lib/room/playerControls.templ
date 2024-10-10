@@ -7,11 +7,6 @@ import (
     "goodbuzz/lib/room/users"
 )
 
-func PlayerLogEvent(message string) string {
-	data := fmt.Sprintf("<div>%s</div>", message)
-	return lib.FormatEventString("log", data)
-}
-
 func PlayerListEvent(players []*users.Player) string {
 	var sb strings.Builder
 

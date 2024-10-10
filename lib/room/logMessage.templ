@@ -1,0 +1,12 @@
+package room
+
+import "time"
+
+templ LogMessage (message string, timestamp time.Time) {
+  <div>
+    <time datetime={timestamp.Format("2006-01-02T03:04:05.000")}>
+      {timestamp.Format("03:04:05.000")}
+    </time>
+    {message}
+  </div>
+}

@@ -2,10 +2,13 @@ package room
 
 import (
 	"fmt"
-	"github.com/google/uuid"
+	"goodbuzz/lib"
 	"goodbuzz/lib/logger"
 	"goodbuzz/lib/room/users"
 	"net/http"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type BuzzerStatus int
@@ -29,12 +32,17 @@ func (s BuzzerStatus) String() string {
 	return "Unknown"
 }
 
+type logMessage struct {
+	message string
+	timestampe time.Time
+}
+
 type Room struct {
 	roomId       int64
 	name         string
 	resetToken   string
+	logs         []logMessage
 	buzzes       []string
-	logs         []string
 	buzzerStatus BuzzerStatus
 	players      *users.UserMap[*users.Player]
 	moderators   *users.UserMap[*users.Moderator]
@@ -44,8 +52,9 @@ func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
 	return &Room{
 		roomId:       roomId,
 		name:         name,
-		buzzes:       make([]string, 0),
 		resetToken:   uuid.NewString(),
+		logs:					make([]logMessage, 0),
+		buzzes:       make([]string, 0),
 		buzzerStatus: Unlocked,
 		players:      users.NewUserMap[*users.Player](),
 		moderators:   users.NewUserMap[*users.Moderator](),
@@ -121,7 +130,7 @@ func (room *Room) BuzzRoom(token string, resetToken string) {
 	logMessage := fmt.Sprintf("%s Buzzed", player.Name())
 
 	room.sendBuzzerUpdates()
-	room.sendLogUpdates(logMessage)
+	room.log(logMessage)
 }
 
 func (room *Room) ResetAll() {
@@ -133,7 +142,7 @@ func (room *Room) ResetAll() {
 	room.resetToken = uuid.NewString()
 	room.sendBuzzerUpdates()
 	room.sendPlayerListUpdates()
-	room.sendLogUpdates("Buzzer Unlocked")
+	room.log("Buzzer Unlocked")
 }
 
 func (room *Room) ResetSome() {
@@ -152,7 +161,7 @@ func (room *Room) ResetSome() {
 	room.resetToken = uuid.NewString()
 	room.sendBuzzerUpdates()
 	room.sendPlayerListUpdates()
-	room.sendLogUpdates("Buzzer Unlocked")
+	room.log("Buzzer Unlocked")
 }
 
 func (room *Room) CurrentBuzzerEvent() string {
@@ -218,9 +227,22 @@ func (room *Room) RemovePlayer(token string) {
 /**
 * Functions for pushing updates to the connected clients
 * */
-func (room *Room) sendLogUpdates(message string) {
-	room.moderators.SendToAll(ModeratorLogEvent(message))
-	room.players.SendToAll(PlayerLogEvent(message))
+func (room *Room) log(message string) {
+	timestamp := time.Now().UTC()
+
+	// Add to list of log messages
+	log := logMessage { message, timestamp }
+	messageSlice := []logMessage{ log }
+	room.logs = append(messageSlice, room.logs...)
+	// Cap the size of the logs array at 100
+	if len(room.logs) > 100 {
+		room.logs = room.logs[:100]
+	}
+
+	logEvent := lib.FormatEventComponent("log", LogMessage(message, timestamp))
+
+	room.moderators.SendToAll(logEvent)
+	room.players.SendToAll(logEvent)
 }
 
 func (room *Room) sendBuzzerUpdates() {
