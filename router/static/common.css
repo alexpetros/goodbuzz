@@ -33,6 +33,7 @@ body {
 
 button.buzzer {
   display: block;
+  margin: 0 auto;
   width: 200px;
   height: 200px;
   color: white;
@@ -160,7 +161,7 @@ main.moderator {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 600px) {
   main.player, main.moderator {
     grid-template-columns: 1fr;
 
