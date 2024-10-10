@@ -1,12 +1,29 @@
 package room
 
 import "time"
+import "goodbuzz/lib"
 
-templ LogMessage (message string, timestamp time.Time) {
+type Log struct {
+	message string
+	timestamp time.Time
+}
+
+func PastLogsEvent(logs []Log) string {
+  component := ManyLogs(logs)
+  return lib.FormatEventComponent("log", component)
+}
+
+templ ManyLogs(logs []Log) {
+    for _, log := range logs {
+      @LogMessage(log)
+    }
+}
+
+templ LogMessage (log Log) {
   <div>
-    <time datetime={timestamp.Format("2006-01-02T03:04:05.000")}>
-      {timestamp.Format("03:04:05.000")}
+    <time datetime={log.timestamp.Format("2006-01-02T03:04:05.000")}>
+      {log.timestamp.Format("03:04:05.000")}
     </time>
-    {message}
+    {log.message}
   </div>
 }

@@ -32,16 +32,11 @@ func (s BuzzerStatus) String() string {
 	return "Unknown"
 }
 
-type logMessage struct {
-	message string
-	timestampe time.Time
-}
-
 type Room struct {
 	roomId       int64
 	name         string
 	resetToken   string
-	logs         []logMessage
+	logs         []Log
 	buzzes       []string
 	buzzerStatus BuzzerStatus
 	players      *users.UserMap[*users.Player]
@@ -53,7 +48,7 @@ func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
 		roomId:       roomId,
 		name:         name,
 		resetToken:   uuid.NewString(),
-		logs:					make([]logMessage, 0),
+		logs:					make([]Log, 0),
 		buzzes:       make([]string, 0),
 		buzzerStatus: Unlocked,
 		players:      users.NewUserMap[*users.Player](),
@@ -198,6 +193,7 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 	// Initialize Player
 	room.sendPlayerListUpdates()
 	player.Channel() <- TokenEvent(token)
+	player.Channel() <- PastLogsEvent(room.logs)
 	player.Channel() <- room.CurrentBuzzerEvent()
 
 	return token, closeChan
@@ -211,6 +207,7 @@ func (room *Room) CreateModerator(w http.ResponseWriter, r *http.Request) (strin
 	room.moderators.Insert(token, moderator)
 
 	// Initialize Moderator
+	eventChan <- PastLogsEvent(room.logs)
 	eventChan <- ModeratorPlayerControlsEvent(room.players.GetUsers())
 	return token, closeChan
 }
@@ -231,15 +228,15 @@ func (room *Room) log(message string) {
 	timestamp := time.Now().UTC()
 
 	// Add to list of log messages
-	log := logMessage { message, timestamp }
-	messageSlice := []logMessage{ log }
-	room.logs = append(messageSlice, room.logs...)
+	log := Log { message, timestamp }
+	room.logs = append(room.logs, log)
+
 	// Cap the size of the logs array at 100
 	if len(room.logs) > 100 {
-		room.logs = room.logs[:100]
+		room.logs = room.logs[1:]
 	}
 
-	logEvent := lib.FormatEventComponent("log", LogMessage(message, timestamp))
+	logEvent := lib.FormatEventComponent("log", LogMessage(log))
 
 	room.moderators.SendToAll(logEvent)
 	room.players.SendToAll(logEvent)
