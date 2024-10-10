@@ -4,7 +4,7 @@ import "net/http"
 import "fmt"
 
 import "goodbuzz/lib"
-import "goodbuzz/lib/rooms"
+import "goodbuzz/router/rooms"
 
 func Get(w http.ResponseWriter, r *http.Request) {
     room_id, err := lib.GetIntParam(r, "id")

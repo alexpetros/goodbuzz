@@ -3,7 +3,7 @@ package player
 import (
 	"goodbuzz/lib"
 	"goodbuzz/lib/logger"
-	"goodbuzz/lib/rooms"
+	"goodbuzz/router/rooms"
 	"net/http"
 )
 

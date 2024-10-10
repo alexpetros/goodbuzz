@@ -5,7 +5,8 @@ import "fmt"
 
 import "goodbuzz/lib"
 import "goodbuzz/lib/db"
-import "goodbuzz/lib/rooms"
+import "goodbuzz/lib/room"
+import "goodbuzz/router/rooms"
 
 func Get(w http.ResponseWriter, r *http.Request) {
     param, error := lib.GetIntParam(r, "id")
@@ -53,7 +54,7 @@ func Edit(w http.ResponseWriter, r *http.Request) {
     lib.Render(w, r, tournament.Name(), content)
 }
 
-templ edit(tournament *db.Tournament, rooms []rooms.Room) {
+templ edit(tournament *db.Tournament, rooms []room.Room) {
 <h1>{tournament.Name()}</h1>
 
 <h2>Rooms</h2>

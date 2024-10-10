@@ -3,7 +3,7 @@ package buzz
 import (
 	"goodbuzz/lib"
 	"goodbuzz/lib/logger"
-	"goodbuzz/lib/rooms"
+	"goodbuzz/router/rooms"
 	"net/http"
 )
 
@@ -21,8 +21,9 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := r.PostFormValue("token")
+	resetToken := r.PostFormValue("resetToken")
 
-	room.BuzzRoom(token)
+	room.BuzzRoom(token, resetToken)
 	w.WriteHeader(204)
 }
 

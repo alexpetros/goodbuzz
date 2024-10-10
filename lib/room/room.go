@@ -1,12 +1,10 @@
-package rooms
+package room
 
 import (
-	"context"
 	"fmt"
 	"github.com/google/uuid"
-	"goodbuzz/lib/db"
 	"goodbuzz/lib/logger"
-	"goodbuzz/lib/rooms/users"
+	"goodbuzz/lib/room/users"
 	"net/http"
 )
 
@@ -34,13 +32,25 @@ func (s BuzzerStatus) String() string {
 type Room struct {
 	roomId       int64
 	name         string
+	resetToken   string
 	buzzes       []string
+	logs         []string
 	buzzerStatus BuzzerStatus
 	players      *users.UserMap[*users.Player]
 	moderators   *users.UserMap[*users.Moderator]
 }
 
-var openRooms = newRoomMap()
+func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
+	return &Room{
+		roomId:       roomId,
+		name:         name,
+		buzzes:       make([]string, 0),
+		resetToken:   uuid.NewString(),
+		buzzerStatus: Unlocked,
+		players:      users.NewUserMap[*users.Player](),
+		moderators:   users.NewUserMap[*users.Moderator](),
+	}
+}
 
 func (room *Room) Id() int64 {
 	return room.roomId
@@ -94,27 +104,11 @@ func (room *Room) SetPlayerName(token string, name string) {
 	room.sendPlayerListUpdates()
 }
 
-func GetRoomsForTournament(ctx context.Context, tournamentId int64) []Room {
-	dbRooms := db.GetRoomsForTournament(ctx, tournamentId)
-	rooms := make([]Room, 0)
-	for _, dbRoom := range dbRooms {
-		newRoom := GetRoom(ctx, dbRoom.Id())
-		rooms = append(rooms, *newRoom)
-	}
-
-	return rooms
-}
-
-func GetRoom(ctx context.Context, roomId int64) *Room {
-	// TODO handle case where this is nil
-	dbRoom := db.GetRoom(ctx, roomId)
-	room := openRooms.getOrCreateRoom(dbRoom.Id(), dbRoom.Name())
-	return room
-}
-
 // TODO need a way to ignore buzzes that came in before the reset
-func (room *Room) BuzzRoom(token string) {
+func (room *Room) BuzzRoom(token string, resetToken string) {
+
 	logger.Debug("Buzzing room for Player with token: %s", token)
+	logger.Debug("Reset token: %s", resetToken)
 
 	player := room.players.Get(token)
 	if player == nil {
@@ -136,6 +130,7 @@ func (room *Room) ResetAll() {
 	room.buzzes = make([]string, 0)
 	room.unlockAll()
 
+	room.resetToken = uuid.NewString()
 	room.sendBuzzerUpdates()
 	room.sendPlayerListUpdates()
 	room.sendLogUpdates("Buzzer Unlocked")
@@ -154,6 +149,7 @@ func (room *Room) ResetSome() {
 
 	room.buzzes = make([]string, 0)
 
+	room.resetToken = uuid.NewString()
 	room.sendBuzzerUpdates()
 	room.sendPlayerListUpdates()
 	room.sendLogUpdates("Buzzer Unlocked")
@@ -164,7 +160,7 @@ func (room *Room) CurrentBuzzerEvent() string {
 
 	status := room.buzzerStatus
 	if status == Unlocked {
-		buzzer = ReadyBuzzerEvent()
+		buzzer = ReadyBuzzerEvent(room.resetToken)
 	} else if status == Waiting {
 		buzzer = WaitingBuzzerEvent()
 	} else if status == Locked {

@@ -3,7 +3,8 @@ package player
 import "net/http"
 
 import "goodbuzz/lib"
-import "goodbuzz/lib/rooms"
+import "goodbuzz/lib/room"
+import "goodbuzz/router/rooms"
 
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +24,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
     lib.Render(w, r, room.Name(), content)
 }
 
-templ index(room *rooms.Room) {
+templ index(room *room.Room) {
 <h1>{room.Name()}</h1>
 
 <!--
