@@ -108,21 +108,23 @@ func (room *Room) SetPlayerName(token string, name string) {
 	room.sendPlayerListUpdates()
 }
 
-// TODO need a way to ignore buzzes that came in before the reset
 func (room *Room) BuzzRoom(token string, resetToken string) {
+	logger.Debug("player %s buzzed with resetToken %s", token, resetToken)
 
-	logger.Debug("Buzzing room for Player with token: %s", token)
-	logger.Debug("Reset token: %s", resetToken)
+	if resetToken != room.resetToken {
+		logger.Info("reset token %s does not match room reset token %s", token, resetToken)
+		return
+	}
 
 	player := room.players.Get(token)
 	if player == nil {
-		logger.Error("nil Player returned for token %v")
+		logger.Error("nil player returned for token %v")
 		return
 	}
 
 	room.buzzerStatus = Locked
 	room.buzzes = append(room.buzzes, token)
-	logMessage := fmt.Sprintf("%s Buzzed", player.Name())
+	logMessage := fmt.Sprintf("%s puzzed", player.Name())
 
 	room.sendBuzzerUpdates()
 	room.log(logMessage)
