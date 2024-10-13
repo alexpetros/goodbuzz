@@ -33,7 +33,7 @@ func (s BuzzerStatus) String() string {
 }
 
 type Buzz struct {
-	token	string
+	token      string
 	resetToken string
 }
 
@@ -42,7 +42,7 @@ type Room struct {
 	name         string
 	resetToken   string
 	logs         []Log
-	buzzes			 []*Buzz
+	buzzes       []*Buzz
 	buzzChannel  chan *Buzz
 	buzzerStatus BuzzerStatus
 	players      *users.UserMap[*users.Player]
@@ -54,17 +54,17 @@ func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
 		roomId:       roomId,
 		name:         name,
 		resetToken:   uuid.NewString(),
-		logs:					make([]Log, 0),
-		buzzes:				make([]*Buzz, 0),
-		buzzChannel: 	make(chan *Buzz),
+		logs:         make([]Log, 0),
+		buzzes:       make([]*Buzz, 0),
+		buzzChannel:  make(chan *Buzz),
 		buzzerStatus: Unlocked,
 		players:      users.NewUserMap[*users.Player](),
 		moderators:   users.NewUserMap[*users.Moderator](),
 	}
 
-	go func () {
+	go func() {
 		for {
-			data := <- room.buzzChannel
+			data := <-room.buzzChannel
 
 			// End the entire loop if the channel is closed
 			if data == nil {
@@ -163,13 +163,13 @@ func (room *Room) SetPlayerName(token string, name string) {
 
 func (room *Room) BuzzRoom(token string, resetToken string) {
 	logger.Debug("player %s buzzed with resetToken %s", token, resetToken)
-	room.buzzChannel <- &Buzz { token, resetToken }
+	room.buzzChannel <- &Buzz{token, resetToken}
 }
 
 func (room *Room) ResetAll() {
 	logger.Debug("Resetting all buzzers")
 	room.unlockAll()
-	room.buzzChannel <- &Buzz {"", ""}
+	room.buzzChannel <- &Buzz{"", ""}
 	room.log("Buzzer unlocked for everyone")
 }
 
@@ -183,7 +183,7 @@ func (room *Room) ResetSome() {
 		room.lockPlayer(buzz.token)
 	}
 
-	room.buzzChannel <- &Buzz {"", ""}
+	room.buzzChannel <- &Buzz{"", ""}
 	room.log("Buzzer unlocked for some players")
 }
 
@@ -256,7 +256,7 @@ func (room *Room) log(message string) {
 	timestamp := time.Now().UTC()
 
 	// Add to list of log messages
-	log := Log { message, timestamp }
+	log := Log{message, timestamp}
 	room.logs = append(room.logs, log)
 
 	// Cap the size of the logs array at 100
