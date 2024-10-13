@@ -32,28 +32,81 @@ func (s BuzzerStatus) String() string {
 	return "Unknown"
 }
 
+type Buzz struct {
+	token	string
+	resetToken string
+}
+
 type Room struct {
 	roomId       int64
 	name         string
 	resetToken   string
 	logs         []Log
-	buzzes       []string
+	buzzes			 []*Buzz
+	buzzChannel  chan *Buzz
 	buzzerStatus BuzzerStatus
 	players      *users.UserMap[*users.Player]
 	moderators   *users.UserMap[*users.Moderator]
 }
 
 func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
-	return &Room{
+	room := Room{
 		roomId:       roomId,
 		name:         name,
 		resetToken:   uuid.NewString(),
 		logs:					make([]Log, 0),
-		buzzes:       make([]string, 0),
+		buzzes:				make([]*Buzz, 0),
+		buzzChannel: 	make(chan *Buzz),
 		buzzerStatus: Unlocked,
 		players:      users.NewUserMap[*users.Player](),
 		moderators:   users.NewUserMap[*users.Moderator](),
 	}
+
+	go func () {
+		for {
+			data := <- room.buzzChannel
+
+			// End the entire loop if the channel is closed
+			if data == nil {
+				logger.Info("Closing buzzChannel for room %s", roomId)
+				return
+			}
+
+			// This is the sign to reset
+			if data.resetToken == "" {
+				room.buzzerStatus = Unlocked
+				room.resetToken = uuid.NewString()
+				room.sendBuzzerUpdates()
+				room.sendPlayerListUpdates()
+				room.buzzes = make([]*Buzz, 0)
+				continue
+			}
+
+			// Ignore buzzes that don't match the reset token
+			if data.resetToken != room.resetToken {
+				logger.Info("reset token %s does not match room reset token %s",
+					data.resetToken, room.resetToken)
+				continue
+			}
+
+			// Ignore buzzes with unknown player tokens
+			player := room.players.Get(data.token)
+			if player == nil {
+				logger.Error("nil player returned for token %v")
+				continue
+			}
+
+			// Append buzzes that match all these conditions
+			logMessage := fmt.Sprintf("%s buzzed", player.Name())
+			room.buzzerStatus = Locked
+			room.sendBuzzerUpdates()
+			room.log(logMessage)
+
+			room.buzzes = append(room.buzzes, data)
+		}
+	}()
+
+	return &room
 }
 
 func (room *Room) Id() int64 {
@@ -110,54 +163,27 @@ func (room *Room) SetPlayerName(token string, name string) {
 
 func (room *Room) BuzzRoom(token string, resetToken string) {
 	logger.Debug("player %s buzzed with resetToken %s", token, resetToken)
-
-	if resetToken != room.resetToken {
-		logger.Info("reset token %s does not match room reset token %s", token, resetToken)
-		return
-	}
-
-	player := room.players.Get(token)
-	if player == nil {
-		logger.Error("nil player returned for token %v")
-		return
-	}
-
-	room.buzzerStatus = Locked
-	room.buzzes = append(room.buzzes, token)
-	logMessage := fmt.Sprintf("%s puzzed", player.Name())
-
-	room.sendBuzzerUpdates()
-	room.log(logMessage)
+	room.buzzChannel <- &Buzz { token, resetToken }
 }
 
 func (room *Room) ResetAll() {
 	logger.Debug("Resetting all buzzers")
-	room.buzzerStatus = Unlocked
-	room.buzzes = make([]string, 0)
 	room.unlockAll()
-
-	room.resetToken = uuid.NewString()
-	room.sendBuzzerUpdates()
-	room.sendPlayerListUpdates()
+	room.buzzChannel <- &Buzz {"", ""}
 	room.log("Buzzer unlocked for everyone")
 }
 
 func (room *Room) ResetSome() {
 	logger.Debug("Resetting some buzzers")
-	room.buzzerStatus = Unlocked
 
 	if len(room.buzzes) < 1 {
 		logger.Info("room %s was reset with no active buzzes", room.name)
 	} else {
-		token := room.buzzes[0]
-		room.lockPlayer(token)
+		buzz := room.buzzes[0]
+		room.lockPlayer(buzz.token)
 	}
 
-	room.buzzes = make([]string, 0)
-
-	room.resetToken = uuid.NewString()
-	room.sendBuzzerUpdates()
-	room.sendPlayerListUpdates()
+	room.buzzChannel <- &Buzz {"", ""}
 	room.log("Buzzer unlocked for some players")
 }
 
