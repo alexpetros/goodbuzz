@@ -2,20 +2,12 @@ package room
 
 import (
     "fmt"
-    "strings"
     "goodbuzz/lib"
     "goodbuzz/lib/room/users"
 )
 
 func PlayerListEvent(players []*users.Player) string {
-	var sb strings.Builder
-
-	for _, player := range players {
-		li := fmt.Sprintf("<li>%s", player.Name())
-		sb.WriteString(li)
-	}
-
-	return lib.FormatEventString("players", sb.String())
+	return lib.FormatEventComponent("players", PlayerTable(players))
 }
 
 func WaitingBuzzerEvent() string {
@@ -44,6 +36,16 @@ templ LockedBuzzer() {
 <button class="buzzer locked" disabled >
   Locked
 </button>
+}
+
+templ PlayerTable(players []*users.Player) {
+<table>
+  for _, player := range players {
+  <tr>
+    <td>{player.Name()}</td>
+  </tr>
+  }
+</table>
 }
 
 templ ReadyBuzzer(resetToken string) {

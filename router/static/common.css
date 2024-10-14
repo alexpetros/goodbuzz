@@ -8,6 +8,7 @@
 }
 
 body {
+  font-family: 'Arial', 'Sans Serif';
   max-width: 800px;
   padding: 15px 10px;
   margin: 0 auto;
@@ -39,7 +40,7 @@ button.buzzer {
   color: white;
   font-size: 30px;
   background-color: var(--button-enabled-color);
-  border: 8px solid black;
+  border: 5px solid black;
   border-radius: 50%;
 
   &:active:enabled {
@@ -86,6 +87,7 @@ table.rooms {
 }
 
 button.action, a.action {
+  font-family: 'Arial', 'Sans Serif';
   background-color: #f7f7f7;
   border-radius: 2px;
   border: 1px solid #424141;
@@ -116,7 +118,7 @@ section.logs {
   .log-container {
     height: 15rem;
     overflow-y: scroll;
-    border: 1px solid black;
+    border: 2px solid var(--button-enabled-color);
     scrollbar-gutter: stable;
   }
 
@@ -143,6 +145,16 @@ main.player {
 
   section.logs {
     grid-column: 1 / 3;
+  }
+
+  .players table {
+    margin-top: 15px;
+    font-style: italic;
+  }
+
+  .players tr {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
   }
 }
 

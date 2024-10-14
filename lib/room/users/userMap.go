@@ -1,6 +1,7 @@
 package users
 
 import (
+	"errors"
 	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/lib/logger"
@@ -75,11 +76,16 @@ func (um *UserMap[T]) Insert(token string, user T) {
 	um.users[token] = user
 }
 
-func (um *UserMap[T]) Get(token string) T {
+func (um *UserMap[T]) Get(token string) (T, error) {
 	um.RLock()
 	defer um.RUnlock()
-	user := um.users[token]
-	return user
+	user, ok := um.users[token]
+
+	if ok {
+		return user, nil
+	} else {
+		return user, errors.New("Resource was not found")
+	}
 }
 
 func (um *UserMap[T]) Run(fn func(T)) {

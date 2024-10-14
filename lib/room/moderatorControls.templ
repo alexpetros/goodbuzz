@@ -21,7 +21,6 @@ func TokenEvent(token string) string {
 	return lib.FormatEventString("token", data)
 }
 
-
 templ ModeratorPlayerControls(players []*users.Player) {
   <table>
     for _, player := range players {
@@ -39,14 +38,4 @@ templ ModeratorPlayerControls(players []*users.Player) {
     </tr>
     }
   </table>
-}
-
-templ BuzzerStatusSpan(room Room) {
-if room.Status() == Unlocked {
-      <span class="unlocked">Unlocked</span>
-    } else if room.Status() == Locked {
-      <span class="locked">Locked</span>
-    } else {
-      <span class="waiting">waiting</span>
-    }
 }

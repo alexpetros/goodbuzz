@@ -44,8 +44,16 @@ func (room *Room) sendBuzzerUpdates(buzzerUpdate BuzzerUpdate) {
 		}
 	}
 
-	moderatorStatusEvent := ModeratorStatusEvent(buzzerUpdate.status.String())
-	room.moderators.SendToAll(moderatorStatusEvent)
+	room.moderators.SendToAll(room.currentModeratorBuzzer(buzzerUpdate))
+	if buzzerUpdate.status == Won {
+		winner := buzzerUpdate.buzzes[0]
+		player, err := room.players.Get(winner.token)
+		if err != nil {
+			room.log(fmt.Sprintf("(disconnected player) won the buzz!", player.Name()))
+		} else {
+			room.log(fmt.Sprintf("%s won the buzz!", player.Name()))
+		}
+	}
 }
 
 func (room *Room) Id() int64 {
@@ -73,7 +81,12 @@ func (room *Room) Status() BuzzerStatus {
 }
 
 func (room *Room) lockPlayer(token string) {
-	room.players.Get(token).Lock()
+	player, err := room.players.Get(token)
+	if err != nil {
+		logger.Info("Attempted to lock player with token %s, who has disconnected", token)
+	} else {
+		player.Lock()
+	}
 }
 
 func (room *Room) unlockAll() {
@@ -84,21 +97,34 @@ func (room *Room) unlockAll() {
 
 func (room *Room) UnlockPlayer(token string) {
 	logger.Debug("Unlocking player %s", token)
-	room.players.Get(token).Unlock()
+	player, err := room.players.Get(token)
+
+	if err != nil {
+		logger.Info("Attempted to unlock player %s who has since disconnected", token)
+		return
+	}
+
+	player.Unlock()
 	room.buzzer.SendUpdates()
 	room.sendPlayerListUpdates()
 }
 
 func (room *Room) SetPlayerName(token string, name string) {
 	logger.Debug("Setting %s name to %s", token, name)
-	player := room.players.Get(token)
+	player, err := room.players.Get(token)
+
+	if err != nil {
+		logger.Info("Attempted to set name for player %s who has since disconnected", token)
+		return
+	}
+
 	player.SetName(name)
 	room.sendPlayerListUpdates()
 }
 
 func (room *Room) BuzzRoom(token string, resetToken string) {
-	player := room.players.Get(token)
-	if player == nil {
+	player, err := room.players.Get(token)
+	if err != nil {
 		logger.Error("nil player returned for token %v", token)
 		return
 	}
@@ -121,13 +147,16 @@ func (room *Room) ResetAll() {
 func (room *Room) ResetSome() {
 	logger.Debug("Resetting some buzzers")
 
-	winningToken := room.buzzer.GetUpdate().winner
+	buzzerUpdate := room.buzzer.GetUpdate()
 
-	if winningToken == "" {
+	if buzzerUpdate.status == Unlocked {
 		logger.Info("room %s was reset with no active buzzes", room.name)
-	} else {
-		logger.Info("Locking player with token %s", winningToken)
-		room.lockPlayer(winningToken)
+	} else if buzzerUpdate.status == Processing {
+		logger.Info("room %s was reset during processing", room.name)
+	} else if buzzerUpdate.status == Won {
+		winner := buzzerUpdate.buzzes[0]
+		logger.Info("Locking player with token %s", winner.token)
+		room.lockPlayer(winner.token)
 	}
 
 	room.buzzer.Reset()
@@ -136,16 +165,32 @@ func (room *Room) ResetSome() {
 }
 
 func currentPlayerBuzzer(buzzerUpdate BuzzerUpdate) string {
-	var playerBuzzer string
-	if buzzerUpdate.status == Unlocked {
-		playerBuzzer = ReadyBuzzerEvent(buzzerUpdate.resetToken)
-	} else if buzzerUpdate.status == Waiting {
-		playerBuzzer = WaitingBuzzerEvent()
-	} else if buzzerUpdate.status == Locked {
-		playerBuzzer = LockedBuzzerEvent()
+	if buzzerUpdate.status != Unlocked {
+		return LockedBuzzerEvent()
 	}
 
-	return playerBuzzer
+	return ReadyBuzzerEvent(buzzerUpdate.resetToken)
+}
+
+func (room *Room) currentModeratorBuzzer(buzzerUpdate BuzzerUpdate) string {
+	if buzzerUpdate.status == Won {
+		winner := buzzerUpdate.buzzes[0]
+		player, err := room.players.Get(winner.token)
+
+		var name string
+		if err != nil {
+			name = "(disconnected player)"
+		} else {
+			name = player.Name()
+		}
+
+		message := fmt.Sprintf("Locked by %s", name)
+		return ModeratorStatusEvent(message)
+	} else if buzzerUpdate.status == Processing {
+		return ModeratorStatusEvent("Processing...")
+	} else {
+		return ModeratorStatusEvent("Unlocked")
+	}
 }
 
 func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, chan struct{}) {
@@ -183,7 +228,7 @@ func (room *Room) CreateModerator(w http.ResponseWriter, r *http.Request) (strin
 	// Initialize Moderator
 	eventChan <- PastLogsEvent(room.logs)
 	eventChan <- ModeratorPlayerControlsEvent(room.players.GetUsers())
-	eventChan <- ModeratorStatusEvent(room.Status().String())
+	eventChan <- room.currentModeratorBuzzer(room.buzzer.GetUpdate())
 	return token, closeChan
 }
 

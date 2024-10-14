@@ -46,7 +46,7 @@ For more, see: https://htmx.org/attributes/hx-include/
     </div>
   </section>
 
-  <section>
+  <section class="players">
     <h2>Players</h2>
     <form hx-put="./player" hx-on::before-request="setNameCookie()">
       <label>
@@ -54,7 +54,7 @@ For more, see: https://htmx.org/attributes/hx-include/
         <input type="text" name="name"></label>
       <button>Set</button>
     </form>
-    <ul sse-swap="players" hx-swap="innerHTML"></ul>
+    <div sse-swap="players" hx-swap="innerHTML"></div>
   </section>
 
 

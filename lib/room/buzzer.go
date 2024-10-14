@@ -1,37 +1,27 @@
 package room
 
 import (
+	"time"
 	"goodbuzz/lib/logger"
 
 	"github.com/google/uuid"
 )
+
+const BUZZER_DELAY = 500 * time.Millisecond
 
 type BuzzerStatus int
 
 type BuzzerUpdate struct {
 	status BuzzerStatus
 	resetToken string
-	winner string
+	buzzes []Buzz
 }
 
 const (
 	Unlocked BuzzerStatus = 0
-	Waiting               = 1
-	Locked                = 2
+	Processing            = 1
+	Won                   = 2
 )
-
-func (s BuzzerStatus) String() string {
-	switch s {
-	case Unlocked:
-		return "Unlocked"
-	case Waiting:
-		return "Waiting"
-	case Locked:
-		return "Locked"
-	}
-
-	return "Unknown"
-}
 
 type Buzz struct {
 	token      string
@@ -77,12 +67,12 @@ func NewBuzzer(updateCallback func(BuzzerUpdate)) *Buzzer {
 }
 
 func (buzzer *Buzzer) makeUpdateSnapshot() BuzzerUpdate {
-	winner := ""
-	if len(buzzer.buzzes) > 0 {
-		winner = buzzer.buzzes[0].token
+	buzzes := make([]Buzz, len(buzzer.buzzes))
+	for i, buzz := range buzzer.buzzes {
+		buzzes[i] = Buzz { buzz.token, buzz.resetToken }
 	}
 
-	return BuzzerUpdate { buzzer.buzzerStatus, buzzer.resetToken, winner }
+	return BuzzerUpdate { buzzer.buzzerStatus, buzzer.resetToken, buzzes }
 }
 
 func (buzzer *Buzzer) doUpdates(data *Buzz) {
@@ -100,9 +90,30 @@ func (buzzer *Buzzer) doUpdates(data *Buzz) {
 		return
 	}
 
-	// Append buzzes that match all these conditions
-	buzzer.buzzerStatus = Locked
-	buzzer.buzzes = append(buzzer.buzzes, data)
+	// If the buzzer isn't locked yet, append the buzz
+	if buzzer.buzzerStatus != Won {
+		logger.Debug("Buzzer isn't locked yet, adding new buzz data")
+		buzzer.buzzes = append(buzzer.buzzes, data)
+	}
+
+	// If the buzzer isn't on a timer yet, start the processing timer
+	if buzzer.buzzerStatus == Unlocked {
+		logger.Debug("Buzzer isn't processing yet, starting processing")
+		go buzzer.StartProcessing()
+	}
+
+}
+
+func (buzzer *Buzzer) StartProcessing() {
+	buzzer.buzzerStatus = Processing
+	buzzer.SendUpdates()
+
+	time.Sleep(BUZZER_DELAY)
+
+	logger.Debug("Processing finished, locking buzzer")
+	logger.Debug("Buzzes: %v", buzzer.buzzes)
+	buzzer.buzzerStatus = Won
+	buzzer.SendUpdates()
 }
 
 func (buzzer *Buzzer) SendUpdates() {
