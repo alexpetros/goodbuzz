@@ -18,30 +18,26 @@ func CreateUser(w http.ResponseWriter, r *http.Request) (chan string, chan struc
 	eventChan := make(chan string)
 	closeChan := make(chan struct{})
 
-	go func() {
-		<-notify
-		closeChan <- struct{}{}
-	}()
+	rc := http.NewResponseController(w)
 
 	// Continuously send data to the client
 	go func() {
 		for {
-			data := <-eventChan
-			// Upon receiving the zero value (""), the channel is closed, so break the loop
-			if data == "" {
+			select {
+			case <-notify:
+				closeChan <- struct{}{}
 				break
-			}
+			case data := <-eventChan:
+				//logger.Debug("Sending data to moderator in room %d:\n%s", room.Id(), data)
+				_, err2 := fmt.Fprintf(w, data)
+				if err2 != nil {
+					logger.Error("error writing data:\n%v", err2)
+				}
 
-			//logger.Debug("Sending data to moderator in room %d:\n%s", room.Id(), data)
-			_, err2 := fmt.Fprintf(w, data)
-			if err2 != nil {
-				//logger.Error("Failed to send data to moderator in room %d:\n%s", room.Id(), data)
-			}
-
-			if w != nil && w.(http.Flusher) != nil {
-				w.(http.Flusher).Flush()
-			} else {
-				logger.Warn("write to socket after connection closed")
+				err := rc.Flush()
+				if err != nil {
+					logger.Error("error flushing writer:\n%v", err)
+				}
 			}
 		}
 	}()
