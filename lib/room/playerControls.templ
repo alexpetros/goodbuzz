@@ -48,7 +48,7 @@ templ PlayerTable(players []*users.Player, self *users.Player) {
   for _, player := range players {
     if player.Token() != self.Token() {
       <tr>
-        <td class={"other", "player-name", templ.KV("locked", self.IsLocked())}>
+        <td class={"other", "player-name", templ.KV("locked", player.IsLocked())}>
           {player.Name()}
         </td>
       </tr>

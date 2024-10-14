@@ -163,6 +163,10 @@ main.player {
   .players .other {
     font-style: italic;
   }
+
+  .players .locked {
+    text-decoration: line-through;
+  }
 }
 
 /** Moderator CSS */
