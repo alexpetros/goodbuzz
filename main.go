@@ -11,7 +11,7 @@ import (
 	"os/signal"
 )
 
-const DEFAULT_PORT = "3000"
+const DEFAULT_PORT = "9090"
 const SQLITE_FILE = "goodbuzz.db"
 
 func main() {
