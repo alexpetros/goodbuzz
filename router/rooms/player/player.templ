@@ -5,6 +5,7 @@ import "net/http"
 import "goodbuzz/lib"
 import "goodbuzz/lib/room"
 import "goodbuzz/router/rooms"
+import "fmt"
 
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -39,21 +40,35 @@ For more, see: https://htmx.org/attributes/hx-include/
 >
   <!-- Upon connection, the server will send a new token and replace this-->
   <input type="hidden" name="token" value="" sse-swap="token" hx-swap="outerHTML">
-  <section>
+  <section class="buzzer">
     <h2>Buzzer</h2>
     <div sse-swap="buzzer" hx-swap="innerHTML">
       <button class="buzzer loading" disabled>Loading...</button>
     </div>
   </section>
 
-  <section class="players">
-    <h2>Players</h2>
+  <section class="settings">
+    <h2>Settings</h2>
     <form hx-put="./player" hx-on::before-request="setNameCookie()">
       <label>
-        Name:
-        <input type="text" name="name"></label>
-      <button>Set</button>
+        Name: <input type="text" name="name">
+      </label>
+
+      <label>
+        Team:
+        <select name="team">
+        for i := 1; i <= 4; i++ {
+          <option value={fmt.Sprintf("%d", i)}>Team {fmt.Sprintf("%d", i)}</option>
+        }
+        </select>
+      </label>
+
+      <button>Save</button>
     </form>
+  </section>
+
+  <section class="players">
+    <h3>Players</h3>
     <div sse-swap="players" hx-swap="innerHTML"></div>
   </section>
 
