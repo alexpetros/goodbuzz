@@ -41,12 +41,16 @@ templ LockedBuzzer() {
 templ PlayerTable(players []*users.Player, self *users.Player) {
 <table>
   <tr>
-    <td><span class="you player-name">{self.Name()}</span> (you)</td>
+    <td class={"you", "player-name", templ.KV("locked", self.IsLocked())}>
+      {self.Name()} (you)
+    </td>
   </tr>
   for _, player := range players {
     if player.Token() != self.Token() {
       <tr>
-        <td><span class="other player-name">{player.Name()}</span></td>
+        <td class={"other", "player-name", templ.KV("locked", self.IsLocked())}>
+          {player.Name()}
+        </td>
       </tr>
     }
   }
