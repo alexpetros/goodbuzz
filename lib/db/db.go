@@ -62,6 +62,7 @@ func InitDb(filename string) {
 		logger.Fatal("Failed to initialize database: %w", err)
 	}
 
+	logger.Info("Connected to db at %s", filename)
 	pool = dbpool
 }
 
