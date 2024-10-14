@@ -6,8 +6,8 @@ import (
     "goodbuzz/lib/room/users"
 )
 
-func PlayerListEvent(players []*users.Player) string {
-	return lib.FormatEventComponent("players", PlayerTable(players))
+func PlayerListEvent(players []*users.Player, self *users.Player) string {
+	return lib.FormatEventComponent("players", PlayerTable(players, self))
 }
 
 func WaitingBuzzerEvent() string {
@@ -38,12 +38,17 @@ templ LockedBuzzer() {
 </button>
 }
 
-templ PlayerTable(players []*users.Player) {
+templ PlayerTable(players []*users.Player, self *users.Player) {
 <table>
-  for _, player := range players {
   <tr>
-    <td>{player.Name()}</td>
+    <td><span class="you player-name">{self.Name()}</span> (you)</td>
   </tr>
+  for _, player := range players {
+    if player.Token() != self.Token() {
+      <tr>
+        <td><span class="other player-name">{player.Name()}</span></td>
+      </tr>
+    }
   }
 </table>
 }

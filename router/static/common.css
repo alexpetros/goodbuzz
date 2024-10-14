@@ -149,12 +149,19 @@ main.player {
 
   .players table {
     margin-top: 15px;
-    font-style: italic;
   }
 
   .players tr {
     display: grid;
     grid-template-columns: 2fr 1fr;
+  }
+
+  .players .you {
+    font-weight: bold;
+  }
+
+  .players .other {
+    font-style: italic;
   }
 }
 

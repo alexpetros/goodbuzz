@@ -272,6 +272,9 @@ func (room *Room) sendPlayerListUpdates() {
 		return strings.Compare(a.Name(), b.Name())
 	})
 
-	room.players.SendToAll(PlayerListEvent(players))
+	for _, player := range players {
+		player.Channel() <- PlayerListEvent(players, player)
+	}
+
 	room.moderators.SendToAll(ModeratorPlayerControlsEvent(players))
 }
