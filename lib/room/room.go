@@ -73,11 +73,11 @@ func (room *Room) Url() string {
 }
 
 func (room *Room) PlayerUrl() string {
-	return fmt.Sprintf("/rooms/%d/Player", room.roomId)
+	return fmt.Sprintf("/rooms/%d/player", room.roomId)
 }
 
 func (room *Room) ModeratorUrl() string {
-	return fmt.Sprintf("/rooms/%d/Moderator", room.roomId)
+	return fmt.Sprintf("/rooms/%d/moderator", room.roomId)
 }
 
 func (room *Room) Status() BuzzerStatus {
