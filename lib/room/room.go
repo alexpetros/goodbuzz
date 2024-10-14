@@ -6,6 +6,8 @@ import (
 	"goodbuzz/lib/logger"
 	"goodbuzz/lib/room/users"
 	"net/http"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -36,7 +38,9 @@ func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
 }
 
 func (room *Room) sendBuzzerUpdates(buzzerUpdate BuzzerUpdate) {
-	for _, player := range room.players.GetUsers() {
+	players := room.players.GetUsers()
+
+	for _, player := range players {
 		if player.IsLocked() {
 			player.Channel() <- LockedBuzzerEvent()
 		} else {
@@ -263,8 +267,11 @@ func (room *Room) log(message string) {
 }
 
 func (room *Room) sendPlayerListUpdates() {
-	users := room.players.GetUsers()
+	players := room.players.GetUsers()
+	slices.SortFunc(players, func(a, b *users.Player) int {
+		return strings.Compare(a.Name(), b.Name())
+	})
 
-	room.players.SendToAll(PlayerListEvent(users))
-	room.moderators.SendToAll(ModeratorPlayerControlsEvent(users))
+	room.players.SendToAll(PlayerListEvent(players))
+	room.moderators.SendToAll(ModeratorPlayerControlsEvent(players))
 }
