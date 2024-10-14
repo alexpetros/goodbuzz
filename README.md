@@ -1,4 +1,8 @@
-# Goodbuzz System
+# Goodbuzz
+
+An online, simultaneous, high-capacity buzzer system.
+
+Documentation incoming (soon).
 
 ## Installation
 
@@ -9,5 +13,6 @@ Once these are installed, use the makefile to build and run the program:
 
 - `make` / `make live` - start the hot-reloading dev version
 - `make build` - build the production version
+- `make dev` - build and run the dev  version
 - `make prod` - build and run the production  version
 - `make clean` - remove all build artifacts
