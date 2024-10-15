@@ -6,7 +6,8 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-
+	"fmt"
+	"strings"
 	"github.com/a-h/templ"
 )
 
@@ -42,4 +43,23 @@ func ServerError(w http.ResponseWriter, r *http.Request) {
 func GetIntParam(r *http.Request, param_name string) (id int64, err error) {
 	param := r.PathValue(param_name)
 	return strconv.ParseInt(param, 10, 64)
+}
+
+
+func FormatEventString(eventName string, data string) string {
+	return fmt.Sprintf("event: %s\ndata: %s\n\n", eventName, data)
+}
+
+func FormatEventComponent(eventName string, component templ.Component) string {
+	data := ToString(component)
+	return fmt.Sprintf("event: %s\ndata: %s\n\n", eventName, data)
+}
+
+func CombineEvents(events ...string) string {
+	var sb strings.Builder
+	for _, message := range events {
+		sb.WriteString(message)
+	}
+
+	return sb.String()
 }

@@ -3,12 +3,11 @@ package users
 type Player struct {
 	name      string
 	token     string
-	channel   chan string
 	is_locked bool
 }
 
-func NewPlayer(name string, token string, channel chan string) *Player {
-	return &Player{name, token, channel, false}
+func NewPlayer(name string, token string) *Player {
+	return &Player{name, token, false}
 }
 
 func (player *Player) Name() string {
@@ -29,10 +28,6 @@ func (player *Player) StatusString() string {
 	} else {
 		return "-"
 	}
-}
-
-func (player *Player) Channel() chan string {
-	return player.channel
 }
 
 func (player *Player) SetName(name string) {

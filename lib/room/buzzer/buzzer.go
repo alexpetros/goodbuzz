@@ -1,4 +1,4 @@
-package room
+package buzzer
 
 import (
 	"goodbuzz/lib/logger"
@@ -12,9 +12,9 @@ const BUZZER_DELAY = 500 * time.Millisecond
 type BuzzerStatus int
 
 type BuzzerUpdate struct {
-	status     BuzzerStatus
-	resetToken string
-	buzzes     []Buzz
+	Status     BuzzerStatus
+	ResetToken string
+	Buzzes     []Buzz
 }
 
 const (
@@ -24,8 +24,8 @@ const (
 )
 
 type Buzz struct {
-	userToken  string
-	resetToken string
+	UserToken  string
+	ResetToken string
 }
 
 type Buzzer struct {
@@ -69,7 +69,7 @@ func NewBuzzer(updateCallback func(BuzzerUpdate)) *Buzzer {
 func (buzzer *Buzzer) makeUpdateSnapshot() BuzzerUpdate {
 	buzzes := make([]Buzz, len(buzzer.buzzes))
 	for i, buzz := range buzzer.buzzes {
-		buzzes[i] = Buzz{buzz.userToken, buzz.resetToken}
+		buzzes[i] = Buzz{buzz.UserToken, buzz.ResetToken}
 	}
 
 	return BuzzerUpdate{buzzer.buzzerStatus, buzzer.resetToken, buzzes}
@@ -77,7 +77,7 @@ func (buzzer *Buzzer) makeUpdateSnapshot() BuzzerUpdate {
 
 func (buzzer *Buzzer) doUpdates(data *Buzz) {
 	// This is the sign to reset
-	if data.resetToken == "" {
+	if data.ResetToken == "" {
 		buzzer.buzzerStatus = Unlocked
 		buzzer.resetToken = uuid.NewString()
 		buzzer.buzzes = make([]*Buzz, 0)
@@ -85,8 +85,8 @@ func (buzzer *Buzzer) doUpdates(data *Buzz) {
 	}
 
 	// Ignore buzzes that don't match the reset userToken
-	if data.resetToken != buzzer.resetToken {
-		logger.Info("reset userToken %s does not match room reset userToken %s", data.resetToken, buzzer.resetToken)
+	if data.ResetToken != buzzer.resetToken {
+		logger.Info("reset userToken %s does not match room reset userToken %s", data.UserToken, buzzer.resetToken)
 		return
 	}
 

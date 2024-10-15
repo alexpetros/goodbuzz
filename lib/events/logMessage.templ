@@ -1,11 +1,11 @@
-package room
+package events
 
 import "time"
 import "goodbuzz/lib"
 
 type Log struct {
-	message string
-	timestamp time.Time
+	Message   string
+	Timestamp time.Time
 }
 
 func PastLogsEvent(logs []Log) string {
@@ -21,9 +21,9 @@ templ ManyLogs(logs []Log) {
 
 templ LogMessage (log Log) {
   <div>
-    <time datetime={log.timestamp.Format("2006-01-02T03:04:05.000")}>
-      {log.timestamp.Format("03:04:05.000")}
+    <time datetime={log.Timestamp.Format("2006-01-02T03:04:05.000")}>
+      {log.Timestamp.Format("03:04:05.000")}
     </time>
-    {log.message}
+    {log.Message}
   </div>
 }

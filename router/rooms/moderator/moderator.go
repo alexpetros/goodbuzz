@@ -5,6 +5,8 @@ import (
 	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 func Live(w http.ResponseWriter, r *http.Request) {
@@ -20,17 +22,12 @@ func Live(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set the response header to indicate SSE content type
-	w.Header().Add("Content-Type", "text/event-stream")
-	w.Header().Add("Cache-Control", "no-cache")
-	w.Header().Add("Connection", "keep-alive")
+	token := uuid.NewString()
 
 	// Listen for client close and remove the client from the list
-	logger.Info("Moderator connected to room %d", room.Id())
-	token, closeConn := room.CreateModerator(w, r)
+	logger.Info("Moderator %s connected to room %d", token, room.Id())
+	room.AttachModerator(w, r, token)
 
 	// Wait for cleanup to happen and then close the connection
-	<-closeConn
 	logger.Info("Moderator disconnected from room %d", room.Id())
-	room.RemoveModerator(token)
 }

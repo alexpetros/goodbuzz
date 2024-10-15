@@ -1,7 +1,6 @@
 package users
 
 import (
-	"errors"
 	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/lib/logger"
@@ -9,51 +8,74 @@ import (
 	"sync"
 )
 
-type User interface {
-	Channel() chan string
+type item [T any] struct {
+	data T
+	eventChan chan string
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) (chan string, chan struct{}) {
-	notify := r.Context().Done()
+type UserMap [T any] struct {
+	sync.RWMutex
+	users map[string]item[T]
+}
+
+func NewUserMap[T any]() *UserMap[T] {
+	return &UserMap[T]{
+		users: make(map[string]item[T]),
+	}
+}
+
+func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken string, data T) <- chan struct {} {
+	// Set the response header to indicate SSE content type
+	w.Header().Add("Content-Type", "text/event-stream")
+	w.Header().Add("Cache-Control", "no-cache")
+	w.Header().Add("Connection", "keep-alive")
+
 	eventChan := make(chan string)
 	closeChan := make(chan struct{})
 
-	rc := http.NewResponseController(w)
+	um.Lock()
+	um.users[userToken] = item[T] { data, eventChan }
+	um.Unlock()
+
+	// Remove the channel if the connection closes
+	go func() {
+		<- r.Context().Done()
+		um.RemoveUser(userToken)
+		closeChan <- struct{}{}
+	}()
 
 	// Continuously send data to the client
 	go func() {
-		for {
-			select {
-			case <-notify:
-				closeChan <- struct{}{}
-				break
-			case data := <-eventChan:
-				//logger.Debug("Sending data to moderator in room %d:\n%s", room.Id(), data)
-				_, err2 := fmt.Fprintf(w, data)
-				if err2 != nil {
-					logger.Error("error writing data:\n%v", err2)
-				}
+		// Remove the channel if the loop exists (an exception, probably)
+		defer func() {
+			um.RemoveUser(userToken)
+			closeChan <- struct{}{}
+		}()
 
-				err := rc.Flush()
-				if err != nil {
-					logger.Error("error flushing writer:\n%v", err)
-				}
+		rc := http.NewResponseController(w)
+		for {
+			data := <-eventChan
+
+			_, err2 := fmt.Fprintf(w, data)
+			if err2 != nil {
+				logger.Error("error writing data:\n%v", err2)
+			}
+
+			err := rc.Flush()
+			if err != nil {
+				logger.Error("error flushing writer:\n%v", err)
 			}
 		}
 	}()
 
-	return eventChan, closeChan
+	return closeChan
 }
 
-type UserMap[T User] struct {
-	sync.RWMutex
-	users map[string]T
-}
+func (um *UserMap[T]) SendToPlayer(userToken string, message string) {
+	um.RLock()
+	defer um.RUnlock()
 
-func NewUserMap[T User]() *UserMap[T] {
-	return &UserMap[T]{
-		users: make(map[string]T),
-	}
+	um.users[userToken].eventChan <- message
 }
 
 func (um *UserMap[T]) SendToAll(messages ...string) {
@@ -62,41 +84,29 @@ func (um *UserMap[T]) SendToAll(messages ...string) {
 	defer um.RUnlock()
 
 	for _, user := range um.users {
-		user.Channel() <- message
+		user.eventChan <- message
 	}
 }
 
-func (um *UserMap[T]) Insert(token string, user T) {
-	um.Lock()
-	defer um.Unlock()
-	um.users[token] = user
-}
-
-func (um *UserMap[T]) Get(token string) (T, error) {
+func (um *UserMap[T]) Run(userToken string, fn func(data T)) {
 	um.RLock()
 	defer um.RUnlock()
-	user, ok := um.users[token]
 
-	if ok {
-		return user, nil
-	} else {
-		return user, errors.New("Resource was not found")
-	}
+	item := um.users[userToken].data
+	fn(item)
 }
 
-func (um *UserMap[T]) Run(fn func(T)) {
+func (um *UserMap[T]) RunAll(fn func(data T, eventChan chan string)) {
 	um.RLock()
 	defer um.RUnlock()
-	for _, user := range um.users {
-		fn(user)
+	for _, item := range um.users {
+		fn(item.data, item.eventChan)
 	}
 }
 
-func (um *UserMap[T]) CloseAndDelete(token string) {
+func (um *UserMap[T]) RemoveUser(token string) {
 	um.Lock()
 	defer um.Unlock()
-	user := um.users[token]
-	close(user.Channel())
 	delete(um.users, token)
 }
 
@@ -106,14 +116,20 @@ func (um *UserMap[T]) NumUsers() int {
 	return len(um.users)
 }
 
-func (um *UserMap[T]) GetUsers() []T {
+func (um *UserMap[T]) Get(userToken string) T {
+	um.RLock()
+	defer um.RUnlock()
+	return um.users[userToken].data
+}
+
+func (um *UserMap[T]) GetAll() []T {
 	um.RLock()
 	defer um.RUnlock()
 
-	res := make([]T, 0, len(um.users))
-	for _, value := range um.users {
-		res = append(res, value)
+	items := make([]T, 0)
+	for _, item := range um.users {
+		items = append(items, item.data)
 	}
 
-	return res
+	return items
 }

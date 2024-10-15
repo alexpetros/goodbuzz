@@ -50,13 +50,6 @@ func Live(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Set the response header to indicate SSE content type
-	w.Header().Add("Content-Type", "text/event-stream")
-	w.Header().Add("Cache-Control", "no-cache")
-	w.Header().Add("Connection", "keep-alive")
-
-	logger.Info("Player connected to room %d\n", room.Id())
-
 	cookie, noToken := r.Cookie("userToken")
 	if noToken != nil {
 		lib.BadRequest(w, r)
@@ -64,10 +57,8 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	}
 	token := cookie.Value
 
-	closeConn := room.CreatePlayer(w, r, token)
+	logger.Info("Player %s connected to room %d\n", token, room.Id())
+	room.AttachPlayer(w, r, token)
 
-	// Wait for cleanup to happen and then close the connection
-	<-closeConn
-	logger.Info("Player disconnected from room %d", room.Id())
-	room.RemovePlayer(token)
+	logger.Info("Player %s disconnected from room %d", token, room.Id())
 }
