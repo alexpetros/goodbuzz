@@ -43,14 +43,9 @@ func Get(w http.ResponseWriter, r *http.Request) {
 templ index(room *room.Room) {
 <h1>{room.Name()}</h1>
 
-<!--
-Note that hx-include is inherited by all its children (so everything in <main>)
-For more, see: https://htmx.org/attributes/hx-include/
--->
 <main
   class="player"
   hx-ext="sse"
-  hx-include="[name=token]"
   sse-connect="./player/live"
 >
   <section class="buzzer">
@@ -92,7 +87,7 @@ For more, see: https://htmx.org/attributes/hx-include/
       class="log-container"
       sse-swap="log"
       hx-swap="beforeend"
-      hx-on::after-swap="this.scrollTop = this.lastChild.offsetTop"
+      hx-on::after-swap="if (this.lastChild) this.scrollTop = this.lastChild.offsetTop"
     ></div>
   </section>
 
