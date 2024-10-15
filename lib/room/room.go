@@ -51,7 +51,7 @@ func (room *Room) sendBuzzerUpdates(buzzerUpdate BuzzerUpdate) {
 	room.moderators.SendToAll(room.currentModeratorBuzzer(buzzerUpdate))
 	if buzzerUpdate.status == Won {
 		winner := buzzerUpdate.buzzes[0]
-		player, err := room.players.Get(winner.token)
+		player, err := room.players.Get(winner.userToken)
 		if err != nil {
 			room.log(fmt.Sprintf("(disconnected player) won the buzz!", player.Name()))
 		} else {
@@ -84,10 +84,10 @@ func (room *Room) Status() BuzzerStatus {
 	return room.buzzer.GetUpdate().status
 }
 
-func (room *Room) lockPlayer(token string) {
-	player, err := room.players.Get(token)
+func (room *Room) lockPlayer(userToken string) {
+	player, err := room.players.Get(userToken)
 	if err != nil {
-		logger.Info("Attempted to lock player with token %s, who has disconnected", token)
+		logger.Info("Attempted to lock player with userToken %s, who has disconnected", userToken)
 	} else {
 		player.Lock()
 	}
@@ -99,12 +99,12 @@ func (room *Room) unlockAll() {
 	})
 }
 
-func (room *Room) UnlockPlayer(token string) {
-	logger.Debug("Unlocking player %s", token)
-	player, err := room.players.Get(token)
+func (room *Room) UnlockPlayer(userToken string) {
+	logger.Debug("Unlocking player %s", userToken)
+	player, err := room.players.Get(userToken)
 
 	if err != nil {
-		logger.Info("Attempted to unlock player %s who has since disconnected", token)
+		logger.Info("Attempted to unlock player %s who has since disconnected", userToken)
 		return
 	}
 
@@ -113,12 +113,12 @@ func (room *Room) UnlockPlayer(token string) {
 	room.sendPlayerListUpdates()
 }
 
-func (room *Room) SetPlayerName(token string, name string) {
-	logger.Debug("Setting %s name to %s", token, name)
-	player, err := room.players.Get(token)
+func (room *Room) SetPlayerName(userToken string, name string) {
+	logger.Debug("Setting %s name to %s", userToken, name)
+	player, err := room.players.Get(userToken)
 
 	if err != nil {
-		logger.Info("Attempted to set name for player %s who has since disconnected", token)
+		logger.Info("Attempted to set name for player %s who has since disconnected", userToken)
 		return
 	}
 
@@ -126,14 +126,14 @@ func (room *Room) SetPlayerName(token string, name string) {
 	room.sendPlayerListUpdates()
 }
 
-func (room *Room) BuzzRoom(token string, resetToken string) {
-	player, err := room.players.Get(token)
+func (room *Room) BuzzRoom(userToken string, resetToken string) {
+	player, err := room.players.Get(userToken)
 	if err != nil {
-		logger.Error("nil player returned for token %v", token)
+		logger.Error("nil player returned for userToken %v", userToken)
 		return
 	}
 
-	room.buzzer.Buzz(token, resetToken)
+	room.buzzer.Buzz(userToken, resetToken)
 
 	logMessage := fmt.Sprintf("Player %v buzzed room %v", player.Name(), room.Id())
 	logger.Debug(logMessage)
@@ -159,8 +159,8 @@ func (room *Room) ResetSome() {
 		logger.Info("room %s was reset during processing", room.name)
 	} else if buzzerUpdate.status == Won {
 		winner := buzzerUpdate.buzzes[0]
-		logger.Info("Locking player with token %s", winner.token)
-		room.lockPlayer(winner.token)
+		logger.Info("Locking player with userToken %s", winner.userToken)
+		room.lockPlayer(winner.userToken)
 	}
 
 	room.buzzer.Reset()
@@ -179,7 +179,7 @@ func currentPlayerBuzzer(buzzerUpdate BuzzerUpdate) string {
 func (room *Room) currentModeratorBuzzer(buzzerUpdate BuzzerUpdate) string {
 	if buzzerUpdate.status == Won {
 		winner := buzzerUpdate.buzzes[0]
-		player, err := room.players.Get(winner.token)
+		player, err := room.players.Get(winner.userToken)
 
 		var name string
 		if err != nil {
@@ -197,7 +197,7 @@ func (room *Room) currentModeratorBuzzer(buzzerUpdate BuzzerUpdate) string {
 	}
 }
 
-func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request, token string) chan struct{} {
+func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request, userToken string) chan struct{} {
 	eventChan, closeChan := users.CreateUser(w, r)
 
 	nameCookie, err := r.Cookie("name")
@@ -208,9 +208,9 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request, token str
 		name = nameCookie.Value
 	}
 
-	player := users.NewPlayer(name, token, eventChan)
+	player := users.NewPlayer(name, userToken, eventChan)
 
-	room.players.Insert(token, player)
+	room.players.Insert(userToken, player)
 
 	// Initialize Player
 	room.sendPlayerListUpdates()
@@ -223,23 +223,23 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request, token str
 func (room *Room) CreateModerator(w http.ResponseWriter, r *http.Request) (string, chan struct{}) {
 	eventChan, closeChan := users.CreateUser(w, r)
 
-	token := uuid.NewString()
+	userToken := uuid.NewString()
 	moderator := users.NewModerator(eventChan)
-	room.moderators.Insert(token, moderator)
+	room.moderators.Insert(userToken, moderator)
 
 	// Initialize Moderator
 	eventChan <- PastLogsEvent(room.logs)
 	eventChan <- ModeratorPlayerControlsEvent(room.players.GetUsers())
 	eventChan <- room.currentModeratorBuzzer(room.buzzer.GetUpdate())
-	return token, closeChan
+	return userToken, closeChan
 }
 
-func (room *Room) RemoveModerator(token string) {
-	room.moderators.CloseAndDelete(token)
+func (room *Room) RemoveModerator(userToken string) {
+	room.moderators.CloseAndDelete(userToken)
 }
 
-func (room *Room) RemovePlayer(token string) {
-	room.players.CloseAndDelete(token)
+func (room *Room) RemovePlayer(userToken string) {
+	room.players.CloseAndDelete(userToken)
 	room.sendPlayerListUpdates()
 }
 

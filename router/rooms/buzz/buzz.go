@@ -20,7 +20,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, noToken := r.Cookie("token")
+	cookie, noToken := r.Cookie("userToken")
 	if noToken != nil {
 		lib.BadRequest(w, r)
 		return
@@ -28,7 +28,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 
 	resetToken := r.PostFormValue("resetToken")
 
-	room.BuzzRoom(token.Value, resetToken)
+	room.BuzzRoom(cookie.Value, resetToken)
 	w.WriteHeader(204)
 }
 

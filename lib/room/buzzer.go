@@ -24,7 +24,7 @@ const (
 )
 
 type Buzz struct {
-	token      string
+	userToken  string
 	resetToken string
 }
 
@@ -69,7 +69,7 @@ func NewBuzzer(updateCallback func(BuzzerUpdate)) *Buzzer {
 func (buzzer *Buzzer) makeUpdateSnapshot() BuzzerUpdate {
 	buzzes := make([]Buzz, len(buzzer.buzzes))
 	for i, buzz := range buzzer.buzzes {
-		buzzes[i] = Buzz{buzz.token, buzz.resetToken}
+		buzzes[i] = Buzz{buzz.userToken, buzz.resetToken}
 	}
 
 	return BuzzerUpdate{buzzer.buzzerStatus, buzzer.resetToken, buzzes}
@@ -84,9 +84,9 @@ func (buzzer *Buzzer) doUpdates(data *Buzz) {
 		return
 	}
 
-	// Ignore buzzes that don't match the reset token
+	// Ignore buzzes that don't match the reset userToken
 	if data.resetToken != buzzer.resetToken {
-		logger.Info("reset token %s does not match room reset token %s", data.resetToken, buzzer.resetToken)
+		logger.Info("reset userToken %s does not match room reset userToken %s", data.resetToken, buzzer.resetToken)
 		return
 	}
 

@@ -25,7 +25,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		lib.BadRequest(w, r)
 	}
 
-	token, noToken := r.Cookie("token")
+	cookie, noToken := r.Cookie("userToken")
 	if noToken != nil {
 		lib.BadRequest(w, r)
 		return
@@ -33,7 +33,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 
 	name := r.PostFormValue("name")
 
-	room.SetPlayerName(token.Value, name)
+	room.SetPlayerName(cookie.Value, name)
 	lib.NoContent(w, r)
 }
 
@@ -57,7 +57,7 @@ func Live(w http.ResponseWriter, r *http.Request) {
 
 	logger.Info("Player connected to room %d\n", room.Id())
 
-	cookie, noToken := r.Cookie("token")
+	cookie, noToken := r.Cookie("userToken")
 	if noToken != nil {
 		lib.BadRequest(w, r)
 		return

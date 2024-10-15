@@ -19,13 +19,13 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token := r.PathValue("token")
-	if token == "" {
+	userToken := r.PathValue("userToken")
+	if userToken == "" {
 		lib.BadRequest(w, r)
 		return
 	}
 
-	room.UnlockPlayer(token)
+	room.UnlockPlayer(userToken)
 
 	w.WriteHeader(204)
 }

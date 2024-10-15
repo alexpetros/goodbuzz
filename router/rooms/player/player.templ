@@ -22,10 +22,11 @@ func Get(w http.ResponseWriter, r *http.Request) {
       return
     }
 
-    _, noCookie := r.Cookie("token")
+    // The cookie is checked and assigned at
+    _, noCookie := r.Cookie("userToken")
     if noCookie != nil {
       cookie := http.Cookie {
-        Name:     "token",
+        Name:     "userToken",
         Value:    uuid.NewString(),
         Path:     "/",
         HttpOnly: true,
@@ -61,7 +62,7 @@ For more, see: https://htmx.org/attributes/hx-include/
 
   <section class="settings">
     <h2>Settings</h2>
-    <form hx-put="./player" hx-on::before-request="setNameCookie()">
+    <form hx-put="./player">
       <label>
         Name: <input type="text" name="name">
       </label>
@@ -103,11 +104,6 @@ function disableBuzzer() {
   this.setAttribute('disabled', 'true')
   this.innerText = 'Waiting...'
   this.classList.add('waiting')
-}
-
-function setNameCookie() {
-  const input = event.target.querySelector('input[name=name]')
-  document.cookie = `name=${input.value}`
 }
 
 </script>

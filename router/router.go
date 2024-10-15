@@ -37,7 +37,7 @@ func SetupRouter(mux *http.ServeMux) {
 	mux.HandleFunc("PUT /rooms/{id}/buzz", buzz.Put)
 	mux.HandleFunc("DELETE /rooms/{id}/buzz", buzz.Delete)
 
-	mux.HandleFunc("DELETE /rooms/{id}/locks/{token}", locks.Delete)
+	mux.HandleFunc("DELETE /rooms/{id}/locks/{userToken}", locks.Delete)
 
 	mux.HandleFunc("GET /admin", admin.Get)
 
