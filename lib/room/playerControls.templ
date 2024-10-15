@@ -22,10 +22,6 @@ func ReadyBuzzerEvent(resetToken string) string {
 	return lib.FormatEventComponent("buzzer", ReadyBuzzer(resetToken))
 }
 
-templ TokenInput(token string) {
-  <input type="hidden" name="token" value={token} sse-swap="token" hx-swap="outerHTML">
-}
-
 templ WaitingBuzzer() {
 <button class="buzzer locked" disabled >
   Waiting

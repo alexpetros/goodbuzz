@@ -16,11 +16,6 @@ func ModeratorPlayerControlsEvent(players []*users.Player) string {
 	return lib.FormatEventComponent("controls", component)
 }
 
-func TokenEvent(token string) string {
-	data := lib.ToString(TokenInput(token))
-	return lib.FormatEventString("token", data)
-}
-
 templ ModeratorPlayerControls(players []*users.Player) {
   <table>
     for _, player := range players {

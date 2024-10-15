@@ -13,9 +13,9 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		lib.BadRequest(w, r)
 		return
 	}
-	room := rooms.GetRoom(r.Context(), roomId)
 
-	if room == nil {
+	room, notFoundErr := rooms.GetRoom(r.Context(), roomId)
+	if notFoundErr != nil {
 		lib.NotFound(w, r)
 		return
 	}
@@ -25,9 +25,15 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		lib.BadRequest(w, r)
 	}
 
-	token := r.PostFormValue("token")
+	token, noToken := r.Cookie("token")
+	if noToken != nil {
+		lib.BadRequest(w, r)
+		return
+	}
+
 	name := r.PostFormValue("name")
-	room.SetPlayerName(token, name)
+
+	room.SetPlayerName(token.Value, name)
 	lib.NoContent(w, r)
 }
 
@@ -37,9 +43,9 @@ func Live(w http.ResponseWriter, r *http.Request) {
 		lib.BadRequest(w, r)
 		return
 	}
-	room := rooms.GetRoom(r.Context(), roomId)
 
-	if room == nil {
+	room, notFoundErr := rooms.GetRoom(r.Context(), roomId)
+	if notFoundErr != nil {
 		http.NotFound(w, r)
 		return
 	}
@@ -50,7 +56,15 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Connection", "keep-alive")
 
 	logger.Info("Player connected to room %d\n", room.Id())
-	token, closeConn := room.CreatePlayer(w, r)
+
+	cookie, noToken := r.Cookie("token")
+	if noToken != nil {
+		lib.BadRequest(w, r)
+		return
+	}
+	token := cookie.Value
+
+	closeConn := room.CreatePlayer(w, r, token)
 
 	// Wait for cleanup to happen and then close the connection
 	<-closeConn

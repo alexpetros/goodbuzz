@@ -197,10 +197,8 @@ func (room *Room) currentModeratorBuzzer(buzzerUpdate BuzzerUpdate) string {
 	}
 }
 
-func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, chan struct{}) {
+func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request, token string) chan struct{} {
 	eventChan, closeChan := users.CreateUser(w, r)
-
-	token := uuid.New().String()
 
 	nameCookie, err := r.Cookie("name")
 	var name string
@@ -209,23 +207,23 @@ func (room *Room) CreatePlayer(w http.ResponseWriter, r *http.Request) (string, 
 	} else {
 		name = nameCookie.Value
 	}
+
 	player := users.NewPlayer(name, token, eventChan)
 
 	room.players.Insert(token, player)
 
 	// Initialize Player
 	room.sendPlayerListUpdates()
-	player.Channel() <- TokenEvent(token)
 	player.Channel() <- PastLogsEvent(room.logs)
 	player.Channel() <- currentPlayerBuzzer(room.buzzer.GetUpdate())
 
-	return token, closeChan
+	return closeChan
 }
 
 func (room *Room) CreateModerator(w http.ResponseWriter, r *http.Request) (string, chan struct{}) {
 	eventChan, closeChan := users.CreateUser(w, r)
 
-	token := uuid.New().String()
+	token := uuid.NewString()
 	moderator := users.NewModerator(eventChan)
 	room.moderators.Insert(token, moderator)
 

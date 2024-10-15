@@ -14,16 +14,21 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	room := rooms.GetRoom(r.Context(), room_id)
-	if room == nil {
+	room, notFoundErr := rooms.GetRoom(r.Context(), room_id)
+	if notFoundErr != nil {
 		http.NotFound(w, r)
 		return
 	}
 
-	token := r.PostFormValue("token")
+	token, noToken := r.Cookie("token")
+	if noToken != nil {
+		lib.BadRequest(w, r)
+		return
+	}
+
 	resetToken := r.PostFormValue("resetToken")
 
-	room.BuzzRoom(token, resetToken)
+	room.BuzzRoom(token.Value, resetToken)
 	w.WriteHeader(204)
 }
 
@@ -34,9 +39,8 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	room := rooms.GetRoom(r.Context(), room_id)
-
-	if room == nil {
+	room, notFoundErr := rooms.GetRoom(r.Context(), room_id)
+	if notFoundErr != nil {
 		http.NotFound(w, r)
 		return
 	}

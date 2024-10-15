@@ -6,6 +6,7 @@ import "goodbuzz/lib"
 import "goodbuzz/lib/room"
 import "goodbuzz/router/rooms"
 import "fmt"
+import "github.com/google/uuid"
 
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -14,11 +15,24 @@ func Get(w http.ResponseWriter, r *http.Request) {
       lib.BadRequest(w, r)
       return
     }
-    room := rooms.GetRoom(r.Context(), room_id)
 
-    if room == nil {
+    room, notFoundErr := rooms.GetRoom(r.Context(), room_id)
+    if notFoundErr != nil {
       http.NotFound(w, r)
       return
+    }
+
+    _, noCookie := r.Cookie("token")
+    if noCookie != nil {
+      cookie := http.Cookie {
+        Name:     "token",
+        Value:    uuid.NewString(),
+        Path:     "/",
+        HttpOnly: true,
+        Secure:   true,
+        SameSite: http.SameSiteLaxMode,
+      }
+      http.SetCookie(w, &cookie)
     }
 
     content := index(room)
@@ -38,8 +52,6 @@ For more, see: https://htmx.org/attributes/hx-include/
   hx-include="[name=token]"
   sse-connect="./player/live"
 >
-  <!-- Upon connection, the server will send a new token and replace this-->
-  <input type="hidden" name="token" value="" sse-swap="token" hx-swap="outerHTML">
   <section class="buzzer">
     <h2>Buzzer</h2>
     <div sse-swap="buzzer" hx-swap="innerHTML">

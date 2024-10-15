@@ -13,9 +13,8 @@ func Get(w http.ResponseWriter, r *http.Request) {
       return
     }
 
-    room := rooms.GetRoom(r.Context(), room_id)
-
-    if room == nil {
+    room, notFoundErr := rooms.GetRoom(r.Context(), room_id)
+    if notFoundErr != nil {
       http.NotFound(w, r)
       return
     }

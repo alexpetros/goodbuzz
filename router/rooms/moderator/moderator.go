@@ -13,9 +13,9 @@ func Live(w http.ResponseWriter, r *http.Request) {
 		lib.BadRequest(w, r)
 		return
 	}
-	room := rooms.GetRoom(r.Context(), roomId)
 
-	if room == nil {
+	room, notFoundErr := rooms.GetRoom(r.Context(), roomId)
+	if notFoundErr != nil {
 		http.NotFound(w, r)
 		return
 	}
