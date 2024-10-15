@@ -1,1 +1,1 @@
-echo "GET http://localhost:8080/rooms/1/player/live" | vegeta attack -duration=2s
+cat attacks | vegeta attack -duration=2s -timeout=20s

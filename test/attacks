@@ -1,0 +1,300 @@
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=DE1C46CA-B32C-4484-B667-CF191B600187
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=5E650EE7-D88B-4ACB-997F-8513E2772E9B
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=8474FCF9-8341-4F9C-921E-1937C80C5CCA
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=59E3D7E9-1D7F-468B-B3BA-26F759B26E42
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=5D8E3AF2-B43C-4389-9326-971D68CAAAE0
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=A68ABB71-1E9A-4AEC-B619-A524DCD9C6E5
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=0EDB47CF-578D-466C-9873-8262F6C077AC
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=3447482F-B0A9-4EBC-B255-BCE05DB25D5A
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=124A36BA-4578-456F-B2CB-4C1A582CAC4A
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=1AE5217C-ED34-4AAF-A77E-40E575500E2F
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=20D75DC4-132F-4244-B663-9C530987E7D9
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=94E41D44-2B93-4900-9FB1-6CC4F9275E58
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=43669F68-6F5C-46AD-AE98-37B56F5C02BB
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=C9EA9156-9897-4FAD-A505-FB4425CC9B00
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=D5267A72-C4AB-4A07-A84D-CC8CFED32BBE
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=AD3B5CFD-08C3-4FB7-9E93-8ED4BF95B9C7
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=0A763F35-ED00-4DD4-AC8E-1002F0975715
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=3541F920-19AC-4E2A-BAE9-894994C8B8B9
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=BB4B8C12-7616-4079-A337-ADB67932AFE7
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=4398449B-E1C1-41EC-9E56-8F72030BE90D
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=E34593DB-E6DD-4BAE-9478-A9B7AE9D9392
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=593C89B1-3FED-42B8-BAEF-C6B9DAA13B5A
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=3A0B88BB-A2AB-46B7-BA8B-52212E16F448
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=24B1499A-8FBD-4A89-8D01-D265950E076D
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=28F766F6-1697-4BAA-A62C-3BD62AC12912
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=DF172E3A-167D-4A4E-B41F-62F70E6CA650
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=48ABD38A-6BDE-42D0-814E-E43A08DE0A6E
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=8E64F92B-A951-47C9-BC73-7A61C8382CAA
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=7C713501-F512-4785-ADBB-ECBD7F9A1F7B
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=1BE85562-A8FC-4164-9E21-155346DF2CC4
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=7D8579F4-BAA1-4DCC-8D92-A62E84D19037
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=58CFBF7C-FD10-4597-BC21-DCB6F3C771FE
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=35FC1327-658F-46D3-8391-C6A65CA417FC
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=7CC4EA45-5FDC-4AA4-968B-C83CB96AD913
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=75C2E136-CC68-4A1B-A20F-563080381410
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=98023C8B-4EA9-443F-96C6-3B0A576F3C8D
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=E1995054-2AC5-4B22-BBAD-F4638CA3A8CE
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=43F15D06-8FF4-4967-91AF-5B8D28CFE135
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=B69B7F23-C930-4766-9FC7-059D23158DD0
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=71317721-5748-4E63-8B4D-CB294E899503
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=1BCCFDAD-DBE8-4F26-92A2-B9035FC41AFC
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=B9130A58-E46B-4F7E-87D0-586BFC61ED77
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=6FA67862-37B4-47A7-BA82-9CA47229B106
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=C7ADE4B1-C120-446A-A943-AD4B15C0B2AB
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=2FEC1446-5A1D-4F96-A8F6-B224D075BC4C
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=98DCF35F-2388-4E21-8A75-7DD70A7DDDC7
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=4D35C64E-B90A-4296-9997-BBA659B93FB4
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=C269ADE8-8611-47DC-A7B6-D291F6149B9F
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=CD2698E7-FC17-448A-B695-10D402FC8643
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=A33F4061-BA45-429B-9756-0482C1864AB7
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=C3063BE3-6088-4EAF-8158-9F33F8AA5977
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=CE2107B6-18F2-48E3-A609-F020F151ADE0
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=BDD61536-A1DA-416A-8726-FA8FB1D71E9C
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=24D3DEFB-6E44-49B1-8BDA-89ABD7B50576
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=6F43B512-A57F-4D70-B660-8C0FCD46D185
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=60A7AA19-4E50-4CFE-9667-E0E8526FB5E2
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=827F59EB-1FB8-48B0-B7DD-955355296DA9
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=1ACA2F32-5EA1-44E4-820C-869CA70FB445
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=F21E1175-E2BA-4970-AD90-5EC726BF1812
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=2183ED06-1416-4C62-86F0-AF55FA5FAE17
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=5B9C2AB5-2A0C-4F3C-8952-8EF727DD8D6B
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=7C3BE072-4AB1-4796-ABA5-A680FDEA2C64
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=2B62ECB1-0C90-4960-BA28-1DD3298CEEE5
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=2D4CCD13-5FB9-43CF-B32C-F6DD0062D355
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=37CBDAF2-433F-4DC1-AD73-B9C950E2058F
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=55008446-D3DC-4971-8845-9F547F3CC6B1
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=243F7CAB-7D5F-49A7-9ECD-FFCAD9DA72E3
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=D5F47E32-F8CD-47EC-8876-E97C8D40EC96
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=48EAF940-7E8F-4490-B7A4-1917B1DA0FF4
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=BF1A33A3-54FA-438F-A4D3-CF93F207CAA5
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=768698BE-8962-40E3-B466-20FB90E8BFC8
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=3AA321A6-53B6-4893-8E63-29B88035B8C4
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=775A4FE2-1A2D-4509-84F7-D8D2AEF45423
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=D9376952-8FEB-4517-BDB0-68B6CDBB78D4
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=38F3233F-505A-49A3-BE02-98F1F8E4BA41
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=A8621283-CF8F-4C09-836A-48226CAF4466
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=F81CFC2F-F9C8-490C-9659-C1ADBB9EE637
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=449D219D-976B-47F1-BEBF-A94803CB2BD9
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=2DFD559F-2928-4E36-AD4C-3F16EFC73495
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=B5484B24-1665-4BD4-A2B1-8B1261F6CAC1
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=85675200-AAA2-42CB-BF53-41807914DD8A
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=8EB8D5CB-2835-4F45-B4C1-C71A7AB18A32
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=238E6453-0983-46D7-93AC-3D988B48D607
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=8345CBC1-7E10-43B0-8ECF-675405F6277E
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=55EA7F04-DC61-4714-B5A7-C82F5EB21099
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=C27CB847-75A6-460D-9840-7DFE008A4B8F
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=F6A57883-C0D7-456E-AED1-A2735FA0D128
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=8D915F5B-0A13-45FB-9A39-1D3FFD6C060D
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=F5D93379-D8D5-4966-A8DA-35A94F65DA58
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=242F34CB-D6B5-49FE-AEE1-D738C40C3581
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=CA44D5B9-C0B0-4F8E-ACA3-B106D72071C4
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=E916308A-1A66-43EE-ADCE-13A30CA13799
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=F17E9D9E-784E-4361-A832-191989233A28
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=9DAA7C72-C277-4A0E-AFA8-CD686591837A
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=0464D646-3137-46E4-82DE-A96EF2D59BDB
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=67C7200E-D68F-4683-86BF-FBD79757AA6F
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=946105F6-22FE-4BBC-BDF8-A9D2D900A829
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=0CF3CD91-CFCA-4D3C-B971-4F1E77215AA3
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=60E3DEAB-BB28-47F2-92FF-F13DA619F121
+
+GET http://localhost:8080/rooms/1/player/live
+Cookie: userToken=AE4F9AD3-12AF-4278-B3ED-E6B5C1985969
+
