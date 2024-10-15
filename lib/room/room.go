@@ -30,10 +30,7 @@ func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
 		players:    users.NewUserMap[*users.Player](),
 		moderators: users.NewUserMap[struct{}](),
 	}
-
-	buzzer := buzzer.NewBuzzer(room.sendBuzzerUpdates)
-	room.buzzer = buzzer
-
+	room.buzzer = buzzer.NewBuzzer(room.sendBuzzerUpdates)
 	return &room
 }
 
@@ -43,7 +40,7 @@ func (room *Room) sendBuzzerUpdates(buzzerUpdate buzzer.BuzzerUpdate) {
 	if buzzerUpdate.Status == buzzer.Won {
 		winner := buzzerUpdate.Buzzes[0]
 		name := room.players.Get(winner.UserToken).Name()
-			// room.log(fmt.Sprintf("(disconnected player) won the buzz!", player.Name()))
+		// room.log(fmt.Sprintf("(disconnected player) won the buzz!", player.Name()))
 		room.log(fmt.Sprintf("%s won the buzz!", name))
 	}
 }
@@ -73,7 +70,7 @@ func (room *Room) Status() buzzer.BuzzerStatus {
 }
 
 func (room *Room) lockPlayer(userToken string) {
-	room.players.Run(userToken, func (player *users.Player) {
+	room.players.Run(userToken, func(player *users.Player) {
 		player.Lock()
 	})
 }
@@ -95,7 +92,7 @@ func (room *Room) UnlockPlayer(userToken string) {
 }
 
 func (room *Room) UpdateBuzzers(buzzerUpdate buzzer.BuzzerUpdate) {
-	updateFunc := func (player *users.Player, eventChan chan string) {
+	updateFunc := func(player *users.Player, eventChan chan string) {
 		if player.IsLocked() {
 			eventChan <- events.LockedBuzzerEvent()
 		} else {
@@ -108,7 +105,7 @@ func (room *Room) UpdateBuzzers(buzzerUpdate buzzer.BuzzerUpdate) {
 func (room *Room) SetPlayerName(userToken string, name string) {
 	logger.Debug("Setting %s name to %s", userToken, name)
 
-	room.players.Run(userToken, func (player *users.Player) {
+	room.players.Run(userToken, func(player *users.Player) {
 		player.SetName(name)
 	})
 
@@ -168,7 +165,7 @@ func (room *Room) currentModeratorBuzzer(buzzerUpdate buzzer.BuzzerUpdate) strin
 
 		message := fmt.Sprintf("Locked by %s", name)
 		return events.ModeratorStatusEvent(message)
-	} else if buzzerUpdate.Status ==buzzer.Processing {
+	} else if buzzerUpdate.Status == buzzer.Processing {
 		return events.ModeratorStatusEvent("Processing...")
 	} else {
 		return events.ModeratorStatusEvent("Unlocked")
@@ -193,8 +190,8 @@ func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken
 	room.players.SendToPlayer(userToken, events.PastLogsEvent(room.logs))
 	room.players.SendToPlayer(userToken, currentPlayerBuzzer(room.buzzer.GetUpdate()))
 
-	// Wait for the channl to close, and then send everyone else the disconnect update
-	<- closeChan
+	// Wait for the channel to close, and then send everyone else the disconnect update
+	<-closeChan
 	room.sendPlayerListUpdates()
 }
 
@@ -207,8 +204,8 @@ func (room *Room) AttachModerator(w http.ResponseWriter, r *http.Request, userTo
 	room.moderators.SendToPlayer(userToken, events.ModeratorPlayerControlsEvent(room.players.GetAll()))
 	room.moderators.SendToPlayer(userToken, room.currentModeratorBuzzer(room.buzzer.GetUpdate()))
 
-	// Wait for the channl to close, and then send everyone else the disconnect update
-	<- closeChan
+	// Wait for the channel to close, and then send everyone else the disconnect update
+	<-closeChan
 	room.sendPlayerListUpdates()
 }
 
@@ -219,7 +216,7 @@ func (room *Room) log(message string) {
 	timestamp := time.Now().UTC()
 
 	// Add to list of log messages
-	log := events.Log{ Message: message, Timestamp: timestamp}
+	log := events.Log{Message: message, Timestamp: timestamp}
 	room.logs = append(room.logs, log)
 
 	// Cap the size of the logs array at 100

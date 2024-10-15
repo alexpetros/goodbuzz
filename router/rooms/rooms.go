@@ -12,7 +12,7 @@ var openRooms = room.NewRoomMap()
 func GetRoom(ctx context.Context, roomId int64) (*room.Room, error) {
 	dbRoom := db.GetRoom(ctx, roomId)
 	if dbRoom == nil {
-		return nil, errors.New("Room not found")
+		return nil, errors.New("room not found")
 	}
 
 	return openRooms.GetOrCreateRoom(dbRoom.Id(), dbRoom.Name()), nil
