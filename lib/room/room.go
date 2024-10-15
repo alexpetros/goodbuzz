@@ -14,21 +14,21 @@ import (
 )
 
 type Room struct {
-	roomId       int64
-	name         string
-	logs         []Log
-	buzzer			 *Buzzer
-	players      *users.UserMap[*users.Player]
-	moderators   *users.UserMap[*users.Moderator]
+	roomId     int64
+	name       string
+	logs       []Log
+	buzzer     *Buzzer
+	players    *users.UserMap[*users.Player]
+	moderators *users.UserMap[*users.Moderator]
 }
 
 func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
 	room := Room{
-		roomId:       roomId,
-		name:         name,
-		logs:         make([]Log, 0),
-		players:      users.NewUserMap[*users.Player](),
-		moderators:   users.NewUserMap[*users.Moderator](),
+		roomId:     roomId,
+		name:       name,
+		logs:       make([]Log, 0),
+		players:    users.NewUserMap[*users.Player](),
+		moderators: users.NewUserMap[*users.Moderator](),
 	}
 
 	buzzer := NewBuzzer(room.sendBuzzerUpdates)

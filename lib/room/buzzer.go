@@ -1,8 +1,8 @@
 package room
 
 import (
-	"time"
 	"goodbuzz/lib/logger"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -12,15 +12,15 @@ const BUZZER_DELAY = 500 * time.Millisecond
 type BuzzerStatus int
 
 type BuzzerUpdate struct {
-	status BuzzerStatus
+	status     BuzzerStatus
 	resetToken string
-	buzzes []Buzz
+	buzzes     []Buzz
 }
 
 const (
-	Unlocked BuzzerStatus = 0
-	Processing            = 1
-	Won                   = 2
+	Unlocked   BuzzerStatus = 0
+	Processing              = 1
+	Won                     = 2
 )
 
 type Buzz struct {
@@ -29,24 +29,24 @@ type Buzz struct {
 }
 
 type Buzzer struct {
-	buzzes       []*Buzz
-	resetToken   string
-	readChannel  	chan struct{}
-	writeChannel  chan *Buzz
-	updateChannel   chan BuzzerUpdate
-	updateCallback func (BuzzerUpdate)
-	buzzerStatus BuzzerStatus
+	buzzes         []*Buzz
+	resetToken     string
+	readChannel    chan struct{}
+	writeChannel   chan *Buzz
+	updateChannel  chan BuzzerUpdate
+	updateCallback func(BuzzerUpdate)
+	buzzerStatus   BuzzerStatus
 }
 
 func NewBuzzer(updateCallback func(BuzzerUpdate)) *Buzzer {
-	buzzer := &Buzzer {
-		buzzes:       make([]*Buzz, 0),
-		resetToken: 	uuid.NewString(),
-		readChannel:  	make(chan struct{}),
-		writeChannel: 	make(chan *Buzz),
-		updateChannel:  		make(chan BuzzerUpdate),
+	buzzer := &Buzzer{
+		buzzes:         make([]*Buzz, 0),
+		resetToken:     uuid.NewString(),
+		readChannel:    make(chan struct{}),
+		writeChannel:   make(chan *Buzz),
+		updateChannel:  make(chan BuzzerUpdate),
 		updateCallback: updateCallback,
-		buzzerStatus: Unlocked,
+		buzzerStatus:   Unlocked,
 	}
 
 	go func() {
@@ -55,9 +55,9 @@ func NewBuzzer(updateCallback func(BuzzerUpdate)) *Buzzer {
 			// The buzzer status will only be retrieved when no one else is editing it
 			// I don't really think this is much simpler than mutexes, but it's fine I guess
 			select {
-			case <- buzzer.readChannel:
+			case <-buzzer.readChannel:
 				buzzer.updateChannel <- buzzer.makeUpdateSnapshot()
-			case data := <- buzzer.writeChannel:
+			case data := <-buzzer.writeChannel:
 				buzzer.doUpdates(data)
 			}
 		}
@@ -69,10 +69,10 @@ func NewBuzzer(updateCallback func(BuzzerUpdate)) *Buzzer {
 func (buzzer *Buzzer) makeUpdateSnapshot() BuzzerUpdate {
 	buzzes := make([]Buzz, len(buzzer.buzzes))
 	for i, buzz := range buzzer.buzzes {
-		buzzes[i] = Buzz { buzz.token, buzz.resetToken }
+		buzzes[i] = Buzz{buzz.token, buzz.resetToken}
 	}
 
-	return BuzzerUpdate { buzzer.buzzerStatus, buzzer.resetToken, buzzes }
+	return BuzzerUpdate{buzzer.buzzerStatus, buzzer.resetToken, buzzes}
 }
 
 func (buzzer *Buzzer) doUpdates(data *Buzz) {
@@ -118,13 +118,13 @@ func (buzzer *Buzzer) StartProcessing() {
 
 func (buzzer *Buzzer) SendUpdates() {
 	buzzer.readChannel <- struct{}{}
-	buzzerUpdate := <- buzzer.updateChannel
+	buzzerUpdate := <-buzzer.updateChannel
 	buzzer.updateCallback(buzzerUpdate)
 }
 
 func (buzzer *Buzzer) GetUpdate() BuzzerUpdate {
 	buzzer.readChannel <- struct{}{}
-	return <- buzzer.updateChannel
+	return <-buzzer.updateChannel
 }
 
 func (buzzer *Buzzer) Buzz(token string, resetToken string) {
