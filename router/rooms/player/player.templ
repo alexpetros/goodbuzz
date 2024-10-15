@@ -96,9 +96,10 @@ templ index(room *room.Room) {
 
 <script>
 function disableBuzzer() {
-  this.setAttribute('disabled', 'true')
-  this.innerText = 'Waiting...'
-  this.classList.add('waiting')
+  const button = event.target
+  button.setAttribute('disabled', 'true')
+  button.innerText = 'Waiting...'
+  button.classList.add('waiting')
 }
 
 </script>
