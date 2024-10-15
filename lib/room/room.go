@@ -39,9 +39,12 @@ func (room *Room) sendBuzzerUpdates(buzzerUpdate buzzer.BuzzerUpdate) {
 	room.moderators.SendToAll(room.currentModeratorBuzzer(buzzerUpdate))
 	if buzzerUpdate.Status == buzzer.Won {
 		winner := buzzerUpdate.Buzzes[0]
-		name := room.players.Get(winner.UserToken).Name()
-		// room.log(fmt.Sprintf("(disconnected player) won the buzz!", player.Name()))
-		room.log(fmt.Sprintf("%s won the buzz!", name))
+		player, ok := room.players.Get(winner.UserToken)
+		if !ok {
+			room.log(fmt.Sprintf("(disconnected player) won the buzz!", player.Name()))
+		}
+
+		room.log(fmt.Sprintf("%s won the buzz!", player.Name()))
 	}
 }
 
@@ -113,11 +116,14 @@ func (room *Room) SetPlayerName(userToken string, name string) {
 }
 
 func (room *Room) BuzzRoom(userToken string, resetToken string) {
-	name := room.players.Get(userToken).Name()
 	room.buzzer.Buzz(userToken, resetToken)
 
-	// TODO this shows a log message even if the reset token is wrong
-	logMessage := fmt.Sprintf("Player %v buzzed room %v", name, room.Id())
+	player, ok := room.players.Get(userToken)
+	if !ok {
+		logger.Info("unknown player %s buzzed", userToken)
+		return
+	}
+	logMessage := fmt.Sprintf("Player %v buzzed room %v", player.Name(), room.Id())
 	logger.Debug(logMessage)
 	room.log(logMessage)
 }
@@ -161,9 +167,15 @@ func currentPlayerBuzzer(buzzerUpdate buzzer.BuzzerUpdate) string {
 func (room *Room) currentModeratorBuzzer(buzzerUpdate buzzer.BuzzerUpdate) string {
 	if buzzerUpdate.Status == buzzer.Won {
 		winner := buzzerUpdate.Buzzes[0]
-		name := room.players.Get(winner.UserToken).Name()
+		player, ok := room.players.Get(winner.UserToken)
 
-		message := fmt.Sprintf("Locked by %s", name)
+		var message string
+		if !ok {
+			message = fmt.Sprintf("Locked by (disconnected player)")
+		} else {
+			message = fmt.Sprintf("Locked by %s", player.Name())
+		}
+
 		return events.ModeratorStatusEvent(message)
 	} else if buzzerUpdate.Status == buzzer.Processing {
 		return events.ModeratorStatusEvent("Processing...")

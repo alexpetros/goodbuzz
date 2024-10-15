@@ -116,10 +116,11 @@ func (um *UserMap[T]) NumUsers() int {
 	return len(um.users)
 }
 
-func (um *UserMap[T]) Get(userToken string) T {
+func (um *UserMap[T]) Get(userToken string) (T, bool) {
 	um.RLock()
 	defer um.RUnlock()
-	return um.users[userToken].data
+	user, ok := um.users[userToken]
+	return user.data, ok
 }
 
 func (um *UserMap[T]) GetAll() []T {
