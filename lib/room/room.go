@@ -17,6 +17,7 @@ type Room struct {
 	roomId     int64
 	name       string
 	logs       []events.Log
+	locksCache *LocksCache
 	buzzer     *buzzer.Buzzer
 	players    *users.UserMap[*users.Player]
 	moderators *users.UserMap[struct{}]
@@ -27,6 +28,7 @@ func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
 		roomId:     roomId,
 		name:       name,
 		logs:       make([]events.Log, 0),
+		locksCache:	NewLocksCache(),
 		players:    users.NewUserMap[*users.Player](),
 		moderators: users.NewUserMap[struct{}](),
 	}
@@ -41,7 +43,7 @@ func (room *Room) sendBuzzerUpdates(buzzerUpdate buzzer.BuzzerUpdate) {
 		winner := buzzerUpdate.Buzzes[0]
 		player, ok := room.players.Get(winner.UserToken)
 		if !ok {
-			room.log(fmt.Sprintf("(disconnected player) won the buzz!", player.Name))
+			room.log(fmt.Sprintf("(disconnected player) won the buzz!"))
 		}
 
 		room.log(fmt.Sprintf("%s won the buzz!", player.Name))
@@ -72,6 +74,12 @@ func (room *Room) Status() buzzer.BuzzerStatus {
 	return room.buzzer.GetUpdate().Status
 }
 
+func (room *Room) LockPlayer(userToken string) {
+	room.players.Run(userToken, func(player *users.Player) {
+		player.Lock()
+	})
+}
+
 func (room *Room) UnlockPlayer(userToken string) {
 	logger.Debug("Unlocking player %s", userToken)
 	room.players.Run(userToken, func(player *users.Player) {
@@ -87,7 +95,7 @@ func (room *Room) UpdateBuzzers(buzzerUpdate buzzer.BuzzerUpdate) {
 		if player.IsLocked {
 			eventChan <- events.LockedBuzzerEvent()
 		} else {
-			eventChan <- currentPlayerBuzzer(buzzerUpdate)
+			eventChan <- currentPlayerBuzzer(player, buzzerUpdate)
 		}
 	}
 	room.players.RunAll(updateFunc)
@@ -119,6 +127,7 @@ func (room *Room) BuzzRoom(userToken string, resetToken string) {
 func (room *Room) ResetAll() {
 	logger.Debug("Resetting all buzzers")
 
+	room.locksCache.ResetAll()
 	room.players.RunAll(func(player *users.Player, eventChan chan string) {
 		player.Unlock()
 	})
@@ -139,9 +148,8 @@ func (room *Room) ResetSome() {
 	} else if buzzerUpdate.Status == buzzer.Won {
 		winner := buzzerUpdate.Buzzes[0]
 		logger.Info("Locking player with userToken %s", winner.UserToken)
-		room.players.Run(winner.UserToken, func(player *users.Player) {
-			player.Lock()
-		})
+		room.locksCache.LockPlayer(winner.UserToken)
+		room.LockPlayer(winner.UserToken)
 	}
 
 	room.buzzer.Reset()
@@ -149,8 +157,8 @@ func (room *Room) ResetSome() {
 	room.log("Buzzer unlocked for some players")
 }
 
-func currentPlayerBuzzer(buzzerUpdate buzzer.BuzzerUpdate) string {
-	if buzzerUpdate.Status != buzzer.Unlocked {
+func currentPlayerBuzzer(player *users.Player, buzzerUpdate buzzer.BuzzerUpdate) string {
+	if buzzerUpdate.Status != buzzer.Unlocked || player.IsLocked {
 		return events.LockedBuzzerEvent()
 	}
 
@@ -178,7 +186,6 @@ func (room *Room) currentModeratorBuzzer(buzzerUpdate buzzer.BuzzerUpdate) strin
 }
 
 func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken string) {
-
 	nameCookie, err := r.Cookie("name")
 	var name string
 	if err != nil {
@@ -187,13 +194,14 @@ func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken
 		name = nameCookie.Value
 	}
 
-	player := users.NewPlayer(name, userToken)
+	isLocked := room.locksCache.IsLocked(userToken)
+	player := users.NewPlayer(name, userToken, isLocked)
 	closeChan := room.players.AddUser(w, r, userToken, player)
 
 	// Initialize Player
 	room.sendPlayerListUpdates()
 	room.players.SendToPlayer(userToken, events.PastLogsEvent(room.logs))
-	room.players.SendToPlayer(userToken, currentPlayerBuzzer(room.buzzer.GetUpdate()))
+	room.players.SendToPlayer(userToken, currentPlayerBuzzer(player, room.buzzer.GetUpdate()))
 
 	// Wait for the channel to close, and then send everyone else the disconnect update
 	<-closeChan
@@ -201,7 +209,6 @@ func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken
 }
 
 func (room *Room) AttachModerator(w http.ResponseWriter, r *http.Request, userToken string) {
-
 	closeChan := room.moderators.AddUser(w, r, userToken, struct{}{})
 
 	// Initialize Moderator

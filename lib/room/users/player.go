@@ -6,8 +6,8 @@ type Player struct {
 	IsLocked bool
 }
 
-func NewPlayer(name string, token string) *Player {
-	return &Player{name, token, false}
+func NewPlayer(name string, token string, isLocked bool) *Player {
+	return &Player{name, token, isLocked}
 }
 
 func (player *Player) StatusString() string {
