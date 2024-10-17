@@ -8,19 +8,19 @@ import (
 	"sync"
 )
 
-type item [T any] struct {
+type user [T any] struct {
 	data T
 	eventChan chan string
 }
 
 type UserMap [T any] struct {
 	sync.RWMutex
-	users map[string]item[T]
+	users map[string]user[T]
 }
 
 func NewUserMap[T any]() *UserMap[T] {
 	return &UserMap[T]{
-		users: make(map[string]item[T]),
+		users: make(map[string]user[T]),
 	}
 }
 
@@ -34,7 +34,7 @@ func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken 
 	closeChan := make(chan struct{})
 
 	um.Lock()
-	um.users[userToken] = item[T] { data, eventChan }
+	um.users[userToken] = user[T] { data, eventChan }
 	um.Unlock()
 
 	// Remove the channel if the connection closes
@@ -92,15 +92,20 @@ func (um *UserMap[T]) Run(userToken string, fn func(data T)) {
 	um.RLock()
 	defer um.RUnlock()
 
-	item := um.users[userToken].data
-	fn(item)
+
+	user, ok := um.users[userToken]
+
+	if ok {
+		fn(user.data)
+	}
+
 }
 
 func (um *UserMap[T]) RunAll(fn func(data T, eventChan chan string)) {
 	um.RLock()
 	defer um.RUnlock()
-	for _, item := range um.users {
-		fn(item.data, item.eventChan)
+	for _, user := range um.users {
+		fn(user.data, user.eventChan)
 	}
 }
 
@@ -128,8 +133,8 @@ func (um *UserMap[T]) GetAll() []T {
 	defer um.RUnlock()
 
 	items := make([]T, 0)
-	for _, item := range um.users {
-		items = append(items, item.data)
+	for _, user := range um.users {
+		items = append(items, user.data)
 	}
 
 	return items
