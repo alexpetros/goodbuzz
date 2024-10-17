@@ -27,6 +27,12 @@ prod:
 	go build
 	GOODBUZZ_PORT=8080 ./$(PROJECT_NAME)
 
+.PHONY: install
+install:
+	go install github.com/a-h/templ/cmd/templ@v0.2.747
+	make templ
+	go build
+
 .PHONY: live/templ
 live/templ:
 	@templ generate --watch \
