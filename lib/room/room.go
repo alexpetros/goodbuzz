@@ -41,10 +41,10 @@ func (room *Room) sendBuzzerUpdates(buzzerUpdate buzzer.BuzzerUpdate) {
 		winner := buzzerUpdate.Buzzes[0]
 		player, ok := room.players.Get(winner.UserToken)
 		if !ok {
-			room.log(fmt.Sprintf("(disconnected player) won the buzz!", player.Name()))
+			room.log(fmt.Sprintf("(disconnected player) won the buzz!", player.Name))
 		}
 
-		room.log(fmt.Sprintf("%s won the buzz!", player.Name()))
+		room.log(fmt.Sprintf("%s won the buzz!", player.Name))
 	}
 }
 
@@ -72,18 +72,6 @@ func (room *Room) Status() buzzer.BuzzerStatus {
 	return room.buzzer.GetUpdate().Status
 }
 
-func (room *Room) lockPlayer(userToken string) {
-	room.players.Run(userToken, func(player *users.Player) {
-		player.Lock()
-	})
-}
-
-func (room *Room) unlockAll() {
-	room.players.RunAll(func(player *users.Player, eventChan chan string) {
-		player.Unlock()
-	})
-}
-
 func (room *Room) UnlockPlayer(userToken string) {
 	logger.Debug("Unlocking player %s", userToken)
 	room.players.Run(userToken, func(player *users.Player) {
@@ -96,7 +84,7 @@ func (room *Room) UnlockPlayer(userToken string) {
 
 func (room *Room) UpdateBuzzers(buzzerUpdate buzzer.BuzzerUpdate) {
 	updateFunc := func(player *users.Player, eventChan chan string) {
-		if player.IsLocked() {
+		if player.IsLocked {
 			eventChan <- events.LockedBuzzerEvent()
 		} else {
 			eventChan <- currentPlayerBuzzer(buzzerUpdate)
@@ -123,14 +111,18 @@ func (room *Room) BuzzRoom(userToken string, resetToken string) {
 		logger.Info("unknown player %s buzzed", userToken)
 		return
 	}
-	logMessage := fmt.Sprintf("Player %v buzzed room %v", player.Name(), room.Id())
+	logMessage := fmt.Sprintf("Player %v buzzed room %v", player.Name, room.Id())
 	logger.Debug(logMessage)
 	room.log(logMessage)
 }
 
 func (room *Room) ResetAll() {
 	logger.Debug("Resetting all buzzers")
-	room.unlockAll()
+
+	room.players.RunAll(func(player *users.Player, eventChan chan string) {
+		player.Unlock()
+	})
+
 	room.buzzer.Reset()
 	room.sendPlayerListUpdates()
 	room.log("Buzzer unlocked for everyone")
@@ -138,7 +130,6 @@ func (room *Room) ResetAll() {
 
 func (room *Room) ResetSome() {
 	logger.Debug("Resetting some buzzers")
-
 	buzzerUpdate := room.buzzer.GetUpdate()
 
 	if buzzerUpdate.Status == buzzer.Unlocked {
@@ -148,7 +139,9 @@ func (room *Room) ResetSome() {
 	} else if buzzerUpdate.Status == buzzer.Won {
 		winner := buzzerUpdate.Buzzes[0]
 		logger.Info("Locking player with userToken %s", winner.UserToken)
-		room.lockPlayer(winner.UserToken)
+		room.players.Run(winner.UserToken, func(player *users.Player) {
+			player.Lock()
+		})
 	}
 
 	room.buzzer.Reset()
@@ -173,7 +166,7 @@ func (room *Room) currentModeratorBuzzer(buzzerUpdate buzzer.BuzzerUpdate) strin
 		if !ok {
 			message = fmt.Sprintf("Locked by (disconnected player)")
 		} else {
-			message = fmt.Sprintf("Locked by %s", player.Name())
+			message = fmt.Sprintf("Locked by %s", player.Name)
 		}
 
 		return events.ModeratorStatusEvent(message)
@@ -245,7 +238,7 @@ func (room *Room) log(message string) {
 func (room *Room) sendPlayerListUpdates() {
 	players := room.players.GetAll()
 	slices.SortFunc(players, func(a, b *users.Player) int {
-		return strings.Compare(a.Name(), b.Name())
+		return strings.Compare(a.Name, b.Name)
 	})
 
 	room.players.RunAll(func(player *users.Player, eventChan chan string) {

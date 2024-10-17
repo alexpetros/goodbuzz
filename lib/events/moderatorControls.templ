@@ -20,10 +20,10 @@ templ ModeratorPlayerControls(players []*users.Player) {
   <table>
     for _, player := range players {
     <tr>
-      <td>{player.Name()}</td>
+      <td>{player.Name}</td>
       <td>
-      if player.IsLocked() {
-        <button hx-delete={fmt.Sprintf("./locks/%s", player.Token())}>
+      if player.IsLocked {
+        <button hx-delete={fmt.Sprintf("./locks/%s", player.Token)}>
           Unlock
         </button>
       } else {
