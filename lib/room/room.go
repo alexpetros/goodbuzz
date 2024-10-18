@@ -23,6 +23,13 @@ type Room struct {
 	moderators *users.UserMap[struct{}]
 }
 
+type roomUpdate struct {
+	buzzerStatus buzzer.BuzzerStatus
+	// nilable because there will be no winner if the status isn't "Won"
+	winner *users.Player
+	resetToken string
+}
+
 func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
 	room := Room{
 		roomId:     roomId,
@@ -36,18 +43,50 @@ func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
 	return &room
 }
 
-func (room *Room) sendBuzzerUpdates(buzzerUpdate buzzer.BuzzerUpdate) {
-	room.UpdateBuzzers(buzzerUpdate)
-	room.moderators.SendToAll(room.currentModeratorBuzzer(buzzerUpdate))
+func (room *Room) convertUpdate(buzzerUpdate buzzer.BuzzerUpdate) roomUpdate {
+	var winner *users.Player
 	if buzzerUpdate.Status == buzzer.Won {
-		winner := buzzerUpdate.Buzzes[0]
-		player, ok := room.players.Get(winner.UserToken)
-		if !ok {
-			room.log(fmt.Sprintf("(disconnected player) won the buzz!"))
-		}
+		winnerToken := buzzerUpdate.WinnerToken
+		player, ok := room.players.Get(winnerToken)
 
-		room.log(fmt.Sprintf("%s won the buzz!", player.Name))
+		// Ensures we never have a nil winner, if there's a winner
+		if !ok {
+			winner = users.NewPlayer("(disconnected player)", buzzerUpdate.WinnerToken, false)
+		} else {
+			winner = player
+		}
 	}
+
+	update := roomUpdate { buzzerUpdate.Status, winner, buzzerUpdate.ResetToken }
+	return update
+}
+
+func (room *Room) getUpdate() roomUpdate {
+	buzzerUpdate := room.buzzer.GetUpdate()
+	return room.convertUpdate(buzzerUpdate)
+}
+
+func (room *Room) sendBuzzerUpdates(buzzerUpdate buzzer.BuzzerUpdate) {
+	update := room.convertUpdate(buzzerUpdate)
+
+	// Update all the player buzzers
+	updateFunc := func(player *users.Player, eventChan chan string) {
+		if player.IsLocked {
+			eventChan <- events.LockedOutBuzzerEvent()
+		} else {
+			eventChan <- currentPlayerBuzzer(player, update)
+		}
+	}
+	room.players.RunAll(updateFunc)
+
+	// Update all the moderator statuses
+	room.moderators.SendToAll(room.currentModeratorBuzzer(update))
+
+	// Log update if there's a winner
+	if update.buzzerStatus == buzzer.Won {
+		room.log(fmt.Sprintf("%s won the buzz!", update.winner.Name))
+	}
+
 }
 
 func (room *Room) Id() int64 {
@@ -90,17 +129,6 @@ func (room *Room) UnlockPlayer(userToken string) {
 	room.sendPlayerListUpdates()
 }
 
-func (room *Room) UpdateBuzzers(buzzerUpdate buzzer.BuzzerUpdate) {
-	updateFunc := func(player *users.Player, eventChan chan string) {
-		if player.IsLocked {
-			eventChan <- events.LockedBuzzerEvent()
-		} else {
-			eventChan <- currentPlayerBuzzer(player, buzzerUpdate)
-		}
-	}
-	room.players.RunAll(updateFunc)
-}
-
 func (room *Room) SetPlayerName(userToken string, name string) {
 	logger.Debug("Setting %s name to %s", userToken, name)
 
@@ -139,17 +167,16 @@ func (room *Room) ResetAll() {
 
 func (room *Room) ResetSome() {
 	logger.Debug("Resetting some buzzers")
-	buzzerUpdate := room.buzzer.GetUpdate()
+	update := room.getUpdate()
 
-	if buzzerUpdate.Status == buzzer.Unlocked {
+	if update.buzzerStatus == buzzer.Unlocked {
 		logger.Info("room %s was reset with no active buzzes", room.name)
-	} else if buzzerUpdate.Status == buzzer.Processing {
+	} else if update.buzzerStatus == buzzer.Processing {
 		logger.Info("room %s was reset during processing", room.name)
-	} else if buzzerUpdate.Status == buzzer.Won {
-		winner := buzzerUpdate.Buzzes[0]
-		logger.Info("Locking player with userToken %s", winner.UserToken)
-		room.locksCache.LockPlayer(winner.UserToken)
-		room.LockPlayer(winner.UserToken)
+	} else if update.buzzerStatus == buzzer.Won {
+		logger.Info("Locking player with userToken %s", update.winner.Token)
+		room.locksCache.LockPlayer(update.winner.Token)
+		room.LockPlayer(update.winner.Token)
 	}
 
 	room.buzzer.Reset()
@@ -157,20 +184,18 @@ func (room *Room) ResetSome() {
 	room.log("Buzzer unlocked for some players")
 }
 
-func currentPlayerBuzzer(player *users.Player, buzzerUpdate buzzer.BuzzerUpdate) string {
-	if buzzerUpdate.Status != buzzer.Unlocked || player.IsLocked {
+func currentPlayerBuzzer(player *users.Player, update roomUpdate) string {
+	if update.buzzerStatus != buzzer.Unlocked || player.IsLocked {
 		return events.LockedBuzzerEvent()
 	}
 
-	return events.ReadyBuzzerEvent(buzzerUpdate.ResetToken)
+	return events.ReadyBuzzerEvent(update.resetToken)
 }
 
-func (room *Room) currentModeratorBuzzer(buzzerUpdate buzzer.BuzzerUpdate) string {
-	if buzzerUpdate.Status == buzzer.Won {
-		winner := buzzerUpdate.Buzzes[0]
-		player, _ := room.players.Get(winner.UserToken)
-		return events.LockedStatusEvent(player)
-	} else if buzzerUpdate.Status == buzzer.Processing {
+func (room *Room) currentModeratorBuzzer(update roomUpdate) string {
+	if update.buzzerStatus == buzzer.Won {
+		return events.LockedStatusEvent(update.winner)
+	} else if update.buzzerStatus == buzzer.Processing {
 		return events.ProcessingStatusEvent()
 	} else {
 		return events.UnlockedStatusEvent()
@@ -193,7 +218,7 @@ func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken
 	// Initialize Player
 	room.sendPlayerListUpdates()
 	room.players.SendToPlayer(userToken, events.PastLogsEvent(room.logs))
-	room.players.SendToPlayer(userToken, currentPlayerBuzzer(player, room.buzzer.GetUpdate()))
+	room.players.SendToPlayer(userToken, currentPlayerBuzzer(player, room.getUpdate()))
 
 	// Wait for the channel to close, and then send everyone else the disconnect update
 	<-closeChan
@@ -206,7 +231,7 @@ func (room *Room) AttachModerator(w http.ResponseWriter, r *http.Request, userTo
 	// Initialize Moderator
 	room.moderators.SendToPlayer(userToken, events.PastLogsEvent(room.logs))
 	room.moderators.SendToPlayer(userToken, events.ModeratorPlayerControlsEvent(room.players.GetAll()))
-	room.moderators.SendToPlayer(userToken, room.currentModeratorBuzzer(room.buzzer.GetUpdate()))
+	room.moderators.SendToPlayer(userToken, room.currentModeratorBuzzer(room.getUpdate()))
 
 	// Wait for the channel to close, and then send everyone else the disconnect update
 	<-closeChan

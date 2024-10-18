@@ -13,8 +13,10 @@ type BuzzerStatus int
 
 type BuzzerUpdate struct {
 	Status     BuzzerStatus
+	// This will be "" if there's no winner
+	// Yes that's a little gross but go's enum system is... yeesh
+	WinnerToken		 string
 	ResetToken string
-	Buzzes     []Buzz
 }
 
 const (
@@ -67,12 +69,16 @@ func NewBuzzer(updateCallback func(BuzzerUpdate)) *Buzzer {
 }
 
 func (buzzer *Buzzer) makeUpdateSnapshot() BuzzerUpdate {
-	buzzes := make([]Buzz, len(buzzer.buzzes))
-	for i, buzz := range buzzer.buzzes {
-		buzzes[i] = Buzz{buzz.UserToken, buzz.ResetToken}
+	winnerToken := ""
+	if len(buzzer.buzzes) > 0 {
+		winnerToken = buzzer.buzzes[0].UserToken
 	}
 
-	return BuzzerUpdate{buzzer.buzzerStatus, buzzer.resetToken, buzzes}
+	return BuzzerUpdate {
+		Status: buzzer.buzzerStatus,
+		WinnerToken: winnerToken,
+		ResetToken: buzzer.resetToken,
+	}
 }
 
 func (buzzer *Buzzer) doUpdates(data *Buzz) {
