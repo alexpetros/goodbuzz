@@ -14,6 +14,11 @@ func WaitingBuzzerEvent() string {
 	return lib.FormatEventComponent("buzzer", WaitingBuzzer())
 }
 
+func ProcessingBuzzerEvent() string {
+	return lib.FormatEventComponent("buzzer", ProcessingBuzzer())
+}
+
+
 func LockedOutBuzzerEvent() string {
 	return lib.FormatEventComponent("buzzer", LockedOutBuzzer())
 }
@@ -38,10 +43,16 @@ templ LockedOutBuzzer() {
 </button>
 }
 
+templ ProcessingBuzzer() {
+<button class="buzzer locked" disabled >
+  Locked
+</button>
+}
+
 templ WonBuzzer(player *users.Player) {
 <button class="buzzer locked" disabled >
   Locked
-  <div class="explanation"> By {player.Name}</div>
+  <div class="explanation"> Won by {player.Name}</div>
 </button>
 }
 
