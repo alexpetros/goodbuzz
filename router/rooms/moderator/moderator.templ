@@ -34,10 +34,10 @@ templ index(title string, roomId int64) {
 
   <div class="status-container" sse-swap="status" hx-swap="innerHTML"></div>
   <button class="reset full" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=all", roomId) }>
-    Full Reset
+    Reset All
   </button>
   <button class="reset partial" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", roomId) }>
-    Partial Reset
+    Lock Winner and Reset
   </button>
 </section>
 

@@ -10,14 +10,9 @@ func PlayerListEvent(players []*users.Player, self *users.Player) string {
 	return lib.FormatEventComponent("players", PlayerTable(players, self))
 }
 
-func WaitingBuzzerEvent() string {
-	return lib.FormatEventComponent("buzzer", WaitingBuzzer())
-}
-
 func ProcessingBuzzerEvent() string {
 	return lib.FormatEventComponent("buzzer", ProcessingBuzzer())
 }
-
 
 func LockedOutBuzzerEvent() string {
 	return lib.FormatEventComponent("buzzer", LockedOutBuzzer())
@@ -31,12 +26,6 @@ func ReadyBuzzerEvent(resetToken string) string {
 	return lib.FormatEventComponent("buzzer", ReadyBuzzer(resetToken))
 }
 
-templ WaitingBuzzer() {
-<button class="buzzer locked" disabled >
-  Waiting
-</button>
-}
-
 templ LockedOutBuzzer() {
 <button class="buzzer locked" disabled >
   Locked Out
@@ -44,8 +33,8 @@ templ LockedOutBuzzer() {
 }
 
 templ ProcessingBuzzer() {
-<button class="buzzer locked" disabled >
-  Locked
+<button class="buzzer waiting" disabled >
+  Waiting...
 </button>
 }
 
