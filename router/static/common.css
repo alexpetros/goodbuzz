@@ -42,18 +42,18 @@ button.buzzer {
   background-color: var(--button-enabled-color);
   border: 5px solid black;
   border-radius: 50%;
+}
 
-  &:active:enabled {
-    background-color: var(--button-pressed-color);
-  }
+button.buzzer:active:enabled {
+  background-color: var(--button-pressed-color);
+}
 
-  &.locked {
-    background-color: var(--button-locked-color);
-  }
+button.buzzer.locked {
+  background-color: var(--button-locked-color);
+}
 
-  &.loading, &.waiting {
-    background-color: var(--button-loading-color);
-  }
+button.buzzer.loading, &.waiting {
+  background-color: var(--button-loading-color);
 }
 
 table.tournaments {
@@ -79,7 +79,6 @@ table.rooms {
   th, td {
     padding: 5px;
   }
-
 }
 
 button.action, a.action {

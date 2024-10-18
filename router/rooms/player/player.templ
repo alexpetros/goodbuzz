@@ -48,48 +48,48 @@ templ index(room *room.Room) {
   hx-ext="sse"
   sse-connect="./player/live"
 >
-  <section class="buzzer">
-    <h2>Buzzer</h2>
-    <div sse-swap="buzzer" hx-swap="innerHTML">
-      <button class="buzzer loading" disabled>Loading...</button>
-    </div>
-  </section>
 
-  <section class="settings">
-    <h2>Settings</h2>
-    <form hx-put="./player">
-      <label>
-        Name: <input type="text" name="name">
-      </label>
+<section class="buzzer">
+  <h2>Buzzer</h2>
+  <div sse-swap="buzzer" hx-swap="innerHTML">
+    <button class="buzzer loading" disabled>Loading...</button>
+  </div>
+</section>
 
-      <label>
-        Team:
-        <select name="team">
-        for i := 1; i <= 4; i++ {
-          <option value={fmt.Sprintf("%d", i)}>Team {fmt.Sprintf("%d", i)}</option>
-        }
-        </select>
-      </label>
+<section class="settings">
+  <h2>Settings</h2>
+  <form hx-put="./player">
+    <label>
+      Name: <input type="text" name="name">
+    </label>
 
-      <button>Save</button>
-    </form>
-  </section>
+    <label>
+      Team:
+      <select name="team">
+      for i := 1; i <= 4; i++ {
+        <option value={fmt.Sprintf("%d", i)}>Team {fmt.Sprintf("%d", i)}</option>
+      }
+      </select>
+    </label>
 
-  <section class="players">
-    <h3>Players</h3>
-    <div sse-swap="players" hx-swap="innerHTML"></div>
-  </section>
+    <button>Save</button>
+  </form>
+</section>
 
+<section class="players">
+  <h3>Players</h3>
+  <div sse-swap="players" hx-swap="innerHTML"></div>
+</section>
 
-  <section class="logs">
-    <h2>Log</h2>
-    <div
-      class="log-container"
-      sse-swap="log"
-      hx-swap="beforeend"
-      hx-on::after-swap="if (this.lastChild) this.scrollTop = this.lastChild.offsetTop"
-    ></div>
-  </section>
+<section class="logs">
+  <h2>Log</h2>
+  <div
+    class="log-container"
+    sse-swap="log"
+    hx-swap="beforeend"
+    hx-on::after-swap="if (this.lastChild) this.scrollTop = this.lastChild.offsetTop"
+  ></div>
+</section>
 
 </main>
 

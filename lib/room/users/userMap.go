@@ -92,7 +92,6 @@ func (um *UserMap[T]) Run(userToken string, fn func(data T)) {
 	um.RLock()
 	defer um.RUnlock()
 
-
 	user, ok := um.users[userToken]
 
 	if ok {
