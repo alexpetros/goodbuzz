@@ -190,8 +190,13 @@ func currentPlayerBuzzer(player *users.Player, update roomUpdate) string {
 	}
 
 	if update.buzzerStatus == buzzer.Won {
-		return events.WonBuzzerEvent(update.winner)
+		if update.winner.Token == player.Token {
+			return events.YouWonBuzzerEvent()
+		} else {
+			return events.OtherPlayerWonBuzzerEvent(update.winner)
+		}
 	}
+
 
 	if update.buzzerStatus == buzzer.Processing {
 		return events.ProcessingBuzzerEvent()

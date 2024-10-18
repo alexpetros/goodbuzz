@@ -49,6 +49,10 @@ button.buzzer:active:enabled {
   background-color: var(--button-pressed-color);
 }
 
+button.buzzer.you-won {
+  background-color: var(--button-pressed-color);
+}
+
 button.buzzer.locked {
   background-color: var(--locked-color);
 }
@@ -59,6 +63,7 @@ button.buzzer.loading, button.buzzer.waiting {
 
 button.buzzer .explanation {
   font-size: .9rem;
+  overflow-wrap: break-word;
 }
 
 table.tournaments {
