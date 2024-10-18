@@ -3,7 +3,6 @@ package users
 import (
 	"fmt"
 	"goodbuzz/lib"
-	"goodbuzz/lib/logger"
 	"net/http"
 	"sync"
 )
@@ -56,15 +55,9 @@ func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken 
 		for {
 			data := <-eventChan
 
-			_, err2 := fmt.Fprintf(w, data)
-			if err2 != nil {
-				logger.Error("error writing data:\n%v", err2)
-			}
-
-			err := rc.Flush()
-			if err != nil {
-				logger.Error("error flushing writer:\n%v", err)
-			}
+			// No need to handle the errors here, panics will just break the loop and remove the user
+			fmt.Fprintf(w, data)
+			rc.Flush()
 		}
 	}()
 
