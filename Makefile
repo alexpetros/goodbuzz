@@ -31,7 +31,7 @@ prod:
 install:
 	go install github.com/a-h/templ/cmd/templ@v0.2.747
 	make templ
-	go build
+	go install
 
 .PHONY: live/templ
 live/templ:

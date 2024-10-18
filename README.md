@@ -1,6 +1,6 @@
 # Goodbuzz
 
-An online, simultaneous, high-capacity buzzer system, primarily intended for quiz bowl competitions.
+An online, simultaneous, high-capacity buzzer system, primarily intended for quiz bowl competitions (like Jeopardy).
 
 You enter to a room, someone reads a question (on a video call, elsewhere), and when you think you know the answer, you click the "Buzz" button.
 The room's moderator can either reset the buzzer for everyone, or everyone but the person who buzzed in.

@@ -29,15 +29,16 @@ templ index(title string, roomId int64) {
 
 <main class="moderator" hx-ext="sse" sse-connect="./moderator/live">
 
-<section class="live-view">
-  <h2>Live View</h2>
-  <p>
-  Buzzer Status:
-  <span class="buzzer-status" sse-swap="status" hx-swap="innerHTML"></span>
-  </p>
+<section class="controls">
+  <h2>Buzzer Controls</h2>
 
-  <button hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=all", roomId) }>Full Reset</button>
-  <button hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", roomId) }>Partial Reset</button>
+  <div class="status-container" sse-swap="status" hx-swap="innerHTML"></div>
+  <button class="reset full" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=all", roomId) }>
+    Full Reset
+  </button>
+  <button class="reset partial" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", roomId) }>
+    Partial Reset
+  </button>
 </section>
 
 <section class="players">

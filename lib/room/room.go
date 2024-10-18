@@ -168,20 +168,12 @@ func currentPlayerBuzzer(player *users.Player, buzzerUpdate buzzer.BuzzerUpdate)
 func (room *Room) currentModeratorBuzzer(buzzerUpdate buzzer.BuzzerUpdate) string {
 	if buzzerUpdate.Status == buzzer.Won {
 		winner := buzzerUpdate.Buzzes[0]
-		player, ok := room.players.Get(winner.UserToken)
-
-		var message string
-		if !ok {
-			message = fmt.Sprintf("Locked by (disconnected player)")
-		} else {
-			message = fmt.Sprintf("Locked by %s", player.Name)
-		}
-
-		return events.ModeratorStatusEvent(message)
+		player, _ := room.players.Get(winner.UserToken)
+		return events.LockedStatusEvent(player)
 	} else if buzzerUpdate.Status == buzzer.Processing {
-		return events.ModeratorStatusEvent("Processing...")
+		return events.ProcessingStatusEvent()
 	} else {
-		return events.ModeratorStatusEvent("Unlocked")
+		return events.UnlockedStatusEvent()
 	}
 }
 
