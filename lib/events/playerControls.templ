@@ -18,8 +18,8 @@ func LockedOutBuzzerEvent() string {
 	return lib.FormatEventComponent("buzzer", LockedOutBuzzer())
 }
 
-func LockedBuzzerEvent() string {
-	return lib.FormatEventComponent("buzzer", LockedBuzzer())
+func WonBuzzerEvent(player *users.Player) string {
+	return lib.FormatEventComponent("buzzer", WonBuzzer(player))
 }
 
 func ReadyBuzzerEvent(resetToken string) string {
@@ -34,14 +34,14 @@ templ WaitingBuzzer() {
 
 templ LockedOutBuzzer() {
 <button class="buzzer locked" disabled >
-  Locked
-  <div>(you're locked out)</div>
+  Locked Out
 </button>
 }
 
-templ LockedBuzzer() {
+templ WonBuzzer(player *users.Player) {
 <button class="buzzer locked" disabled >
   Locked
+  <div class="explanation"> By {player.Name}</div>
 </button>
 }
 

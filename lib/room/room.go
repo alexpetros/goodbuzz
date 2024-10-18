@@ -86,7 +86,6 @@ func (room *Room) sendBuzzerUpdates(buzzerUpdate buzzer.BuzzerUpdate) {
 	if update.buzzerStatus == buzzer.Won {
 		room.log(fmt.Sprintf("%s won the buzz!", update.winner.Name))
 	}
-
 }
 
 func (room *Room) Id() int64 {
@@ -185,8 +184,13 @@ func (room *Room) ResetSome() {
 }
 
 func currentPlayerBuzzer(player *users.Player, update roomUpdate) string {
-	if update.buzzerStatus != buzzer.Unlocked || player.IsLocked {
-		return events.LockedBuzzerEvent()
+
+	if player.IsLocked {
+		return events.LockedOutBuzzerEvent()
+	}
+
+	if update.buzzerStatus == buzzer.Won {
+		return events.WonBuzzerEvent(update.winner)
 	}
 
 	return events.ReadyBuzzerEvent(update.resetToken)

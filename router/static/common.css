@@ -53,8 +53,12 @@ button.buzzer.locked {
   background-color: var(--locked-color);
 }
 
-button.buzzer.loading, &.waiting {
+button.buzzer.loading, button.buzzer.waiting {
   background-color: var(--loading-color);
+}
+
+button.buzzer .explanation {
+  font-size: .9rem;
 }
 
 table.tournaments {
