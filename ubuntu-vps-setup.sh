@@ -73,14 +73,14 @@ cat > /lib/systemd/system/$SERVICE_NAME.service <<EOF
 Description=$SERVICE_NAME
 
 [Service]
-WorkingDirectory=/home/$SERVICE_NAME
+WorkingDirectory=/home/$RUNAS_USER
 Type=simple
 User=$RUNAS_USER
 Restart=always
 RestartSec=1s
 StandardOutput=append:/var/log/$SERVICE_NAME/output.log
 StandardError=append:/var/log/$SERVICE_NAME/error.log
-ExecStart=/home/$SERVICE_NAME/$EXECUTEABLE_NAME
+ExecStart=/home/$RUNAS_USER/go/bin/$EXECUTEABLE_NAME
 
 [Install]
 WantedBy=multi-user.target
@@ -97,7 +97,7 @@ make install
 cat schema.sql | sqlite3 ../goodbuzz.db
 EOF
 
-systemctl restart goodbuzz
+systemctl restart $SERVICE_NAME
 
 echo "You're done!"
 echo "Don't forget you need to run: certbot --nginx -d example.com -d www.example.com"
