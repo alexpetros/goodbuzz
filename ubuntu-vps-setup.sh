@@ -88,7 +88,7 @@ EOF
 
 # Login to $RUNAS_USER, set up the go environment, and install the program
 sudo -i -u $RUNAS_USER bash << EOF
-echo "PATH=$PATH:/home/$RUNAS_USER/go/bin" >> .profile
+echo "export PATH=\$PATH:/home/$RUNAS_USER/go/bin" >> .profile
 source .profile
 cd /home/$RUNAS_USER
 git clone https://github.com/alexpetros/goodbuzz
