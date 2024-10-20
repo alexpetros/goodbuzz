@@ -25,6 +25,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 templ index(title string, roomId int64) {
+<link rel="stylesheet" href="/static/moderator.css">
 <h1>{title}</h1>
 
 <main class="moderator" hx-ext="sse" sse-connect="./moderator/live">

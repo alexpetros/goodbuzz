@@ -1,0 +1,73 @@
+main.player {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+button.buzzer {
+  display: block;
+  margin: 0 auto;
+  width: 200px;
+  height: 200px;
+  color: white;
+  font-size: 30px;
+  background-color: var(--unlocked-color);
+  border: 5px solid black;
+  border-radius: 50%;
+}
+
+button.buzzer:active:enabled {
+  background-color: var(--button-pressed-color);
+}
+
+button.buzzer.you-won {
+  background-color: var(--button-pressed-color);
+}
+
+button.buzzer.locked {
+  background-color: var(--locked-color);
+}
+
+button.buzzer.loading, button.buzzer.waiting {
+  background-color: var(--loading-color);
+}
+
+button.buzzer .explanation {
+  font-size: .9rem;
+  overflow-wrap: break-word;
+}
+
+section.settings {
+  form { width: 80%; }
+  button { display: block; }
+  label {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+  }
+  button, label { margin: 10px 0; }
+}
+
+section.players {
+  table { margin-top: 15px; }
+  tr {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+  }
+  .you { font-weight: bold; }
+  .other { font-style: italic; }
+  .locked { text-decoration: line-through; }
+}
+
+@media (min-width: 600px) {
+  section.buzzer { grid-area: buzzer }
+  section.settings { grid-area: settings }
+  section.players { grid-area: players }
+  section.logs { grid-area: logs }
+
+  main.player {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "buzzer settings"
+      "buzzer players"
+      "logs logs";
+  }
+}

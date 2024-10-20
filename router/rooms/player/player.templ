@@ -41,7 +41,9 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 templ index(room *room.Room) {
+<link rel="stylesheet" href="/static/player.css">
 <h1>{room.Name()}</h1>
+<style></style>
 
 <main
   class="player"
