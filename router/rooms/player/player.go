@@ -33,6 +33,17 @@ func Put(w http.ResponseWriter, r *http.Request) {
 
 	name := r.PostFormValue("name")
 
+	nameCookie := http.Cookie {
+		Name:     "name",
+		Value:    name,
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	}
+	http.SetCookie(w, &nameCookie)
+
+
 	room.SetPlayerName(cookie.Value, name)
 	lib.NoContent(w, r)
 }
