@@ -185,7 +185,7 @@ func SetRoomDescription(ctx context.Context, roomId int64, description string) e
 
 func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
 	fn := func(conn *sqlite.Conn) []Room {
-		stmt := conn.Prep("SELECT room_id, name FROM rooms WHERE tournament_id = $1")
+		stmt := conn.Prep("SELECT room_id, name, description FROM rooms WHERE tournament_id = $1")
 		stmt.SetInt64("$1", tournament_id)
 
 		rooms := make([]Room, 0)

@@ -17,17 +17,18 @@ templ index(tournaments []db.Tournament) {
 Welcome to Goodbuzz, the online buzzer system for quiz bowl.
 </p>
 
-<p>
-<a href="/admin">Admin Page</a>
-</p>
-
-<h2>Ongoing Tournaments</h2>
-<ul>
-for _, tournament := range tournaments {
-  <li>
-    <a href={ templ.URL(tournament.Url()) }>{ tournament.Name() }</a>
-  </li>
-}
-</ul>
+<main class="index">
+  <h2>Ongoing Tournaments</h2>
+  <table class="tournaments">
+    <tr>
+      <th>Name</th>
+    </tr>
+    for _, tournament := range tournaments {
+    <tr>
+      <td><a href={ templ.URL(tournament.Url()) }>{ tournament.Name() }</a></td>
+    </tr>
+    }
+  </table>
+</main>
 }
 

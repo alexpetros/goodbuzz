@@ -27,15 +27,19 @@ func Get(w http.ResponseWriter, r *http.Request) {
 templ get(tournament *db.Tournament, rooms []db.Room) {
 <h1>{tournament.Name()}</h1>
 
-<p>
-Rooms:
-
-<ul>
-for _, room := range rooms {
-  <li><a href={ templ.URL(fmt.Sprintf("/rooms/%d/player", room.RoomId)) }>{ room.Name }</a></li>
-}
-</ul>
-</p>
+<h2>Rooms</h2>
+<table class="rooms-player">
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  for _, room := range rooms {
+    <tr>
+        <td><a href={templ.URL(fmt.Sprintf("/rooms/%d/player", room.RoomId))}>{room.Name}</a></td>
+        <td>{ room.Description }</td>
+    </tr>
+  }
+</table>
 }
 
 func Edit(w http.ResponseWriter, r *http.Request) {
