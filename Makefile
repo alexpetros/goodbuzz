@@ -69,6 +69,7 @@ reset-db:
 	sqlite3 $(DB_NAME) < db/schema.sql
 
 .PHONY: upcoming
-upcoming:
+upcoming: reset-db
 	sqlite3 $(DB_NAME) < db/october-online.sql
+
 
