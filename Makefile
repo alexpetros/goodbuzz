@@ -66,4 +66,9 @@ reset-db:
 	rm -f $(DB_NAME)
 	rm -f $(DB_NAME)-wal
 	rm -f $(DB_NAME)-shm
-	sqlite3 $(DB_NAME) < schema.sql
+	sqlite3 $(DB_NAME) < db/schema.sql
+
+.PHONY: upcoming
+upcoming:
+	sqlite3 $(DB_NAME) < db/october-online.sql
+
