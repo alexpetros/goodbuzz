@@ -1,10 +1,11 @@
 package moderator
 
-import "net/http"
-import "fmt"
-
-import "goodbuzz/lib"
-import "goodbuzz/router/rooms"
+import (
+  "net/http"
+  "fmt"
+  "goodbuzz/lib"
+  "goodbuzz/router/rooms"
+)
 
 func Get(w http.ResponseWriter, r *http.Request) {
     room_id, err := lib.GetIntParam(r, "id")
@@ -26,7 +27,9 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
 templ index(title string, roomId int64) {
 <link rel="stylesheet" href="/static/moderator.css">
+
 <h1>{title}</h1>
+<div><a href="./edit">Edit</a></div>
 
 <main class="moderator" hx-ext="sse" sse-connect="./moderator/live">
 

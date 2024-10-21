@@ -32,7 +32,7 @@ Rooms:
 
 <ul>
 for _, room := range rooms {
-  <li><a href={ templ.URL(fmt.Sprintf("/rooms/%d/player", room.Id())) }>{ room.Name() }</a></li>
+  <li><a href={ templ.URL(fmt.Sprintf("/rooms/%d/player", room.RoomId)) }>{ room.Name }</a></li>
 }
 </ul>
 </p>

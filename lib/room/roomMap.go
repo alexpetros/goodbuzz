@@ -15,11 +15,11 @@ func NewRoomMap() RoomMap {
 	}
 }
 
-func (roomMap *RoomMap) GetOrCreateRoom(roomId int64, name string) *Room {
+func (roomMap *RoomMap) GetOrCreateRoom(roomId int64, name string, description string) *Room {
 	roomMap.Lock()
 	room := roomMap.internal[roomId]
 	if room == nil {
-		room = roomMap.newRoom(roomId, name)
+		room = roomMap.newRoom(roomId, name, description)
 		roomMap.internal[roomId] = room
 	} else if room.name != name {
 		room.name = name

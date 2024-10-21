@@ -16,6 +16,7 @@ import (
 type Room struct {
 	roomId     int64
 	name       string
+	description string
 	logs       []events.Log
 	locksCache *LocksCache
 	buzzer     *buzzer.Buzzer
@@ -30,10 +31,11 @@ type roomUpdate struct {
 	resetToken string
 }
 
-func (roomMap *RoomMap) newRoom(roomId int64, name string) *Room {
+func (roomMap *RoomMap) newRoom(roomId int64, name string, description string) *Room {
 	room := Room{
 		roomId:     roomId,
 		name:       name,
+		description: description,
 		logs:       make([]events.Log, 0),
 		locksCache:	NewLocksCache(),
 		players:    users.NewUserMap[*users.Player](),
@@ -94,6 +96,14 @@ func (room *Room) Id() int64 {
 
 func (room *Room) Name() string {
 	return room.name
+}
+
+func (room *Room) Description() string {
+	return room.description
+}
+
+func (room *Room) SetDescription(description string) {
+	room.description = description
 }
 
 func (room *Room) Url() string {

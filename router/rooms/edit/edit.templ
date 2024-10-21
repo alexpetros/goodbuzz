@@ -1,0 +1,58 @@
+package edit
+
+import (
+  "net/http"
+  "fmt"
+  "goodbuzz/lib"
+  "goodbuzz/router/rooms"
+)
+
+func Get(w http.ResponseWriter, r *http.Request) {
+    room_id, err := lib.GetIntParam(r, "id")
+    if err != nil {
+      lib.BadRequest(w, r)
+      return
+    }
+
+    room, notFoundErr := rooms.GetRoom(r.Context(), room_id)
+    if notFoundErr != nil {
+      http.NotFound(w, r)
+      return
+    }
+
+    title := fmt.Sprintf("%s - Edit", room.Name())
+    content := index(title, room.Id())
+    lib.Render(w, r, title, content)
+}
+
+templ index(title string, roomId int64) {
+<style>
+textarea {
+width: 400px;
+height: 3rem;
+resize: none;
+}
+
+button {
+  display: block;
+}
+</style>
+
+<h1>{title}</h1>
+
+<main>
+
+<form hx-put={fmt.Sprintf("/rooms/%d", roomId)}>
+<label>
+  <div>Description</div>
+  <textarea name="description"></textarea>
+</label>
+
+<button>Save</button>
+</form>
+
+<p><a href="./moderator">Return to moderator view</a></p>
+</main>
+
+}
+
