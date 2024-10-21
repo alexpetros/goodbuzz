@@ -3,6 +3,7 @@ package rooms
 import (
 	"context"
 	"errors"
+	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/lib/db"
 	"goodbuzz/lib/logger"
@@ -30,7 +31,8 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	room.SetDescription(description)
 	db.SetRoomDescription(r.Context(), roomId, description)
 
-	lib.NoContent(w, r)
+	route := fmt.Sprintf("/rooms/%d/moderator", roomId)
+	lib.HxRedirect(w, r, route)
 }
 
 func GetRoom(ctx context.Context, roomId int64) (*room.Room, error) {

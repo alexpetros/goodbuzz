@@ -4,6 +4,7 @@ import (
   "net/http"
   "fmt"
   "goodbuzz/lib"
+  "goodbuzz/lib/room"
   "goodbuzz/router/rooms"
 )
 
@@ -21,26 +22,26 @@ func Get(w http.ResponseWriter, r *http.Request) {
     }
 
     title := fmt.Sprintf("%s - Moderator", room.Name())
-    content := index(title, room.Id())
+    content := index(room)
     lib.Render(w, r, title, content)
 }
 
-templ index(title string, roomId int64) {
+templ index(room *room.Room) {
 <link rel="stylesheet" href="/static/moderator.css">
 
-<h1>{title}</h1>
-<div><a href="./edit">Edit</a></div>
+<h1>{room.Name()}</h1>
 
+<p class="description">{room.Description()}</p>
 <main class="moderator" hx-ext="sse" sse-connect="./moderator/live">
 
 <section class="controls">
   <h2>Buzzer Controls</h2>
 
   <div class="status-container" sse-swap="status" hx-swap="innerHTML"></div>
-  <button class="reset full" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=all", roomId) }>
+  <button class="reset full" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=all", room.Id()) }>
     Reset All
   </button>
-  <button class="reset partial" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", roomId) }>
+  <button class="reset partial" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", room.Id()) }>
     Lock Winner and Reset
   </button>
 </section>
@@ -58,6 +59,10 @@ templ index(title string, roomId int64) {
     hx-swap="beforeend"
     hx-on::after-swap="if (this.lastChild) this.scrollTop = this.lastChild.offsetTop"
   ></div>
+</section>
+
+<section class="settings">
+<a href="./edit" class="button action edit">Edit Room</a>
 </section>
 
 </main>

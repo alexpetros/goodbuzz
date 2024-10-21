@@ -30,6 +30,11 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "<h1>404 Not Found</h1><p><a href=/>Return home</a>")
 }
 
+func HxRedirect(w http.ResponseWriter, r *http.Request, route string) {
+	w.Header().Add("Hx-Redirect", route)
+	w.WriteHeader(200)
+}
+
 func BadRequest(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(400)
 	io.WriteString(w, "<h1>Bad Request</h1><p><a href=/>Return home</a>")

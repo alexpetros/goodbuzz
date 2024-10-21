@@ -44,16 +44,23 @@ main.moderator {
   }
 }
 
+a.edit {
+  margin-top: 20px;
+}
+
 @media (min-width: 600px) {
   section.controls { grid-area: controls }
   section.players { grid-area: players }
   section.logs { grid-area: logs }
+  section.settings { grid-area: settings }
 
   main.moderator {
     grid-template-columns: 3fr 2fr;
     grid-template-areas:
       "controls players"
-      "logs logs";
+      "logs logs"
+      "settings settings"
+    ;
     column-gap: 5%;
   }
 }
