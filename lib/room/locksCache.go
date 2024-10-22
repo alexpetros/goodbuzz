@@ -10,7 +10,7 @@ type LocksCache struct {
 }
 
 func NewLocksCache() *LocksCache {
-	return &LocksCache {
+	return &LocksCache{
 		cache: make(map[string]struct{}),
 	}
 }
@@ -40,4 +40,3 @@ func (lc *LocksCache) ResetAll() {
 	defer lc.Unlock()
 	lc.cache = make(map[string]struct{})
 }
-

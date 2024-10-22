@@ -12,11 +12,11 @@ const BUZZER_DELAY = 500 * time.Millisecond
 type BuzzerStatus int
 
 type BuzzerUpdate struct {
-	Status     BuzzerStatus
+	Status BuzzerStatus
 	// This will be "" if there's no winner
 	// Yes that's a little gross but go's enum system is... yeesh
-	WinnerToken		 string
-	ResetToken string
+	WinnerToken string
+	ResetToken  string
 }
 
 const (
@@ -74,10 +74,10 @@ func (buzzer *Buzzer) makeUpdateSnapshot() BuzzerUpdate {
 		winnerToken = buzzer.buzzes[0].UserToken
 	}
 
-	return BuzzerUpdate {
-		Status: buzzer.buzzerStatus,
+	return BuzzerUpdate{
+		Status:      buzzer.buzzerStatus,
 		WinnerToken: winnerToken,
-		ResetToken: buzzer.resetToken,
+		ResetToken:  buzzer.resetToken,
 	}
 }
 

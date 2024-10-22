@@ -3,12 +3,12 @@ package lib
 import (
 	"bytes"
 	"context"
+	"fmt"
+	"github.com/a-h/templ"
 	"io"
 	"net/http"
 	"strconv"
-	"fmt"
 	"strings"
-	"github.com/a-h/templ"
 )
 
 func Render(w http.ResponseWriter, r *http.Request, title string, component templ.Component) {
@@ -49,7 +49,6 @@ func GetIntParam(r *http.Request, param_name string) (id int64, err error) {
 	param := r.PathValue(param_name)
 	return strconv.ParseInt(param, 10, 64)
 }
-
 
 func FormatEventString(eventName string, data string) string {
 	return fmt.Sprintf("event: %s\ndata: %s\n\n", eventName, data)

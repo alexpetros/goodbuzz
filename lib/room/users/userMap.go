@@ -8,13 +8,13 @@ import (
 	"sync"
 )
 
-type user [T any] struct {
-	data T
-	eventChan chan string
-	interruptChan chan struct {}
+type user[T any] struct {
+	data          T
+	eventChan     chan string
+	interruptChan chan struct{}
 }
 
-type UserMap [T any] struct {
+type UserMap[T any] struct {
 	sync.RWMutex
 	users map[string]user[T]
 }
@@ -25,7 +25,7 @@ func NewUserMap[T any]() *UserMap[T] {
 	}
 }
 
-func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken string, data T) <- chan struct {} {
+func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken string, data T) <-chan struct{} {
 	// Set the response header to indicate SSE content type
 	w.Header().Add("Content-Type", "text/event-stream")
 	w.Header().Add("Cache-Control", "no-cache")
@@ -35,20 +35,20 @@ func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken 
 	interruptChan := make(chan struct{})
 	closeChan := make(chan struct{})
 
-	newUser := user[T] { data, eventChan, interruptChan }
+	newUser := user[T]{data, eventChan, interruptChan}
 	um.users[userToken] = newUser
 
 	// Remove the channel if the connection closes
 	go func() {
 		select {
-		case <- r.Context().Done():
+		case <-r.Context().Done():
 			um.RemoveUser(userToken)
 			closeChan <- struct{}{}
-		case <- newUser.interruptChan:
+		case <-newUser.interruptChan:
 			logger.Debug("interrupting")
 			newUser.eventChan <- lib.FormatEventString("close", "")
 			// Send the close event and then wait for the clean close
-			<- r.Context().Done()
+			<-r.Context().Done()
 			um.RemoveUser(userToken)
 			closeChan <- struct{}{}
 		}
@@ -125,12 +125,12 @@ func (um *UserMap[T]) NumUsers() int {
 	return len(um.users)
 }
 
-func (um *UserMap[T]) KickUser(userToken string)  {
+func (um *UserMap[T]) KickUser(userToken string) {
 	um.RLock()
 	defer um.RUnlock()
 	user, ok := um.users[userToken]
 	if ok {
-		user.interruptChan <- struct {}{}
+		user.interruptChan <- struct{}{}
 	} else {
 		logger.Info("Attempted to kick user %s who was not present", userToken)
 	}

@@ -14,32 +14,32 @@ import (
 )
 
 type Room struct {
-	roomId     int64
-	name       string
+	roomId      int64
+	name        string
 	description string
-	logs       []events.Log
-	locksCache *LocksCache
-	buzzer     *buzzer.Buzzer
-	players    *users.UserMap[*users.Player]
-	moderators *users.UserMap[struct{}]
+	logs        []events.Log
+	locksCache  *LocksCache
+	buzzer      *buzzer.Buzzer
+	players     *users.UserMap[*users.Player]
+	moderators  *users.UserMap[struct{}]
 }
 
 type roomUpdate struct {
 	buzzerStatus buzzer.BuzzerStatus
 	// nilable because there will be no winner if the status isn't "Won"
-	winner *users.Player
+	winner     *users.Player
 	resetToken string
 }
 
 func (roomMap *RoomMap) newRoom(roomId int64, name string, description string) *Room {
 	room := Room{
-		roomId:     roomId,
-		name:       name,
+		roomId:      roomId,
+		name:        name,
 		description: description,
-		logs:       make([]events.Log, 0),
-		locksCache:	NewLocksCache(),
-		players:    users.NewUserMap[*users.Player](),
-		moderators: users.NewUserMap[struct{}](),
+		logs:        make([]events.Log, 0),
+		locksCache:  NewLocksCache(),
+		players:     users.NewUserMap[*users.Player](),
+		moderators:  users.NewUserMap[struct{}](),
 	}
 	room.buzzer = buzzer.NewBuzzer(room.sendBuzzerUpdates)
 	return &room
@@ -59,7 +59,7 @@ func (room *Room) convertUpdate(buzzerUpdate buzzer.BuzzerUpdate) roomUpdate {
 		}
 	}
 
-	update := roomUpdate { buzzerUpdate.Status, winner, buzzerUpdate.ResetToken }
+	update := roomUpdate{buzzerUpdate.Status, winner, buzzerUpdate.ResetToken}
 	return update
 }
 
@@ -217,7 +217,6 @@ func currentPlayerBuzzer(player *users.Player, update roomUpdate) string {
 			return events.OtherPlayerWonBuzzerEvent(update.winner)
 		}
 	}
-
 
 	if update.buzzerStatus == buzzer.Processing {
 		return events.ProcessingBuzzerEvent()

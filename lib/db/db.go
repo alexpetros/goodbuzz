@@ -40,8 +40,8 @@ func (t *Tournament) AdminUrl() string {
 }
 
 type Room struct {
-	RoomId int64
-	Name    string
+	RoomId      int64
+	Name        string
 	Description string
 }
 
@@ -184,9 +184,9 @@ func GetRoom(ctx context.Context, room_id int64) *Room {
 		}
 
 		room := Room{
-			RoomId: stmt.ColumnInt64(0),
-			Name:    stmt.ColumnText(1),
-			Description:    stmt.ColumnText(2),
+			RoomId:      stmt.ColumnInt64(0),
+			Name:        stmt.ColumnText(1),
+			Description: stmt.ColumnText(2),
 		}
 
 		stmt.Reset()
@@ -230,9 +230,9 @@ func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
 			}
 
 			room := Room{
-				RoomId: stmt.ColumnInt64(0),
-				Name:    stmt.ColumnText(1),
-				Description:    stmt.ColumnText(2),
+				RoomId:      stmt.ColumnInt64(0),
+				Name:        stmt.ColumnText(1),
+				Description: stmt.ColumnText(2),
 			}
 
 			rooms = append(rooms, room)

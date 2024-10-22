@@ -1,8 +1,8 @@
 package users
 
 type Player struct {
-	Name      string
-	Token     string
+	Name     string
+	Token    string
 	IsLocked bool
 }
 
