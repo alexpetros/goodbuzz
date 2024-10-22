@@ -31,8 +31,12 @@ func (t *Tournament) Url() string {
 	return fmt.Sprintf("/tournaments/%d", t.tournament_id)
 }
 
-func (t *Tournament) EditUrl() string {
-	return fmt.Sprintf("/tournaments/%d/edit", t.tournament_id)
+func (t *Tournament) ModeratorUrl() string {
+	return fmt.Sprintf("/tournaments/%d/moderator", t.tournament_id)
+}
+
+func (t *Tournament) AdminUrl() string {
+	return fmt.Sprintf("/tournaments/%d/admin", t.tournament_id)
 }
 
 type Room struct {

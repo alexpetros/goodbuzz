@@ -8,7 +8,7 @@ import (
   "goodbuzz/router/rooms"
 )
 
-func Edit(w http.ResponseWriter, r *http.Request) {
+func Moderator(w http.ResponseWriter, r *http.Request) {
     param, error := lib.GetIntParam(r, "id")
     context := r.Context()
     tournament_id := int64(param)
@@ -20,11 +20,11 @@ func Edit(w http.ResponseWriter, r *http.Request) {
 
     tournament := db.GetTournament(context, tournament_id)
     rooms := rooms.GetRoomsForTournament(context, tournament_id)
-    content := edit(tournament, rooms)
+    content := moderator(tournament, rooms)
     lib.Render(w, r, tournament.Name(), content)
 }
 
-templ edit(tournament *db.Tournament, rooms []room.Room) {
+templ moderator(tournament *db.Tournament, rooms []room.Room) {
 <h1>{tournament.Name()}</h1>
 
 <h2>Rooms</h2>
@@ -34,7 +34,6 @@ templ edit(tournament *db.Tournament, rooms []room.Room) {
         <td>{ room.Name() }</td>
         <td><a href={templ.URL(room.PlayerUrl())}>Join as Player</a></td>
         <td><a href={templ.URL(room.ModeratorUrl())}>Join as Moderator</a></td>
-        <td><a class="button action edit" href={templ.SafeURL(room.EditUrl())}>Edit</a></td>
     </tr>
   }
 </table>

@@ -1,4 +1,4 @@
-package admin
+package moderator
 
 import "net/http"
 import "goodbuzz/lib"
@@ -8,11 +8,11 @@ import "strconv"
 func Get(w http.ResponseWriter, r *http.Request) {
     tournaments := db.GetTournaments(r.Context())
     content := index(tournaments)
-    lib.Render(w, r, "Admin Page", content)
+    lib.Render(w, r, "Moderator Page", content)
 }
 
 templ index(tournaments []db.Tournament) {
-<h1>Admin Page</h1>
+<h1>Moderator Page</h1>
 
 <h2>Tournaments</h2>
 <table class="tournaments">
@@ -24,20 +24,12 @@ templ index(tournaments []db.Tournament) {
   for _, tournament := range tournaments {
     <tr>
         <td>
-          <a href={templ.URL(tournament.AdminUrl())}>
+          <a href={templ.URL(tournament.ModeratorUrl())}>
           { tournament.Name() } </a>
          </td>
          <td>
           {strconv.FormatInt(tournament.NumRooms(), 10)}
          </td>
-        <td>
-          <button
-            class="action delete"
-            hx-delete={tournament.Url()}
-            hx-confirm="Are you sure you want to delete this tournament and all its rooms?"
-            >Delete
-            </button>
-        </td>
     </tr>
   }
 </table>
