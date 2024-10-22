@@ -1,11 +1,11 @@
-package edit
+package rooms
 
 import (
   "net/http"
   "fmt"
   "goodbuzz/lib"
+  "goodbuzz/lib/db"
   "goodbuzz/lib/room"
-  "goodbuzz/router/rooms"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -15,35 +15,44 @@ func Get(w http.ResponseWriter, r *http.Request) {
       return
     }
 
-    room, notFoundErr := rooms.GetRoom(r.Context(), room_id)
+    room, notFoundErr := GetRoom(r.Context(), room_id)
     if notFoundErr != nil {
       http.NotFound(w, r)
       return
     }
 
     title := fmt.Sprintf("%s - Edit", room.Name())
-    content := index(room)
+    tournament := db.GetTournamentForRoom(r.Context(), room.Id())
+    content := index(room, tournament)
     lib.Render(w, r, title, content)
 }
 
-templ index(room *room.Room) {
+templ index(room *room.Room, tournament *db.Tournament) {
 <style>
 textarea {
-width: 400px;
-height: 3rem;
-resize: none;
+  width: 400px;
+  height: 3rem;
+  resize: none;
 }
 
-button {
+button, label {
   display: block;
+  margin: 20px 0;
 }
+
 </style>
+
+<p><a href={templ.SafeURL(tournament.Url())}>{tournament.Name()}</a></p>
 
 <h1>{room.Name()}</h1>
 
 <main>
 
 <form hx-put={fmt.Sprintf("/rooms/%d", room.Id())}>
+<label>
+  <div>Name</div>
+  <input type="text" value={room.Name()}>
+</label>
 <label>
   <div>Description</div>
   <textarea name="description">{room.Description()}</textarea>
@@ -52,7 +61,6 @@ button {
 <button>Save</button>
 </form>
 
-<p><a href="./moderator">Return to moderator view</a></p>
 </main>
 
 }

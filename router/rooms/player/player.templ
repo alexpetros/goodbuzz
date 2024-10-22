@@ -50,6 +50,8 @@ templ index(room *room.Room) {
   class="player"
   hx-ext="sse"
   sse-connect="./player/live"
+  sse-close="close"
+  hx-on::sse-close="onKick()"
 >
 
 <section class="buzzer">
@@ -103,6 +105,14 @@ function disableBuzzer() {
   button.setAttribute('disabled', 'true')
   button.innerText = 'Waiting...'
   button.classList.add('waiting')
+}
+
+function onKick() {
+  const main = document.querySelector('main')
+    main.innerHTML = `
+      <p>You have been kicked from this room.</p>
+      <p><a href="/">Click here to return home</a></p>
+    `
 }
 
 </script>

@@ -46,6 +46,11 @@ templ ModeratorPlayerControls(players []*users.Player) {
         <button disabled>Unlock</button>
       }
       </td>
+      <td>
+        <button hx-delete={fmt.Sprintf("./players/%s", player.Token)}>
+          Kick
+        </button>
+      </td>
     </tr>
     }
   </table>

@@ -3,6 +3,7 @@ package users
 import (
 	"fmt"
 	"goodbuzz/lib"
+	"goodbuzz/lib/logger"
 	"net/http"
 	"sync"
 )
@@ -10,6 +11,7 @@ import (
 type user [T any] struct {
 	data T
 	eventChan chan string
+	interruptChan chan struct {}
 }
 
 type UserMap [T any] struct {
@@ -30,17 +32,27 @@ func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken 
 	w.Header().Add("Connection", "keep-alive")
 
 	eventChan := make(chan string)
+	interruptChan := make(chan struct{})
 	closeChan := make(chan struct{})
 
-	um.Lock()
-	um.users[userToken] = user[T] { data, eventChan }
-	um.Unlock()
+	newUser := user[T] { data, eventChan, interruptChan }
+	um.users[userToken] = newUser
 
 	// Remove the channel if the connection closes
 	go func() {
-		<- r.Context().Done()
-		um.RemoveUser(userToken)
-		closeChan <- struct{}{}
+		select {
+		case <- r.Context().Done():
+			um.RemoveUser(userToken)
+			closeChan <- struct{}{}
+		case <- newUser.interruptChan:
+			logger.Debug("interrupting")
+			newUser.eventChan <- lib.FormatEventString("close", "")
+			// Send the close event and then wait for the clean close
+			<- r.Context().Done()
+			um.RemoveUser(userToken)
+			closeChan <- struct{}{}
+		}
+
 	}()
 
 	// Continuously send data to the client
@@ -111,6 +123,17 @@ func (um *UserMap[T]) NumUsers() int {
 	um.RLock()
 	defer um.RUnlock()
 	return len(um.users)
+}
+
+func (um *UserMap[T]) KickUser(userToken string)  {
+	um.RLock()
+	defer um.RUnlock()
+	user, ok := um.users[userToken]
+	if ok {
+		user.interruptChan <- struct {}{}
+	} else {
+		logger.Info("Attempted to kick user %s who was not present", userToken)
+	}
 }
 
 func (um *UserMap[T]) Get(userToken string) (T, bool) {

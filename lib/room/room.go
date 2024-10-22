@@ -110,6 +110,10 @@ func (room *Room) Url() string {
 	return fmt.Sprintf("/rooms/%d", room.roomId)
 }
 
+func (room *Room) EditUrl() string {
+	return fmt.Sprintf("/rooms/%d/edit", room.roomId)
+}
+
 func (room *Room) PlayerUrl() string {
 	return fmt.Sprintf("/rooms/%d/player", room.roomId)
 }
@@ -136,6 +140,13 @@ func (room *Room) UnlockPlayer(userToken string) {
 
 	room.buzzer.SendUpdates()
 	room.sendPlayerListUpdates()
+}
+
+func (room *Room) KickPlayer(userToken string) {
+	logger.Debug("Kicking player %s", userToken)
+	room.players.KickUser(userToken)
+
+	// room.sendPlayerListUpdates()
 }
 
 func (room *Room) SetPlayerName(userToken string, name string) {

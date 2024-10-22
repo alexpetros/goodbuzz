@@ -104,6 +104,33 @@ func GetTournament(ctx context.Context, id int64) *Tournament {
 	return run(ctx, fn)
 }
 
+func GetTournamentForRoom(ctx context.Context, roomId int64) *Tournament {
+	fn := func(conn *sqlite.Conn) *Tournament {
+		stmt := conn.Prep("SELECT tournament_id, tournaments.name FROM rooms LEFT JOIN tournaments USING (tournament_id) WHERE room_id = $id")
+		stmt.SetInt64("$id", roomId)
+
+		row, err := stmt.Step()
+		if err != nil {
+			logger.Error("Error getting tournament: %w", err)
+			return nil
+		}
+		if !row {
+			logger.Warn("Room %d not found found", roomId)
+			return nil
+		}
+
+		tournament := Tournament{
+			tournament_id: stmt.ColumnInt64(0),
+			name:          stmt.ColumnText(1),
+		}
+
+		stmt.Reset()
+		return &tournament
+	}
+
+	return run(ctx, fn)
+}
+
 func GetTournaments(ctx context.Context) []Tournament {
 	fn := func(conn *sqlite.Conn) []Tournament {
 		stmt := conn.Prep(`
