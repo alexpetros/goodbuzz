@@ -45,14 +45,11 @@ func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken 
 			um.RemoveUser(userToken)
 			closeChan <- struct{}{}
 		case <-newUser.interruptChan:
-			logger.Debug("interrupting")
+			// Send the close event, and then remove the the user
 			newUser.eventChan <- lib.FormatEventString("close", "")
-			// Send the close event and then wait for the clean close
-			<-r.Context().Done()
 			um.RemoveUser(userToken)
 			closeChan <- struct{}{}
 		}
-
 	}()
 
 	// Continuously send data to the client

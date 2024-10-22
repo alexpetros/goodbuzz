@@ -145,8 +145,6 @@ func (room *Room) UnlockPlayer(userToken string) {
 func (room *Room) KickPlayer(userToken string) {
 	logger.Debug("Kicking player %s", userToken)
 	room.players.KickUser(userToken)
-
-	// room.sendPlayerListUpdates()
 }
 
 func (room *Room) SetPlayerName(userToken string, name string) {
@@ -256,6 +254,8 @@ func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken
 	// Wait for the channel to close, and then send everyone else the disconnect update
 	<-closeChan
 	room.sendPlayerListUpdates()
+	// Wait two seconds to give the connection time to close gracefully, if necessary
+	time.Sleep(2 * time.Second)
 }
 
 func (room *Room) AttachModerator(w http.ResponseWriter, r *http.Request, userToken string) {
