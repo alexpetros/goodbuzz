@@ -10,24 +10,12 @@ func PlayerListEvent(players []*users.Player, self *users.Player) string {
 	return lib.FormatEventComponent("players", PlayerTable(players, self))
 }
 
-func ProcessingBuzzerEvent() string {
-	return lib.FormatEventComponent("buzzer", ProcessingBuzzer())
-}
-
-func LockedOutBuzzerEvent() string {
-	return lib.FormatEventComponent("buzzer", LockedOutBuzzer())
-}
-
-func YouWonBuzzerEvent() string {
-	return lib.FormatEventComponent("buzzer", YouWonBuzzer())
-}
-
 func OtherPlayerWonBuzzerEvent(player *users.Player) string {
 	return lib.FormatEventComponent("buzzer", OtherPlayerWonBuzzer(player))
 }
 
-func ReadyBuzzerEvent(resetToken string) string {
-	return lib.FormatEventComponent("buzzer", ReadyBuzzer(resetToken))
+func LockedOutBuzzerEvent() string {
+	return lib.FormatEventComponent("buzzer", LockedOutBuzzer())
 }
 
 templ LockedOutBuzzer() {
@@ -36,10 +24,18 @@ templ LockedOutBuzzer() {
 </button>
 }
 
+func ProcessingBuzzerEvent() string {
+	return lib.FormatEventComponent("buzzer", ProcessingBuzzer())
+}
+
 templ ProcessingBuzzer() {
 <button class="buzzer waiting" disabled >
   Waiting...
 </button>
+}
+
+func YouWonBuzzerEvent() string {
+	return lib.FormatEventComponent("buzzer", YouWonBuzzer())
 }
 
 templ YouWonBuzzer() {
@@ -74,6 +70,10 @@ templ PlayerTable(players []*users.Player, self *users.Player) {
 </table>
 }
 
+func ReadyBuzzerEvent(resetToken string) string {
+	return lib.FormatEventComponent("buzzer", ReadyBuzzer(resetToken))
+}
+
 templ ReadyBuzzer(resetToken string) {
 <button
   class="buzzer"
@@ -82,4 +82,14 @@ templ ReadyBuzzer(resetToken string) {
   hx-vals={fmt.Sprintf("\"resetToken\": \"%s\"", resetToken)}
   >Buzz
 </button>
+}
+
+func OtherTabOpenEvent(userToken string) string {
+	return lib.FormatEventComponent("main", OtherTabOpen(userToken))
+}
+
+templ OtherTabOpen(userToken string) {
+  <p>
+  This browser already has a player open in aother tab.
+  </p>
 }

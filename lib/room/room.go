@@ -233,6 +233,10 @@ func (room *Room) currentModeratorBuzzer(update roomUpdate) string {
 	}
 }
 
+func (room *Room) IsPlayerAlreadyConnected(userToken string) bool {
+	return room.players.HasUser(userToken)
+}
+
 func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken string) {
 	nameCookie, err := r.Cookie("name")
 	var name string

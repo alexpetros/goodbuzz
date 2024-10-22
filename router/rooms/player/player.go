@@ -1,7 +1,9 @@
 package player
 
 import (
+	"fmt"
 	"goodbuzz/lib"
+	"goodbuzz/lib/events"
 	"goodbuzz/lib/logger"
 	"goodbuzz/router/rooms"
 	"net/http"
@@ -66,6 +68,14 @@ func Live(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	token := cookie.Value
+
+	if room.IsPlayerAlreadyConnected(token) {
+		w.Header().Add("Content-Type", "text/event-stream")
+		w.Header().Add("Cache-Control", "no-cache")
+		w.Header().Add("Connection", "keep-alive")
+		fmt.Fprint(w, events.OtherTabOpenEvent(token))
+		return
+	}
 
 	logger.Info("Player %s connected to room %d\n", token, room.Id())
 	room.AttachPlayer(w, r, token)

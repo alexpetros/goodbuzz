@@ -49,6 +49,7 @@ templ index(room *room.Room) {
 <main
   class="player"
   hx-ext="sse"
+  sse-swap="main"
   sse-connect="./player/live"
   sse-close="close"
   hx-on::sse-close="onKick()"

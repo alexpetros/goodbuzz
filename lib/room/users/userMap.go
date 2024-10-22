@@ -31,10 +31,13 @@ func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken 
 	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Connection", "keep-alive")
 
+
 	eventChan := make(chan string)
 	interruptChan := make(chan struct{})
 	closeChan := make(chan struct{})
 
+	um.Lock()
+	defer um.Unlock()
 	newUser := user[T]{data, eventChan, interruptChan}
 	um.users[userToken] = newUser
 
@@ -46,7 +49,7 @@ func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken 
 			closeChan <- struct{}{}
 		case <-newUser.interruptChan:
 			// Send the close event, and then remove the the user
-			newUser.eventChan <- lib.FormatEventString("close", "")
+			newUser.eventChan <- lib.FormatEventString("close", "kicked")
 			um.RemoveUser(userToken)
 			closeChan <- struct{}{}
 		}
@@ -131,6 +134,11 @@ func (um *UserMap[T]) KickUser(userToken string) {
 	} else {
 		logger.Info("Attempted to kick user %s who was not present", userToken)
 	}
+}
+
+func (um *UserMap[T]) HasUser(userToken string) bool {
+	_, ok := um.Get(userToken)
+	return ok
 }
 
 func (um *UserMap[T]) Get(userToken string) (T, bool) {
