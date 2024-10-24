@@ -94,6 +94,10 @@ func (room *Room) Id() int64 {
 	return room.roomId
 }
 
+func (room *Room) SetName(name string) {
+	room.name = name
+}
+
 func (room *Room) Name() string {
 	return room.name
 }

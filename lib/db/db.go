@@ -41,6 +41,7 @@ func (t *Tournament) AdminUrl() string {
 
 type Room struct {
 	RoomId      int64
+	TournamentId      int64
 	Name        string
 	Description string
 }
@@ -170,7 +171,7 @@ func GetTournaments(ctx context.Context) []Tournament {
 
 func GetRoom(ctx context.Context, room_id int64) *Room {
 	fn := func(conn *sqlite.Conn) *Room {
-		stmt := conn.Prep("SELECT room_id, name, description FROM rooms WHERE room_id = $1")
+		stmt := conn.Prep("SELECT room_id, name, description, tournament_id FROM rooms WHERE room_id = $1")
 		stmt.SetInt64("$1", room_id)
 
 		row, err := stmt.Step()
@@ -187,6 +188,7 @@ func GetRoom(ctx context.Context, room_id int64) *Room {
 			RoomId:      stmt.ColumnInt64(0),
 			Name:        stmt.ColumnText(1),
 			Description: stmt.ColumnText(2),
+			TournamentId: stmt.ColumnInt64(3),
 		}
 
 		stmt.Reset()
@@ -195,11 +197,12 @@ func GetRoom(ctx context.Context, room_id int64) *Room {
 	return run(ctx, fn)
 }
 
-func SetRoomDescription(ctx context.Context, roomId int64, description string) error {
+func SetRoomNameAndDescription(ctx context.Context, roomId int64, name string, description string) error {
 	fn := func(conn *sqlite.Conn) error {
-		stmt := conn.Prep("UPDATE rooms SET description = $1 WHERE room_id = $2")
+		stmt := conn.Prep("UPDATE rooms SET description = $1, name = $2 WHERE room_id = $3")
 		stmt.SetText("$1", description)
-		stmt.SetInt64("$2", roomId)
+		stmt.SetText("$2", name)
+		stmt.SetInt64("$3", roomId)
 
 		_, err := stmt.Step()
 		if err != nil {

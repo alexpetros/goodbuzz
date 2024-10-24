@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/lib/db"
-	"goodbuzz/lib/logger"
 	"goodbuzz/lib/room"
 	"net/http"
 )
@@ -19,19 +18,23 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		lib.BadRequest(w, r)
 		return
 	}
+	ctx := r.Context()
 
-	room, notFoundErr := GetRoom(r.Context(), roomId)
+	room, notFoundErr := GetRoom(ctx, roomId)
 	if notFoundErr != nil {
 		lib.NotFound(w, r)
 		return
 	}
 
+	name := r.PostFormValue("name")
 	description := r.PostFormValue("description")
-	logger.Info(description)
-	room.SetDescription(description)
-	db.SetRoomDescription(r.Context(), roomId, description)
 
-	route := fmt.Sprintf("/rooms/%d/moderator", roomId)
+	room.SetName(name)
+	room.SetDescription(description)
+	db.SetRoomNameAndDescription(r.Context(), roomId, name, description)
+
+	dbRoom := db.GetRoom(ctx, roomId)
+	route := fmt.Sprintf("/tournaments/%d/admin", dbRoom.TournamentId)
 	lib.HxRedirect(w, r, route)
 }
 

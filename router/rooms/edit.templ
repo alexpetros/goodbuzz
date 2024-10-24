@@ -51,7 +51,7 @@ button, label {
 <form hx-put={fmt.Sprintf("/rooms/%d", room.Id())}>
 <label>
   <div>Name</div>
-  <input type="text" value={room.Name()}>
+  <input name="name" type="text" value={room.Name()}>
 </label>
 <label>
   <div>Description</div>
