@@ -42,7 +42,7 @@ templ index(room *room.Room) {
     Reset All
   </button>
   <button class="reset partial" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", room.Id()) }>
-    Lock Winner and Reset
+    Partial Reset
   </button>
 </section>
 
