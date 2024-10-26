@@ -11,7 +11,7 @@ func LockedStatusEvent(player *users.Player) string {
   if player == nil {
     data = "<div class=\"status locked\">Locked by (disconnected player)</div>"
   } else {
-    data = fmt.Sprintf("<div class=\"status locked\">Locked by %s</div>", player.Name)
+    data = fmt.Sprintf("<div hx-on::load=\"playBuzz()\" class=\"status locked\">Locked by %s</div>", player.Name)
   }
 
   return lib.FormatEventString("status", data)

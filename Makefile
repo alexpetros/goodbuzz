@@ -39,6 +39,11 @@ install:
 	make templ
 	go install
 
+.PHONY: deploy
+deploy:
+	ssh goodbuzz 'cd goodbuzz && git pull && make install && systemctl reestart goodbuzz'
+
+
 .PHONY: live/templ
 live/templ:
 	@templ generate --watch \
