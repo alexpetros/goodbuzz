@@ -5,8 +5,7 @@ import sys
 import uuid
 import subprocess
 
-# URL = "http://localhost:8080"
-URL = "https://goodbuzz.iacompetitions.com"
+URL = "http://localhost:8080"
 NUM_PLAYERS = 13
 
 def makeModerator(room):
