@@ -12,6 +12,7 @@ main.moderator {
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: 5%;
+  height: fit-content;
 
   h2, .status-container { grid-column: 1/3; }
 
