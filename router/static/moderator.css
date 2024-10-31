@@ -16,6 +16,8 @@ main.moderator {
 
   h2, .status-container { grid-column: 1/3; }
 
+  .mute-sound { margin: 10px 0; }
+
   .status {
     display: flex;
     justify-content: center;

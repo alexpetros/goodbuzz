@@ -44,6 +44,8 @@ templ index(room *room.Room) {
   <button class="reset partial" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", room.Id()) }>
     Partial Reset
   </button>
+
+  <label class="mute-sound">Mute Sound: <input type="checkbox"></label>
 </section>
 
 <section class="players">
@@ -70,7 +72,8 @@ templ index(room *room.Room) {
 <script>
 var audio = new Audio('/static/beepbeep.mp3')
 function playBuzz() {
-  audio.play()
+  const muteSoundCheckbox = document.querySelector('.mute-sound input')
+  if (!muteSoundCheckbox.checked) audio.play()
 }
 </script>
 
