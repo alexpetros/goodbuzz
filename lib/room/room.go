@@ -256,8 +256,8 @@ func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken
 
 	// Initialize Player
 	room.sendPlayerListUpdates()
-	room.players.SendToPlayer(userToken, events.PastLogsEvent(room.logs))
-	room.players.SendToPlayer(userToken, currentPlayerBuzzer(player, room.getUpdate()))
+	room.players.SendToUser(userToken, events.PastLogsEvent(room.logs))
+	room.players.SendToUser(userToken, currentPlayerBuzzer(player, room.getUpdate()))
 
 	// Wait for the channel to close, and then send everyone else the disconnect update
 	<-closeChan
@@ -270,9 +270,9 @@ func (room *Room) AttachModerator(w http.ResponseWriter, r *http.Request, userTo
 	closeChan := room.moderators.AddUser(w, r, userToken, struct{}{})
 
 	// Initialize Moderator
-	room.moderators.SendToPlayer(userToken, events.PastLogsEvent(room.logs))
-	room.moderators.SendToPlayer(userToken, events.ModeratorPlayerControlsEvent(room.players.GetAll()))
-	room.moderators.SendToPlayer(userToken, room.currentModeratorBuzzer(room.getUpdate()))
+	room.moderators.SendToUser(userToken, events.PastLogsEvent(room.logs))
+	room.moderators.SendToUser(userToken, events.ModeratorPlayerControlsEvent(room.Id(), room.players.GetAll()))
+	room.moderators.SendToUser(userToken, room.currentModeratorBuzzer(room.getUpdate()))
 
 	// Wait for the channel to close, and then send everyone else the disconnect update
 	<-closeChan
@@ -310,5 +310,5 @@ func (room *Room) sendPlayerListUpdates() {
 		eventChan <- events.PlayerListEvent(players, player)
 	})
 
-	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(players))
+	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(room.Id(), players))
 }

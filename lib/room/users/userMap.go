@@ -76,7 +76,7 @@ func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken 
 	return closeChan
 }
 
-func (um *UserMap[T]) SendToPlayer(userToken string, message string) {
+func (um *UserMap[T]) SendToUser(userToken string, message string) {
 	um.RLock()
 	defer um.RUnlock()
 

@@ -49,6 +49,31 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	lib.NoContent(w, r)
 }
 
+func PutPlayer(w http.ResponseWriter, r *http.Request) {
+	roomId, paramErr := lib.GetIntParam(r, "id")
+	if paramErr != nil {
+		lib.BadRequest(w, r)
+		return
+	}
+
+	room, notFoundErr := rooms.GetRoom(r.Context(), roomId)
+	if notFoundErr != nil {
+		lib.NotFound(w, r)
+		return
+	}
+
+	formErr := r.ParseForm()
+	if formErr != nil {
+		lib.BadRequest(w, r)
+	}
+
+	token := r.PathValue("token")
+	name := r.PostFormValue("name")
+	room.SetPlayerName(token, name)
+
+	lib.NoContent(w, r)
+}
+
 func Live(w http.ResponseWriter, r *http.Request) {
 	roomId, err := lib.GetIntParam(r, "id")
 	if err != nil {

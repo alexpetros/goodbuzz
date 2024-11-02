@@ -27,16 +27,23 @@ func UnlockedStatusEvent() string {
   return lib.FormatEventString("status", data)
 }
 
-func ModeratorPlayerControlsEvent(players []*users.Player) string {
-	component := ModeratorPlayerControls(players)
+func ModeratorPlayerControlsEvent(roomId int64, players []*users.Player) string {
+	component := ModeratorPlayerControls(roomId, players)
 	return lib.FormatEventComponent("controls", component)
 }
 
-templ ModeratorPlayerControls(players []*users.Player) {
+templ ModeratorPlayerControls(roomId int64, players []*users.Player) {
   <table>
     for _, player := range players {
     <tr>
-      <td>{player.Name}</td>
+      <td>
+        <editable-field
+          hx-include="this"
+          name="name"
+          value={player.Name}
+          savefunc={fmt.Sprintf("htmx.ajax('PUT', '/rooms/%d/player/%s', { source: this })", roomId, player.Token)}
+          ></editable-field>
+      </td>
       <td>
       if player.IsLocked {
         <button hx-delete={fmt.Sprintf("./locks/%s", player.Token)}>
