@@ -136,6 +136,16 @@ func (um *UserMap[T]) KickUser(userToken string) {
 	}
 }
 
+func (um *UserMap[T]) KickAll() {
+	um.RLock()
+	defer um.RUnlock()
+
+	for _, user := range um.users {
+		user.interruptChan <- struct{}{}
+	}
+}
+
+
 func (um *UserMap[T]) HasUser(userToken string) bool {
 	_, ok := um.Get(userToken)
 	return ok

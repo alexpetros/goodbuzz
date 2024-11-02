@@ -269,6 +269,7 @@ func (room *Room) AttachModerator(w http.ResponseWriter, r *http.Request, userTo
 	// Wait for the channel to close, and then send everyone else the disconnect update
 	<-closeChan
 	room.sendPlayerListUpdates()
+	time.Sleep(2 * time.Second)
 }
 
 /**

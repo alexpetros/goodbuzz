@@ -33,7 +33,13 @@ templ index(room *room.Room) {
 <h1>{room.Name()}</h1>
 
 <p class="description">{room.Description()}</p>
-<main class="moderator" hx-ext="sse" sse-connect="./moderator/live">
+<main
+  class="moderator"
+  hx-ext="sse"
+  sse-connect="./moderator/live"
+  sse-close="close"
+  hx-on::sse-close="onKick()"
+>
 
 <section class="controls">
   <h2>Buzzer Controls</h2>
@@ -75,6 +81,14 @@ var audio = new Audio('/static/beepbeep.mp3')
 function playBuzz() {
   const muteSoundCheckbox = document.querySelector('.mute-sound input')
   if (!muteSoundCheckbox.checked) audio.play()
+}
+
+function onKick() {
+  const main = document.querySelector('main')
+    main.innerHTML = `
+      <p>You have been kicked from this room.</p>
+      <p><a href="/">Click here to return home</a></p>
+    `
 }
 </script>
 
