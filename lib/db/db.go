@@ -263,3 +263,46 @@ func DeleteTournament(ctx context.Context, tournament_id int64) error {
 
 	return run(ctx, fn)
 }
+
+func GetName(ctx context.Context, userToken string) string {
+	fn := func(conn *sqlite.Conn) string {
+		stmt := conn.Prep("SELECT name FROM known_users WHERE token = $1")
+		stmt.SetText("$1", userToken)
+
+		row, err := stmt.Step()
+		if err != nil {
+			logger.Error("Error getting user: %s", err)
+			return ""
+		}
+
+		if !row {
+			return ""
+		}
+
+		res := stmt.ColumnText(0)
+
+		stmt.Reset()
+		return res
+	}
+
+	return run(ctx, fn)
+}
+
+
+func SetUserName(ctx context.Context, userToken string, name string) error {
+	fn := func(conn *sqlite.Conn) error {
+		stmt := conn.Prep("UPDATE known_users SET name = $1")
+		stmt.SetText("$1", name)
+
+		_, err := stmt.Step()
+		if err != nil {
+			logger.Error("Failed to set name: %s", err)
+			return err
+		}
+
+		stmt.Reset()
+		return nil
+	}
+
+	return run(ctx, fn)
+}

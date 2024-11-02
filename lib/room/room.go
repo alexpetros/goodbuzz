@@ -241,15 +241,7 @@ func (room *Room) IsPlayerAlreadyConnected(userToken string) bool {
 	return room.players.HasUser(userToken)
 }
 
-func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken string) {
-	nameCookie, err := r.Cookie("name")
-	var name string
-	if err != nil {
-		name = "New Player"
-	} else {
-		name = nameCookie.Value
-	}
-
+func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken string, name string) {
 	isLocked := room.locksCache.IsLocked(userToken)
 	player := users.NewPlayer(name, userToken, isLocked)
 	closeChan := room.players.AddUser(w, r, userToken, player)
