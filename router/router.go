@@ -30,6 +30,7 @@ func SetupRouter(mux *http.ServeMux) {
 	mux.HandleFunc("DELETE /tournaments/{id}", tournaments.Delete)
 
 	mux.HandleFunc("PUT /rooms/{id}", rooms.Put)
+	mux.HandleFunc("DELETE /rooms/{id}", rooms.Delete)
 	mux.HandleFunc("GET /rooms/{id}/edit", rooms.Get)
 
 	mux.HandleFunc("GET /rooms/{id}/player", player.Get)

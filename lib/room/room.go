@@ -139,6 +139,13 @@ func (room *Room) KickPlayer(userToken string) {
 	room.players.KickUser(userToken)
 }
 
+func (room *Room) KickAll() {
+	logger.Debug("Kicking everyone out room %s (id: %d)", room.Name, room.Id)
+	room.players.KickAll()
+	room.moderators.KickAll()
+}
+
+
 func (room *Room) SetPlayerName(userToken string, name string) {
 	logger.Debug("Setting %s name to %s", userToken, name)
 

@@ -217,6 +217,24 @@ func SetRoomNameAndDescription(ctx context.Context, roomId int64, name string, d
 	return run(ctx, fn)
 }
 
+func DeleteRoom(ctx context.Context, roomId int64) error {
+	fn := func(conn *sqlite.Conn) error {
+		stmt := conn.Prep("DELETE FROM rooms WHERE room_id = $1")
+		stmt.SetInt64("$1", roomId)
+
+		_, err := stmt.Step()
+		if err != nil {
+			logger.Error("Failed to delete room %d: %s", roomId, err)
+			return err
+		}
+
+		stmt.Reset()
+		return nil
+	}
+
+	return run(ctx, fn)
+}
+
 func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
 	fn := func(conn *sqlite.Conn) []Room {
 		stmt := conn.Prep("SELECT room_id, name, description FROM rooms WHERE tournament_id = $1")

@@ -31,10 +31,34 @@ func Put(w http.ResponseWriter, r *http.Request) {
 
 	room.SetName(name)
 	room.SetDescription(description)
-	db.SetRoomNameAndDescription(r.Context(), roomId, name, description)
+	db.SetRoomNameAndDescription(ctx, roomId, name, description)
 
 	dbRoom := db.GetRoom(ctx, roomId)
 	route := fmt.Sprintf("/tournaments/%d/admin", dbRoom.TournamentId)
+	lib.HxRedirect(w, r, route)
+}
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	roomId, paramErr := lib.GetIntParam(r, "id")
+	if paramErr != nil {
+		lib.BadRequest(w, r)
+		return
+	}
+	ctx := r.Context()
+
+	room, notFoundErr := GetRoom(ctx, roomId)
+	if notFoundErr != nil {
+		lib.NotFound(w, r)
+		return
+	}
+
+	dbRoom := db.GetRoom(ctx, roomId)
+	route := fmt.Sprintf("/tournaments/%d/admin", dbRoom.TournamentId)
+
+	db.DeleteRoom(ctx, roomId)
+	openRooms.DeleteRoom(roomId)
+
+	room.KickAll()
 	lib.HxRedirect(w, r, route)
 }
 

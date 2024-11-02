@@ -17,6 +17,8 @@ func NewRoomMap() RoomMap {
 
 func (roomMap *RoomMap) GetOrCreateRoom(roomId int64, name string, description string) *Room {
 	roomMap.Lock()
+	defer roomMap.Unlock()
+
 	room := roomMap.internal[roomId]
 	if room == nil {
 		room = roomMap.newRoom(roomId, name, description)
@@ -24,7 +26,12 @@ func (roomMap *RoomMap) GetOrCreateRoom(roomId int64, name string, description s
 	} else if room.Name != name {
 		room.Name = name
 	}
-	roomMap.Unlock()
 
 	return room
+}
+
+func (roomMap *RoomMap) DeleteRoom(roomId int64) {
+	roomMap.Lock()
+	defer roomMap.Unlock()
+	delete(roomMap.internal, roomId)
 }

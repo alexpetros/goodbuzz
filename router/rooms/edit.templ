@@ -58,8 +58,15 @@ button, label {
   <textarea name="description">{room.Description}</textarea>
 </label>
 
-<button>Save</button>
+<button class="action edit">Save</button>
 </form>
+
+<h2>Delete Room</h2>
+<button
+  class="action delete"
+  hx-confirm={fmt.Sprintf("Are you sure you want to delete %s?", room.Name)}
+  hx-delete={fmt.Sprintf("/rooms/%d", room.Id)}
+  >Delete</button>
 
 </main>
 
