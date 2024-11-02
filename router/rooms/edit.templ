@@ -21,8 +21,8 @@ func Get(w http.ResponseWriter, r *http.Request) {
       return
     }
 
-    title := fmt.Sprintf("%s - Edit", room.Name())
-    tournament := db.GetTournamentForRoom(r.Context(), room.Id())
+    title := fmt.Sprintf("%s - Edit", room.Name)
+    tournament := db.GetTournamentForRoom(r.Context(), room.Id)
     content := index(room, tournament)
     lib.Render(w, r, title, content)
 }
@@ -44,18 +44,18 @@ button, label {
 
 <p><a href={templ.SafeURL(tournament.Url())}>{tournament.Name()}</a></p>
 
-<h1>{room.Name()}</h1>
+<h1>{room.Name}</h1>
 
 <main>
 
-<form hx-put={fmt.Sprintf("/rooms/%d", room.Id())}>
+<form hx-put={fmt.Sprintf("/rooms/%d", room.Id)}>
 <label>
   <div>Name</div>
-  <input name="name" type="text" value={room.Name()}>
+  <input name="name" type="text" value={room.Name}>
 </label>
 <label>
   <div>Description</div>
-  <textarea name="description">{room.Description()}</textarea>
+  <textarea name="description">{room.Description}</textarea>
 </label>
 
 <button>Save</button>

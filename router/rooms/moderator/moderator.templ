@@ -21,7 +21,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
       return
     }
 
-    title := fmt.Sprintf("%s - Moderator", room.Name())
+    title := fmt.Sprintf("%s - Moderator", room.Name)
     content := index(room)
     lib.Render(w, r, title, content)
 }
@@ -30,9 +30,9 @@ templ index(room *room.Room) {
 <link rel="stylesheet" href="/static/moderator.css">
 <script defer src="/static/webcomponents/editable-field.js"></script>
 
-<h1>{room.Name()}</h1>
+<h1>{room.Name}</h1>
 
-<p class="description">{room.Description()}</p>
+<p class="description">{room.Description}</p>
 <main
   class="moderator"
   hx-ext="sse"
@@ -45,10 +45,10 @@ templ index(room *room.Room) {
   <h2>Buzzer Controls</h2>
 
   <div class="status-container" sse-swap="status" hx-swap="innerHTML"></div>
-  <button class="reset full" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=all", room.Id()) }>
+  <button class="reset full" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=all", room.Id) }>
     Reset All
   </button>
-  <button class="reset partial" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", room.Id()) }>
+  <button class="reset partial" hx-delete={ fmt.Sprintf("/rooms/%d/buzz?mode=partial", room.Id) }>
     Partial Reset
   </button>
 

@@ -14,9 +14,9 @@ import (
 )
 
 type Room struct {
-	roomId      int64
-	name        string
-	description string
+	Id      int64
+	Name        string
+	Description string
 	logs        []events.Log
 	locksCache  *LocksCache
 	buzzer      *buzzer.Buzzer
@@ -33,9 +33,9 @@ type roomUpdate struct {
 
 func (roomMap *RoomMap) newRoom(roomId int64, name string, description string) *Room {
 	room := Room{
-		roomId:      roomId,
-		name:        name,
-		description: description,
+		Id:      roomId,
+		Name:        name,
+		Description: description,
 		logs:        make([]events.Log, 0),
 		locksCache:  NewLocksCache(),
 		players:     users.NewUserMap[*users.Player](),
@@ -90,40 +90,28 @@ func (room *Room) sendBuzzerUpdates(buzzerUpdate buzzer.BuzzerUpdate) {
 	}
 }
 
-func (room *Room) Id() int64 {
-	return room.roomId
-}
-
 func (room *Room) SetName(name string) {
-	room.name = name
-}
-
-func (room *Room) Name() string {
-	return room.name
-}
-
-func (room *Room) Description() string {
-	return room.description
+	room.Name = name
 }
 
 func (room *Room) SetDescription(description string) {
-	room.description = description
+	room.Description = description
 }
 
 func (room *Room) Url() string {
-	return fmt.Sprintf("/rooms/%d", room.roomId)
+	return fmt.Sprintf("/rooms/%d", room.Id)
 }
 
 func (room *Room) EditUrl() string {
-	return fmt.Sprintf("/rooms/%d/edit", room.roomId)
+	return fmt.Sprintf("/rooms/%d/edit", room.Id)
 }
 
 func (room *Room) PlayerUrl() string {
-	return fmt.Sprintf("/rooms/%d/player", room.roomId)
+	return fmt.Sprintf("/rooms/%d/player", room.Id)
 }
 
 func (room *Room) ModeratorUrl() string {
-	return fmt.Sprintf("/rooms/%d/moderator", room.roomId)
+	return fmt.Sprintf("/rooms/%d/moderator", room.Id)
 }
 
 func (room *Room) Status() buzzer.BuzzerStatus {
@@ -169,7 +157,7 @@ func (room *Room) BuzzRoom(userToken string, resetToken string) {
 		logger.Info("unknown player %s buzzed", userToken)
 		return
 	}
-	logMessage := fmt.Sprintf("Player %v buzzed room %v", player.Name, room.Id())
+	logMessage := fmt.Sprintf("Player %v buzzed room %v", player.Name, room.Id)
 	logger.Debug(logMessage)
 	room.log(logMessage)
 }
@@ -192,9 +180,9 @@ func (room *Room) ResetSome() {
 	update := room.getUpdate()
 
 	if update.buzzerStatus == buzzer.Unlocked {
-		logger.Info("room %s was reset with no active buzzes", room.name)
+		logger.Info("room %s was reset with no active buzzes", room.Name)
 	} else if update.buzzerStatus == buzzer.Processing {
-		logger.Info("room %s was reset during processing", room.name)
+		logger.Info("room %s was reset during processing", room.Name)
 	} else if update.buzzerStatus == buzzer.Won {
 		logger.Info("Locking player with userToken %s", update.winner.Token)
 		room.locksCache.LockPlayer(update.winner.Token)
@@ -263,7 +251,7 @@ func (room *Room) AttachModerator(w http.ResponseWriter, r *http.Request, userTo
 
 	// Initialize Moderator
 	room.moderators.SendToUser(userToken, events.PastLogsEvent(room.logs))
-	room.moderators.SendToUser(userToken, events.ModeratorPlayerControlsEvent(room.Id(), room.players.GetAll()))
+	room.moderators.SendToUser(userToken, events.ModeratorPlayerControlsEvent(room.Id, room.players.GetAll()))
 	room.moderators.SendToUser(userToken, room.currentModeratorBuzzer(room.getUpdate()))
 
 	// Wait for the channel to close, and then send everyone else the disconnect update
@@ -303,5 +291,5 @@ func (room *Room) sendPlayerListUpdates() {
 		eventChan <- events.PlayerListEvent(players, player)
 	})
 
-	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(room.Id(), players))
+	room.moderators.SendToAll(events.ModeratorPlayerControlsEvent(room.Id, players))
 }

@@ -31,7 +31,7 @@ templ moderator(tournament *db.Tournament, rooms []room.Room) {
 <table class="rooms">
   for _, room := range rooms {
     <tr>
-        <td>{ room.Name() }</td>
+        <td>{ room.Name }</td>
         <td><a href={templ.URL(room.PlayerUrl())}>Join as Player</a></td>
         <td><a href={templ.URL(room.ModeratorUrl())}>Join as Moderator</a></td>
     </tr>

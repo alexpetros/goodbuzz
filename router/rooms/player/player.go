@@ -118,10 +118,10 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-	logger.Info("Player %s connected to room %d\n", userToken, room.Id())
+	logger.Info("Player %s connected to room %d\n", userToken, room.Id)
 	room.AttachPlayer(w, r, userToken, name)
 
-	logger.Info("Player %s disconnected from room %d", userToken, room.Id())
+	logger.Info("Player %s disconnected from room %d", userToken, room.Id)
 }
 
 func makeNameCookie(name string) *http.Cookie {

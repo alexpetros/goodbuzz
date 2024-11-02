@@ -25,9 +25,9 @@ func Live(w http.ResponseWriter, r *http.Request) {
 	token := uuid.NewString()
 
 	// Listen for client close and remove the client from the list
-	logger.Info("Moderator %s connected to room %d", token, room.Id())
+	logger.Info("Moderator %s connected to room %d", token, room.Id)
 	room.AttachModerator(w, r, token)
 
 	// Wait for cleanup to happen and then close the connection
-	logger.Info("Moderator disconnected from room %d", room.Id())
+	logger.Info("Moderator disconnected from room %d", room.Id)
 }

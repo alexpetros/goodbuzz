@@ -37,14 +37,14 @@ func Get(w http.ResponseWriter, r *http.Request) {
     }
 
     content := index(room)
-    lib.Render(w, r, room.Name(), content)
+    lib.Render(w, r, room.Name, content)
 }
 
 templ index(room *room.Room) {
 <link rel="stylesheet" href="/static/player.css">
-<h1>{room.Name()}</h1>
+<h1>{room.Name}</h1>
 
-<p class="description">{room.Description()}</p>
+<p class="description">{room.Description}</p>
 
 <main
   class="player"
