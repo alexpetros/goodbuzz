@@ -5,24 +5,14 @@ import "net/http"
 import "goodbuzz/lib"
 import "goodbuzz/lib/room"
 import "fmt"
-import "github.com/google/uuid"
-
 
 func Get(w http.ResponseWriter, r *http.Request) {
     room := r.Context().Value("room").(*room.Room)
 
-    // The cookie is checked and assigned at
     _, noCookie := r.Cookie("userToken")
     if noCookie != nil {
-      cookie := http.Cookie {
-        Name:     "userToken",
-        Value:    uuid.NewString(),
-        Path:     "/",
-        HttpOnly: true,
-        Secure:   true,
-        SameSite: http.SameSiteLaxMode,
-      }
-      http.SetCookie(w, &cookie)
+      cookie := lib.NewUserToken()
+      http.SetCookie(w, cookie)
     }
 
     content := index(room)

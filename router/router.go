@@ -21,10 +21,10 @@ import (
 var content embed.FS
 
 func SetupRouter(mux *http.ServeMux) {
-
-	mux.Handle("/static/", http.FileServer(http.FS(content)))
-	mux.HandleFunc("GET /{$}", index.Get)
-	mux.HandleFunc("GET /login", login.Login)
+	mux.Handle(			"/static/", http.FileServer(http.FS(content)))
+	mux.HandleFunc( "GET /{$}", index.Get)
+	mux.HandleFunc(	"GET /login", login.Get)
+	mux.HandleFunc(	"POST /login", login.Post)
 
 	mux.Handle(			"GET /tournaments/{id}", 						tournaments.Middleware(tournaments.Get))
 	mux.Handle(			"GET /tournaments/{id}/moderator", 	tournaments.Middleware(tournaments.Moderator))

@@ -325,3 +325,23 @@ func SetUserName(ctx context.Context, userToken string, name string) error {
 
 	return run(ctx, fn)
 }
+
+func LoginMod(ctx context.Context, userToken string) error {
+	fn := func(conn *sqlite.Conn) error {
+		stmt := conn.Prep("INSERT OR REPLACE INTO mod_sessions (user_token) VALUES ($1)")
+
+		stmt.SetText("$1", userToken)
+
+		_, err := stmt.Step()
+		if err != nil {
+			logger.Error("Failed to set name: %s", err)
+			return err
+		}
+
+		stmt.Reset()
+		return nil
+	}
+
+	return run(ctx, fn)
+}
+

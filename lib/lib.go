@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/a-h/templ"
 	"io"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/a-h/templ"
+	"github.com/google/uuid"
 )
 
 func Render(w http.ResponseWriter, r *http.Request, title string, component templ.Component) {
@@ -66,4 +68,15 @@ func CombineEvents(events ...string) string {
 	}
 
 	return sb.String()
+}
+
+func NewUserToken() *http.Cookie {
+	return &http.Cookie {
+		Name:     "userToken",
+		Value:    uuid.NewString(),
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	}
 }

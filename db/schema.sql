@@ -11,13 +11,13 @@ CREATE TABLE rooms (
   tournament_id INTEGER REFERENCES tournaments ON UPDATE CASCADE ON DELETE CASCADE
 ) STRICT;
 
-CREATE TABLE admins (
-  admin_token TEXT PRIMARY KEY,
+CREATE TABLE admin_sessions (
+  user_token TEXT PRIMARY KEY,
   timestamp INTEGER DEFAULT CURRENT_TIMESTAMP
 ) STRICT;
 
-CREATE TABLE moderators (
-  moderator_token TEXT PRIMARY KEY,
+CREATE TABLE mod_sessions (
+  user_token TEXT PRIMARY KEY,
   timestamp INTEGER DEFAULT CURRENT_TIMESTAMP
 ) STRICT;
 
