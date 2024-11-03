@@ -2,33 +2,62 @@ package tournaments
 
 import (
   "net/http"
-  "fmt"
   "goodbuzz/lib"
   "goodbuzz/lib/db"
+  "goodbuzz/lib/room"
+  "goodbuzz/router/rooms"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
     tournament := r.Context().Value("tournament").(*db.Tournament)
-    rooms := db.GetRoomsForTournament(r.Context(), tournament.Id())
-    content := get(tournament, rooms)
+    isMod := r.Context().Value("isMod").(bool)
+
+    var content templ.Component
+
+    rooms := rooms.GetRoomsForTournament(r.Context(), tournament.Id())
+    content = get(tournament, rooms, isMod)
     lib.Render(w, r, tournament.Name(), content)
 }
 
-templ get(tournament *db.Tournament, rooms []db.Room) {
+templ get(tournament *db.Tournament, rooms []room.Room, isMod bool) {
 <h1>{tournament.Name()}</h1>
 
 <h2>Rooms</h2>
 <table class="rooms-player">
   <tr>
     <th>Name</th>
-    <th>Description</th>
+    <th></th>
+    if isMod {
+    <th></th>
+    }
+<th>Description</th>
   </tr>
   for _, room := range rooms {
     <tr>
-        <td><a href={templ.URL(fmt.Sprintf("/rooms/%d/player", room.RoomId))}>{room.Name}</a></td>
+        <td>{room.Name}</td>
+        <td><a href={templ.URL(room.PlayerUrl())}>Join as Player</a></td>
+        if isMod {
+        <td><a href={templ.URL(room.ModeratorUrl())}>Join as Moderator</a></td>
+        }
         <td>{ room.Description }</td>
     </tr>
   }
 </table>
 }
 
+templ admin(tournament *db.Tournament, rooms []room.Room) {
+<h1>{tournament.Name()}</h1>
+
+<h2>Rooms</h2>
+<table class="rooms">
+  for _, room := range rooms {
+    <tr>
+        <td>{ room.Name }</td>
+        <td><a href={templ.URL(room.PlayerUrl())}>Join as Player</a></td>
+        <td><a href={templ.URL(room.ModeratorUrl())}>Join as Moderator</a></td>
+        <td><a class="button action edit" href={templ.SafeURL(room.EditUrl())}>Edit</a></td>
+    </tr>
+  }
+</table>
+
+}
