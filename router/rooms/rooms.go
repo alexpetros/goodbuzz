@@ -12,68 +12,58 @@ import (
 
 var openRooms = room.NewRoomMap()
 
+func Middleware(next func (http.ResponseWriter, *http.Request)) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		roomId, paramErr := lib.GetIntParam(r, "id")
+		if paramErr != nil {
+			lib.BadRequest(w, r)
+			return
+		}
+
+		room, notFoundErr := GetRoom(r.Context(), roomId)
+		if notFoundErr != nil {
+			lib.NotFound(w, r)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "room", room)
+		r = r.WithContext(ctx)
+		next(w, r)
+	})
+}
+
+
 func Put(w http.ResponseWriter, r *http.Request) {
-	roomId, paramErr := lib.GetIntParam(r, "id")
-	if paramErr != nil {
-		lib.BadRequest(w, r)
-		return
-	}
 	ctx := r.Context()
-
-	room, notFoundErr := GetRoom(ctx, roomId)
-	if notFoundErr != nil {
-		lib.NotFound(w, r)
-		return
-	}
-
+	room := ctx.Value("room").(*room.Room)
 	name := r.PostFormValue("name")
 	description := r.PostFormValue("description")
 
 	room.SetName(name)
 	room.SetDescription(description)
-	db.SetRoomNameAndDescription(ctx, roomId, name, description)
+	db.SetRoomNameAndDescription(ctx, room.Id, name, description)
 
-	dbRoom := db.GetRoom(ctx, roomId)
+	dbRoom := db.GetRoom(ctx, room.Id)
 	route := fmt.Sprintf("/tournaments/%d/admin", dbRoom.TournamentId)
 	lib.HxRedirect(w, r, route)
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
-	roomId, paramErr := lib.GetIntParam(r, "id")
-	if paramErr != nil {
-		lib.BadRequest(w, r)
-		return
-	}
 	ctx := r.Context()
-
-	room, notFoundErr := GetRoom(ctx, roomId)
-	if notFoundErr != nil {
-		lib.NotFound(w, r)
-		return
-	}
-
-	dbRoom := db.GetRoom(ctx, roomId)
+	room := ctx.Value("room").(*room.Room)
+	dbRoom := db.GetRoom(ctx, room.Id)
 	route := fmt.Sprintf("/tournaments/%d/admin", dbRoom.TournamentId)
 
-	db.DeleteRoom(ctx, roomId)
-	openRooms.DeleteRoom(roomId)
+	db.DeleteRoom(ctx, room.Id)
+	openRooms.DeleteRoom(room.Id)
 
 	room.KickAll()
 	lib.HxRedirect(w, r, route)
 }
 
 func KickPlayer(w http.ResponseWriter, r *http.Request) {
-	roomId, err := lib.GetIntParam(r, "id")
-	if err != nil {
-		lib.BadRequest(w, r)
-		return
-	}
-
-	room, notFoundErr := GetRoom(r.Context(), roomId)
-	if notFoundErr != nil {
-		http.NotFound(w, r)
-		return
-	}
+	ctx := r.Context()
+	room := ctx.Value("room").(*room.Room)
 
 	userToken := r.PathValue("userToken")
 	if userToken == "" {

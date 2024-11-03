@@ -4,23 +4,12 @@ import "net/http"
 
 import "goodbuzz/lib"
 import "goodbuzz/lib/room"
-import "goodbuzz/router/rooms"
 import "fmt"
 import "github.com/google/uuid"
 
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    room_id, err := lib.GetIntParam(r, "id")
-    if err != nil {
-      lib.BadRequest(w, r)
-      return
-    }
-
-    room, notFoundErr := rooms.GetRoom(r.Context(), room_id)
-    if notFoundErr != nil {
-      http.NotFound(w, r)
-      return
-    }
+    room := r.Context().Value("room").(*room.Room)
 
     // The cookie is checked and assigned at
     _, noCookie := r.Cookie("userToken")

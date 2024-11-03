@@ -11,24 +11,23 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 templ index(tournaments []db.Tournament) {
-<h1>Welcome!</h1>
-
-<p>
-Welcome to Goodbuzz, the online buzzer system for quiz bowl.
-</p>
+<style>
+main { max-width: 500px; margin: 60px auto; }
+</style>
 
 <main class="index">
   <h2>Ongoing Tournaments</h2>
   <table class="tournaments">
-    <tr>
-      <th>Name</th>
-    </tr>
     for _, tournament := range tournaments {
     <tr>
       <td><a href={ templ.URL(tournament.Url()) }>{ tournament.Name() }</a></td>
     </tr>
     }
   </table>
+
+  <h2>Moderators</h2>
+  <p>Moderators and admins, <a href="/login">login here</a>.</p>
+
 </main>
 }
 

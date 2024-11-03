@@ -22,31 +22,32 @@ var content embed.FS
 func SetupRouter(mux *http.ServeMux) {
 
 	mux.Handle("/static/", http.FileServer(http.FS(content)))
-
 	mux.HandleFunc("GET /{$}", index.Get)
-	mux.HandleFunc("GET /tournaments/{id}", tournaments.Get)
-	mux.HandleFunc("GET /tournaments/{id}/moderator", tournaments.Moderator)
-	mux.HandleFunc("GET /tournaments/{id}/admin", tournaments.Admin)
-	mux.HandleFunc("DELETE /tournaments/{id}", tournaments.Delete)
 
-	mux.HandleFunc("PUT /rooms/{id}", rooms.Put)
-	mux.HandleFunc("DELETE /rooms/{id}", rooms.Delete)
-	mux.HandleFunc("GET /rooms/{id}/edit", rooms.Get)
+	mux.Handle(			"GET /tournaments/{id}", 						tournaments.Middleware(tournaments.Get))
+	mux.Handle(			"GET /tournaments/{id}/moderator", 	tournaments.Middleware(tournaments.Moderator))
+	mux.Handle(			"GET /tournaments/{id}/admin", 			tournaments.Middleware(tournaments.Admin))
+	mux.Handle(			"DELETE /tournaments/{id}", 				tournaments.Middleware(tournaments.Delete))
 
-	mux.HandleFunc("GET /rooms/{id}/player", player.Get)
-	mux.HandleFunc("GET /rooms/{id}/player/live", player.Live)
-	mux.HandleFunc("PUT /rooms/{id}/player", player.Put)
-	mux.HandleFunc("PUT /rooms/{id}/player/{token}", player.Put)
+	mux.Handle(			"PUT /rooms/{id}", 									rooms.Middleware(rooms.Put))
+	mux.Handle(			"DELETE /rooms/{id}", 							rooms.Middleware(rooms.Delete))
+	mux.Handle(			"GET /rooms/{id}/edit", 						rooms.Middleware(rooms.Get))
 
-	mux.HandleFunc("GET /rooms/{id}/moderator", moderator.Get)
-	mux.HandleFunc("GET /rooms/{id}/moderator/live", moderator.Live)
+	mux.Handle(			"GET /rooms/{id}/player", 					rooms.Middleware(player.Get))
+	mux.Handle(			"GET /rooms/{id}/player/live", 			rooms.Middleware(player.Live))
+	mux.Handle(			"PUT /rooms/{id}/player", 					rooms.Middleware(player.Put))
+	mux.Handle(			"PUT /rooms/{id}/player/{token}", 	rooms.Middleware(player.PutPlayer))
 
-	mux.HandleFunc("PUT /rooms/{id}/buzz", buzz.Put)
-	mux.HandleFunc("DELETE /rooms/{id}/buzz", buzz.Delete)
-	mux.HandleFunc("DELETE /rooms/{id}/players/{userToken}", rooms.KickPlayer)
-	mux.HandleFunc("DELETE /rooms/{id}/locks/{userToken}", locks.Delete)
+	mux.Handle(			"GET /rooms/{id}/moderator", 				rooms.Middleware(moderator.Get))
+	mux.Handle(			"GET /rooms/{id}/moderator/live", 	rooms.Middleware(moderator.Live))
 
-	mux.HandleFunc("GET /admin", admin.Get)
+	mux.HandleFunc(	"PUT /rooms/{id}/buzz", 					buzz.Put)
 
-	mux.HandleFunc("GET /healthcheck", healthcheck.Get)
+	mux.HandleFunc(	"DELETE /rooms/{id}/buzz", 				buzz.Delete)
+	mux.HandleFunc(	"DELETE /rooms/{id}/players/{userToken}", rooms.KickPlayer)
+	mux.HandleFunc(	"DELETE /rooms/{id}/locks/{userToken}", locks.Delete)
+
+	mux.HandleFunc(	"GET /admin", admin.Get)
+
+	mux.HandleFunc(	"GET /healthcheck", healthcheck.Get)
 }

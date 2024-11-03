@@ -6,22 +6,12 @@ import (
 	"goodbuzz/lib/db"
 	"goodbuzz/lib/events"
 	"goodbuzz/lib/logger"
-	"goodbuzz/router/rooms"
+	"goodbuzz/lib/room"
 	"net/http"
 )
 
 func Put(w http.ResponseWriter, r *http.Request) {
-	roomId, paramErr := lib.GetIntParam(r, "id")
-	if paramErr != nil {
-		lib.BadRequest(w, r)
-		return
-	}
-
-	room, notFoundErr := rooms.GetRoom(r.Context(), roomId)
-	if notFoundErr != nil {
-		lib.NotFound(w, r)
-		return
-	}
+	room := r.Context().Value("room").(*room.Room)
 
 	formErr := r.ParseForm()
 	if formErr != nil {
@@ -45,17 +35,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 }
 
 func PutPlayer(w http.ResponseWriter, r *http.Request) {
-	roomId, paramErr := lib.GetIntParam(r, "id")
-	if paramErr != nil {
-		lib.BadRequest(w, r)
-		return
-	}
-
-	room, notFoundErr := rooms.GetRoom(r.Context(), roomId)
-	if notFoundErr != nil {
-		lib.NotFound(w, r)
-		return
-	}
+	room := r.Context().Value("room").(*room.Room)
 
 	formErr := r.ParseForm()
 	if formErr != nil {
@@ -72,17 +52,7 @@ func PutPlayer(w http.ResponseWriter, r *http.Request) {
 }
 
 func Live(w http.ResponseWriter, r *http.Request) {
-	roomId, err := lib.GetIntParam(r, "id")
-	if err != nil {
-		lib.BadRequest(w, r)
-		return
-	}
-
-	room, notFoundErr := rooms.GetRoom(r.Context(), roomId)
-	if notFoundErr != nil {
-		http.NotFound(w, r)
-		return
-	}
+	room := r.Context().Value("room").(*room.Room)
 
 	cookie, noToken := r.Cookie("userToken")
 	if noToken != nil {

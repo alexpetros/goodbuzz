@@ -8,17 +8,8 @@ import (
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    param, error := lib.GetIntParam(r, "id")
-    context := r.Context()
-    tournament_id := int64(param)
-
-    if error != nil {
-      http.NotFound(w, r)
-      return
-    }
-
-    tournament := db.GetTournament(r.Context(), tournament_id)
-    rooms := db.GetRoomsForTournament(context, tournament_id)
+    tournament := r.Context().Value("tournament").(*db.Tournament)
+    rooms := db.GetRoomsForTournament(r.Context(), tournament.Id())
     content := get(tournament, rooms)
     lib.Render(w, r, tournament.Name(), content)
 }

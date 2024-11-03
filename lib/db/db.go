@@ -284,7 +284,7 @@ func DeleteTournament(ctx context.Context, tournament_id int64) error {
 
 func GetName(ctx context.Context, userToken string) string {
 	fn := func(conn *sqlite.Conn) string {
-		stmt := conn.Prep("SELECT name FROM known_users WHERE token = $1")
+		stmt := conn.Prep("SELECT name FROM game_users WHERE user_token = $1")
 		stmt.SetText("$1", userToken)
 
 		row, err := stmt.Step()
@@ -309,8 +309,9 @@ func GetName(ctx context.Context, userToken string) string {
 
 func SetUserName(ctx context.Context, userToken string, name string) error {
 	fn := func(conn *sqlite.Conn) error {
-		stmt := conn.Prep("UPDATE known_users SET name = $1")
+		stmt := conn.Prep("UPDATE game_users SET name = $1 WHERE user_token =$2")
 		stmt.SetText("$1", name)
+		stmt.SetText("$2", userToken)
 
 		_, err := stmt.Step()
 		if err != nil {
