@@ -16,6 +16,9 @@ body {
   scrollbar-gutter: stable;
 }
 
+
+main.index, main.login { max-width: 500px; margin: 30px auto; }
+
 .logo {
   font-size: 30px;
   font-family: "Arial Black", "Arial";

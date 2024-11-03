@@ -11,10 +11,6 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 templ index(tournaments []db.Tournament) {
-<style>
-main { max-width: 500px; margin: 60px auto; }
-</style>
-
 <main class="index">
   <h2>Ongoing Tournaments</h2>
   <table class="tournaments">

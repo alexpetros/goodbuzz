@@ -5,6 +5,7 @@ import (
 	"goodbuzz/router/admin"
 	"goodbuzz/router/healthcheck"
 	"goodbuzz/router/index"
+	"goodbuzz/router/login"
 	"goodbuzz/router/rooms"
 	"goodbuzz/router/rooms/buzz"
 	"goodbuzz/router/rooms/locks"
@@ -23,6 +24,7 @@ func SetupRouter(mux *http.ServeMux) {
 
 	mux.Handle("/static/", http.FileServer(http.FS(content)))
 	mux.HandleFunc("GET /{$}", index.Get)
+	mux.HandleFunc("GET /login", login.Login)
 
 	mux.Handle(			"GET /tournaments/{id}", 						tournaments.Middleware(tournaments.Get))
 	mux.Handle(			"GET /tournaments/{id}/moderator", 	tournaments.Middleware(tournaments.Moderator))

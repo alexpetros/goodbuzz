@@ -1,0 +1,28 @@
+package login
+
+import (
+  "net/http"
+  "goodbuzz/lib"
+)
+
+func Login(w http.ResponseWriter, r *http.Request) {
+    content := login()
+    lib.Render(w, r, "Login", content)
+}
+
+
+templ login() {
+<style>
+button { display: block; }
+button, label { margin: 20px 0; }
+</style>
+
+<main class="login">
+  <h1>Login</h1>
+  <form action="/login" method="POST">
+    <label>Password: <input type="password"></label>
+    <button>Submit</button>
+  </form>
+</main>
+
+}
