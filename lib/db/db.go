@@ -85,6 +85,8 @@ func run[T any](ctx context.Context, fn dbFn[T]) T {
 func GetTournament(ctx context.Context, id int64) *Tournament {
 	fn := func(conn *sqlite.Conn) *Tournament {
 		stmt := conn.Prep("SELECT tournament_id, name FROM tournaments WHERE tournament_id = $id")
+		defer stmt.Reset()
+
 		stmt.SetInt64("$id", id)
 
 		row, err := stmt.Step()
@@ -102,7 +104,6 @@ func GetTournament(ctx context.Context, id int64) *Tournament {
 			name:          stmt.ColumnText(1),
 		}
 
-		stmt.Reset()
 		return &tournament
 	}
 
@@ -112,6 +113,8 @@ func GetTournament(ctx context.Context, id int64) *Tournament {
 func GetTournamentForRoom(ctx context.Context, roomId int64) *Tournament {
 	fn := func(conn *sqlite.Conn) *Tournament {
 		stmt := conn.Prep("SELECT tournament_id, tournaments.name FROM rooms LEFT JOIN tournaments USING (tournament_id) WHERE room_id = $id")
+		defer stmt.Reset()
+
 		stmt.SetInt64("$id", roomId)
 
 		row, err := stmt.Step()
@@ -129,7 +132,6 @@ func GetTournamentForRoom(ctx context.Context, roomId int64) *Tournament {
 			name:          stmt.ColumnText(1),
 		}
 
-		stmt.Reset()
 		return &tournament
 	}
 
@@ -144,6 +146,7 @@ func GetTournaments(ctx context.Context) []Tournament {
 			LEFT JOIN rooms USING (tournament_id)
 			GROUP BY tournament_id
 		`)
+		defer stmt.Reset()
 
 		tournaments := make([]Tournament, 0)
 		for {
@@ -172,6 +175,8 @@ func GetTournaments(ctx context.Context) []Tournament {
 func GetRoom(ctx context.Context, room_id int64) *Room {
 	fn := func(conn *sqlite.Conn) *Room {
 		stmt := conn.Prep("SELECT room_id, name, description, tournament_id FROM rooms WHERE room_id = $1")
+		defer stmt.Reset()
+
 		stmt.SetInt64("$1", room_id)
 
 		row, err := stmt.Step()
@@ -191,7 +196,6 @@ func GetRoom(ctx context.Context, room_id int64) *Room {
 			TournamentId: stmt.ColumnInt64(3),
 		}
 
-		stmt.Reset()
 		return &room
 	}
 	return run(ctx, fn)
@@ -200,6 +204,8 @@ func GetRoom(ctx context.Context, room_id int64) *Room {
 func SetRoomNameAndDescription(ctx context.Context, roomId int64, name string, description string) error {
 	fn := func(conn *sqlite.Conn) error {
 		stmt := conn.Prep("UPDATE rooms SET description = $1, name = $2 WHERE room_id = $3")
+		defer stmt.Reset()
+
 		stmt.SetText("$1", description)
 		stmt.SetText("$2", name)
 		stmt.SetInt64("$3", roomId)
@@ -210,7 +216,6 @@ func SetRoomNameAndDescription(ctx context.Context, roomId int64, name string, d
 			return err
 		}
 
-		stmt.Reset()
 		return nil
 	}
 
@@ -220,6 +225,8 @@ func SetRoomNameAndDescription(ctx context.Context, roomId int64, name string, d
 func DeleteRoom(ctx context.Context, roomId int64) error {
 	fn := func(conn *sqlite.Conn) error {
 		stmt := conn.Prep("DELETE FROM rooms WHERE room_id = $1")
+		defer stmt.Reset()
+
 		stmt.SetInt64("$1", roomId)
 
 		_, err := stmt.Step()
@@ -228,7 +235,6 @@ func DeleteRoom(ctx context.Context, roomId int64) error {
 			return err
 		}
 
-		stmt.Reset()
 		return nil
 	}
 
@@ -238,6 +244,8 @@ func DeleteRoom(ctx context.Context, roomId int64) error {
 func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
 	fn := func(conn *sqlite.Conn) []Room {
 		stmt := conn.Prep("SELECT room_id, name, description FROM rooms WHERE tournament_id = $1")
+		defer stmt.Reset()
+
 		stmt.SetInt64("$1", tournament_id)
 
 		rooms := make([]Room, 0)
@@ -267,6 +275,8 @@ func GetRoomsForTournament(ctx context.Context, tournament_id int64) []Room {
 func DeleteTournament(ctx context.Context, tournament_id int64) error {
 	fn := func(conn *sqlite.Conn) error {
 		stmt := conn.Prep("DELETE FROM tournaments WHERE tournament_id = $1")
+		defer stmt.Reset()
+
 		stmt.SetInt64("$1", tournament_id)
 
 		_, err := stmt.Step()
@@ -275,7 +285,6 @@ func DeleteTournament(ctx context.Context, tournament_id int64) error {
 			return err
 		}
 
-		stmt.Reset()
 		return nil
 	}
 
@@ -285,6 +294,8 @@ func DeleteTournament(ctx context.Context, tournament_id int64) error {
 func GetName(ctx context.Context, userToken string) string {
 	fn := func(conn *sqlite.Conn) string {
 		stmt := conn.Prep("SELECT name FROM game_users WHERE user_token = $1")
+		defer stmt.Reset()
+
 		stmt.SetText("$1", userToken)
 
 		row, err := stmt.Step()
@@ -298,8 +309,6 @@ func GetName(ctx context.Context, userToken string) string {
 		}
 
 		res := stmt.ColumnText(0)
-
-		stmt.Reset()
 		return res
 	}
 
@@ -309,7 +318,9 @@ func GetName(ctx context.Context, userToken string) string {
 
 func SetUserName(ctx context.Context, userToken string, name string) error {
 	fn := func(conn *sqlite.Conn) error {
-		stmt := conn.Prep("UPDATE game_users SET name = $1 WHERE user_token =$2")
+		stmt := conn.Prep("UPDATE game_users SET name = $1 WHERE user_token = $2")
+		defer stmt.Reset()
+
 		stmt.SetText("$1", name)
 		stmt.SetText("$2", userToken)
 
@@ -319,7 +330,6 @@ func SetUserName(ctx context.Context, userToken string, name string) error {
 			return err
 		}
 
-		stmt.Reset()
 		return nil
 	}
 
@@ -329,19 +339,61 @@ func SetUserName(ctx context.Context, userToken string, name string) error {
 func LoginMod(ctx context.Context, userToken string) error {
 	fn := func(conn *sqlite.Conn) error {
 		stmt := conn.Prep("INSERT OR REPLACE INTO mod_sessions (user_token) VALUES ($1)")
+		defer stmt.Reset()
 
 		stmt.SetText("$1", userToken)
 
 		_, err := stmt.Step()
 		if err != nil {
-			logger.Error("Failed to set name: %s", err)
+			logger.Error("%v", err)
 			return err
 		}
 
-		stmt.Reset()
 		return nil
 	}
 
 	return run(ctx, fn)
 }
 
+func DeleteLogin(ctx context.Context, userToken string) error {
+	fn := func(conn *sqlite.Conn) error {
+		stmt := conn.Prep("DELETE FROM mod_sessions WHERE user_token = $1")
+		defer stmt.Reset()
+
+		stmt.SetText("$1", userToken)
+
+		_, err := stmt.Step()
+		if err != nil {
+			logger.Error("%v", err)
+			return err
+		}
+
+		return nil
+	}
+
+	return run(ctx, fn)
+}
+
+func IsMod(ctx context.Context, userToken string) bool {
+	fn := func(conn *sqlite.Conn) bool {
+		stmt := conn.Prep("SELECT 1 FROM mod_sessions WHERE user_token = $1")
+		defer stmt.Reset()
+
+		stmt.SetText("$1", userToken)
+
+		row, err := stmt.Step()
+		if err != nil {
+			logger.Error("Error attempting to get moderator status %s", err)
+			return false
+		}
+		if !row {
+			return false
+		}
+
+		res := stmt.ColumnInt(0)
+
+		return res == 1
+	}
+
+	return run(ctx, fn)
+}

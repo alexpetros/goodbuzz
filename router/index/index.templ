@@ -6,11 +6,13 @@ import "goodbuzz/lib/db"
 
 func Get(w http.ResponseWriter, r *http.Request) {
     tournaments := db.GetTournaments(r.Context())
-    content := index(tournaments)
+    isMod := lib.IsMod(r)
+
+    content := index(tournaments, isMod)
     lib.Render(w, r, "Goodbuzz", content)
 }
 
-templ index(tournaments []db.Tournament) {
+templ index(tournaments []db.Tournament, isLoggedIn bool) {
 <main class="index">
   <h2>Ongoing Tournaments</h2>
   <table class="tournaments">
@@ -22,7 +24,11 @@ templ index(tournaments []db.Tournament) {
   </table>
 
   <h2>Moderators</h2>
+  if isLoggedIn {
+  <p><button hx-delete="/login" class="action delete">Logout</button></p>
+  } else {
   <p>Moderators and admins, <a href="/login">login here</a>.</p>
+  }
 
 </main>
 }

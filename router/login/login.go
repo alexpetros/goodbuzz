@@ -3,7 +3,6 @@ package login
 import (
 	"goodbuzz/lib"
 	"goodbuzz/lib/db"
-	"goodbuzz/lib/logger"
 	"net/http"
 )
 
@@ -14,8 +13,7 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
 func Post(w http.ResponseWriter, r *http.Request) {
 	cookie, noToken := r.Cookie("userToken")
-	password := r.PostFormValue("password")
-	logger.Info(password)
+	// password := r.PostFormValue("password")
 
 	if noToken != nil {
 		cookie = lib.NewUserToken()
@@ -24,4 +22,16 @@ func Post(w http.ResponseWriter, r *http.Request) {
 	userToken := cookie.Value
 	db.LoginMod(r.Context(), userToken)
 	http.Redirect(w, r, "/", 303)
+}
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	cookie, noToken := r.Cookie("userToken")
+
+	if noToken != nil {
+		cookie = lib.NewUserToken()
+	}
+
+	userToken := cookie.Value
+	db.DeleteLogin(r.Context(), userToken)
+	lib.HxRedirect(w, r, "/")
 }

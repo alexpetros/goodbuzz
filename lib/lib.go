@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"goodbuzz/lib/db"
 	"io"
 	"net/http"
 	"strconv"
@@ -79,4 +80,15 @@ func NewUserToken() *http.Cookie {
 		Secure:   true,
 		SameSite: http.SameSiteLaxMode,
 	}
+}
+
+func IsMod(r *http.Request) bool {
+	isMod := false
+
+	cookie, noToken := r.Cookie("userToken")
+	if noToken == nil {
+		isMod = db.IsMod(r.Context(), cookie.Value)
+	}
+
+	return isMod
 }
