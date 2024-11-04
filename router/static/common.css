@@ -16,6 +16,9 @@ body {
   scrollbar-gutter: stable;
 }
 
+.hidden {
+  display: none;
+}
 
 main.index, main.login { max-width: 500px; margin: 30px auto; }
 

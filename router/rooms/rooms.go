@@ -48,6 +48,18 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	lib.HxRedirect(w, r, route)
 }
 
+func Description(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	room := ctx.Value("room").(*room.Room)
+	description := r.PostFormValue("description")
+
+	room.SetDescription(description)
+	db.SetRoomNameAndDescription(ctx, room.Id, room.Name, description)
+
+	response := "<button hx-trigger=\"load delay 2s\" hx-on::trigger=\"this.innerText='Save'\">Saved!</button>"
+	fmt.Fprintf(w, response)
+}
+
 func Delete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	room := ctx.Value("room").(*room.Room)

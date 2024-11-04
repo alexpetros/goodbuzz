@@ -1,3 +1,10 @@
+.description textarea {
+  background-color: lightgray;
+  width: 60%;
+  height: 3rem;
+  resize: none;
+}
+
 main.moderator {
   display: grid;
   grid-template-columns: 1fr;
@@ -44,6 +51,18 @@ main.moderator {
   button.reset, .status {
     height: 50px;
     margin: 10px 0;
+  }
+}
+
+section.settings {
+  textarea {
+    width: min(90%, 400px);
+    resize: none;
+    margin-bottom: 10px;
+  }
+
+  button {
+    display: block;
   }
 }
 

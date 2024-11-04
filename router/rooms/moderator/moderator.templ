@@ -32,7 +32,6 @@ templ index(room *room.Room) {
 
 <h1>{room.Name}</h1>
 
-<p class="description">{room.Description}</p>
 <main
   class="moderator"
   hx-ext="sse"
@@ -71,7 +70,12 @@ templ index(room *room.Room) {
 </section>
 
 <section class="settings">
-<a href="./edit" class="button action edit">Edit Room</a>
+  <h2>Room Description</h2>
+  <form hx-put="./description" hx-target="find button" hx-swap="outerHTML">
+    <textarea name="description">{room.Description}</textarea>
+    <button>Save</button>
+  </form>
+  <div class="hidden"><button>Save</button></div>
 </section>
 
 </main>
