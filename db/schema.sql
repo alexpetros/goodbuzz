@@ -27,3 +27,12 @@ CREATE TABLE game_users (
   timestamp TEXT DEFAULT CURRENT_TIMESTAMP
 ) STRICT;
 
+CREATE TABLE settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+) STRICT;
+
+
+INSERT INTO SETTINGS (key, value) VALUES
+('admin_password', 'admin'),
+('mod_password', 'moderator');

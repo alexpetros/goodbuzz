@@ -92,3 +92,14 @@ func IsMod(r *http.Request) bool {
 
 	return isMod
 }
+
+func IsAdmin(r *http.Request) bool {
+	isAdmin := false
+
+	cookie, noToken := r.Cookie("userToken")
+	if noToken == nil {
+		isAdmin = db.IsAdmin(r.Context(), cookie.Value)
+	}
+
+	return isAdmin
+}

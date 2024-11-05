@@ -355,9 +355,9 @@ func LoginMod(ctx context.Context, userToken string) error {
 	return run(ctx, fn)
 }
 
-func DeleteLogin(ctx context.Context, userToken string) error {
+func LoginAdmin(ctx context.Context, userToken string) error {
 	fn := func(conn *sqlite.Conn) error {
-		stmt := conn.Prep("DELETE FROM mod_sessions WHERE user_token = $1")
+		stmt := conn.Prep("INSERT OR REPLACE INTO admin_sessions (user_token) VALUES ($1)")
 		defer stmt.Reset()
 
 		stmt.SetText("$1", userToken)
@@ -374,9 +374,52 @@ func DeleteLogin(ctx context.Context, userToken string) error {
 	return run(ctx, fn)
 }
 
+func DeleteLogin(ctx context.Context, userToken string) error {
+	fn := func(conn *sqlite.Conn) error {
+		modDelete := conn.Prep("DELETE FROM mod_sessions WHERE user_token = $1")
+		defer modDelete.Reset()
+		adminDelete := conn.Prep("DELETE FROM admin_sessions WHERE user_token = $1")
+		defer adminDelete.Reset()
+
+		modDelete.SetText("$1", userToken)
+		adminDelete.SetText("$1", userToken)
+
+		modDelete.Step()
+		adminDelete.Step()
+
+		return nil
+	}
+
+	return run(ctx, fn)
+}
+
 func IsMod(ctx context.Context, userToken string) bool {
 	fn := func(conn *sqlite.Conn) bool {
 		stmt := conn.Prep("SELECT 1 FROM mod_sessions WHERE user_token = $1")
+		defer stmt.Reset()
+
+		stmt.SetText("$1", userToken)
+
+		row, err := stmt.Step()
+		if err != nil {
+			logger.Error("Error attempting to get moderator status %s", err)
+			return false
+		}
+		if !row {
+			return false
+		}
+
+		res := stmt.ColumnInt(0)
+
+		return res == 1
+	}
+
+	return run(ctx, fn)
+}
+
+func IsAdmin(ctx context.Context, userToken string) bool {
+	fn := func(conn *sqlite.Conn) bool {
+		stmt := conn.Prep("SELECT 1 FROM admin_sessions WHERE user_token = $1")
 		defer stmt.Reset()
 
 		stmt.SetText("$1", userToken)

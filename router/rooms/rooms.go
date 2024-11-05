@@ -56,7 +56,7 @@ func Description(w http.ResponseWriter, r *http.Request) {
 	room.SetDescription(description)
 	db.SetRoomNameAndDescription(ctx, room.Id, room.Name, description)
 
-	response := "<button hx-trigger=\"load delay 2s\" hx-on::trigger=\"this.innerText='Save'\">Saved!</button>"
+	response := "<button hx-trigger=\"load delay:1s\" hx-on::trigger=\"this.innerText='Save'\">Saved!</button>"
 	fmt.Fprintf(w, response)
 }
 
