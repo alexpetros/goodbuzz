@@ -20,6 +20,13 @@ body {
   display: none;
 }
 
+.alert {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: red;
+  font-size: 1.1rem;
+}
+
 main.index, main.login { max-width: 500px; margin: 30px auto; }
 
 .logo {

@@ -8,9 +8,20 @@ button, label { margin: 20px 0; }
 
 <main class="login">
   <h1>Login</h1>
+  <div class="alert hidden">Login Failed. Please try again.</div>
   <form action="/login" method="POST">
     <label>Password: <input type="password" name="password"></label>
     <button>Submit</button>
   </form>
 </main>
+
+<script>
+const url = new URL(document.URL)
+const status = url.searchParams.get('s')
+const alert = document.querySelector('.alert')
+
+if (status) {
+  alert.classList.remove('hidden')
+}
+</script>
 }

@@ -29,7 +29,7 @@ CREATE TABLE game_users (
 
 CREATE TABLE settings (
   key TEXT PRIMARY KEY,
-  value TEXT NOT NULL,
+  value TEXT NOT NULL
 ) STRICT;
 
 

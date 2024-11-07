@@ -440,3 +440,41 @@ func IsAdmin(ctx context.Context, userToken string) bool {
 
 	return run(ctx, fn)
 }
+
+func ModPassword(ctx context.Context) string {
+	fn := func(conn *sqlite.Conn) string {
+		stmt := conn.Prep("SELECT value FROM settings WHERE key = 'mod_password'")
+		defer stmt.Reset()
+
+		row, err := stmt.Step()
+		if err != nil {
+			panic("Panicked whil looking for admin password")
+		}
+		if !row {
+			panic("Missing admin password - this is a setup issue")
+		}
+
+		return stmt.ColumnText(0)
+	}
+
+	return run(ctx, fn)
+}
+
+func AdminPassword(ctx context.Context) string {
+	fn := func(conn *sqlite.Conn) string {
+		stmt := conn.Prep("SELECT value FROM settings WHERE key = 'admin_password'")
+		defer stmt.Reset()
+
+		row, err := stmt.Step()
+		if err != nil {
+			panic("Panicked whil looking for admin password")
+		}
+		if !row {
+			panic("Missing admin password - this is a setup issue")
+		}
+
+		return stmt.ColumnText(0)
+	}
+
+	return run(ctx, fn)
+}
