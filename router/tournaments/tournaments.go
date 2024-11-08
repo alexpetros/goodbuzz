@@ -34,11 +34,45 @@ func Middleware(next func (http.ResponseWriter, *http.Request)) http.Handler {
 	})
 }
 
+func Post(w http.ResponseWriter, r *http.Request) {
+	tournament := r.Context().Value("tournament").(*db.Tournament)
+	name := r.PostFormValue("name")
+	if name == "" {
+		lib.BadRequest(w, r)
+		return
+	}
+
+	err := db.CreateRoom(r.Context(), tournament.Id(), name)
+
+	if err == nil {
+		w.Header().Add("HX-Refresh", "true")
+	} else {
+		lib.ServerError(w, r)
+	}
+}
+
+func Put(w http.ResponseWriter, r *http.Request) {
+	tournament := r.Context().Value("tournament").(*db.Tournament)
+	name := r.PostFormValue("name")
+	if name == "" {
+		lib.BadRequest(w, r)
+		return
+	}
+
+	err := db.SetTournamentInfo(r.Context(), tournament.Id(), name)
+
+	if err == nil {
+		w.Header().Add("HX-Refresh", "true")
+	} else {
+		lib.ServerError(w, r)
+	}
+}
+
 func Delete(w http.ResponseWriter, r *http.Request) {
 	tournament := r.Context().Value("tournament").(*db.Tournament)
 	delete_err := db.DeleteTournament(r.Context(), tournament.Id())
 	if delete_err == nil {
-		w.Header().Add("HX-Refresh", "true")
+		lib.HxRedirect(w, r, "/")
 	} else {
 		lib.ServerError(w, r)
 	}

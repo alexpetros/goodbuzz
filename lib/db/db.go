@@ -31,14 +31,6 @@ func (t *Tournament) Url() string {
 	return fmt.Sprintf("/tournaments/%d", t.tournament_id)
 }
 
-func (t *Tournament) ModeratorUrl() string {
-	return fmt.Sprintf("/tournaments/%d/moderator", t.tournament_id)
-}
-
-func (t *Tournament) AdminUrl() string {
-	return fmt.Sprintf("/tournaments/%d/admin", t.tournament_id)
-}
-
 type Room struct {
 	RoomId      int64
 	TournamentId      int64
@@ -110,6 +102,26 @@ func GetTournament(ctx context.Context, id int64) *Tournament {
 	return run(ctx, fn)
 }
 
+func SetTournamentInfo(ctx context.Context, tournamentId int64, name string) error {
+	fn := func(conn *sqlite.Conn) error {
+		stmt := conn.Prep("UPDATE tournaments SET name = $1 WHERE tournament_id = $2")
+		defer stmt.Reset()
+
+		stmt.SetText("$1", name)
+		stmt.SetInt64("$2", tournamentId)
+
+		_, err := stmt.Step()
+		if err != nil {
+			logger.Error("Failed to set tournament name: %s", err)
+			return err
+		}
+
+		return nil
+	}
+
+	return run(ctx, fn)
+}
+
 func GetTournamentForRoom(ctx context.Context, roomId int64) *Tournament {
 	fn := func(conn *sqlite.Conn) *Tournament {
 		stmt := conn.Prep("SELECT tournament_id, tournaments.name FROM rooms LEFT JOIN tournaments USING (tournament_id) WHERE room_id = $id")
@@ -171,6 +183,27 @@ func GetTournaments(ctx context.Context) []Tournament {
 
 	return run(ctx, fn)
 }
+
+func CreateRoom(ctx context.Context, tournament_id int64, name string) error {
+	fn := func(conn *sqlite.Conn) error {
+		stmt := conn.Prep("INSERT INTO rooms (name, tournament_id) VALUES ($1, $2)")
+		defer stmt.Reset()
+
+		stmt.SetText("$1", name)
+		stmt.SetInt64("$2", tournament_id)
+
+		_, err := stmt.Step()
+		if err != nil {
+			logger.Error("%v", err)
+			return err
+		}
+
+		return nil
+	}
+
+	return run(ctx, fn)
+}
+
 
 func GetRoom(ctx context.Context, room_id int64) *Room {
 	fn := func(conn *sqlite.Conn) *Room {

@@ -103,6 +103,10 @@ table.rooms {
   }
 }
 
+.new-room {
+    padding: 10px;
+}
+
 button.action, a.action {
   font-family: 'Arial', 'Sans Serif';
   background-color: #f7f7f7;

@@ -6,6 +6,7 @@ import (
   "goodbuzz/lib/db"
   "goodbuzz/lib/room"
   "goodbuzz/router/rooms"
+	"fmt"
 )
 
 func Get(w http.ResponseWriter, r *http.Request) {
@@ -49,6 +50,25 @@ templ admin (tournament *db.Tournament, rooms []room.Room) {
     </tr>
   }
 </table>
+
+<form class="new-room" hx-post={tournament.Url()}>
+  <input name="name" type="text">
+  <button>Add new</button>
+</form>
+
+<h2>Edit</h2>
+<form hx-put={tournament.Url()}>
+  <label>Name: <input name="name" type="text" value={tournament.Name()}></label>
+  <button class="action edit">Submit</button>
+</form>
+
+<h2>Delete</h2>
+<form
+  hx-delete={tournament.Url()}
+  hx-confirm={fmt.Sprintf("Are you sure you want to delete %s?", tournament.Name())}>
+  <button class="action delete">Delete Tournament</button>
+</form>
+
 }
 
 templ mod(tournament *db.Tournament, rooms []room.Room) {
