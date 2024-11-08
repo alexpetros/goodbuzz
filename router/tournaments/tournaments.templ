@@ -10,16 +10,17 @@ import (
 
 func Get(w http.ResponseWriter, r *http.Request) {
     tournament := r.Context().Value("tournament").(*db.Tournament)
-    isMod := r.Context().Value("isMod").(bool)
+    isAdmin := r.Context().Value("isAdmin").(bool)
+    isMod := r.Context().Value("isMod").(bool) || isAdmin
 
     var content templ.Component
 
     rooms := rooms.GetRoomsForTournament(r.Context(), tournament.Id())
-    content = get(tournament, rooms, isMod)
+    content = get(tournament, rooms, isMod, isAdmin)
     lib.Render(w, r, tournament.Name(), content)
 }
 
-templ get(tournament *db.Tournament, rooms []room.Room, isMod bool) {
+templ get(tournament *db.Tournament, rooms []room.Room, isMod bool, isAdmin bool) {
 <h1>{tournament.Name()}</h1>
 
 <h2>Rooms</h2>
@@ -30,34 +31,23 @@ templ get(tournament *db.Tournament, rooms []room.Room, isMod bool) {
     if isMod {
     <th></th>
     }
-<th>Description</th>
+    if isAdmin {
+    <th></th>
+    }
+    <th>Description</th>
   </tr>
   for _, room := range rooms {
     <tr>
         <td>{room.Name}</td>
-        <td><a href={templ.URL(room.PlayerUrl())}>Join as Player</a></td>
+        <td><a href={templ.URL(room.PlayerUrl())}>Player</a></td>
         if isMod {
-        <td><a href={templ.URL(room.ModeratorUrl())}>Join as Moderator</a></td>
+        <td><a href={templ.URL(room.ModeratorUrl())}>Moderator</a></td>
+        }
+        if isAdmin {
+        <td><a class="button action edit" href={templ.SafeURL(room.EditUrl())}>Edit</a></td>
         }
         <td>{ room.Description }</td>
     </tr>
   }
 </table>
-}
-
-templ admin(tournament *db.Tournament, rooms []room.Room) {
-<h1>{tournament.Name()}</h1>
-
-<h2>Rooms</h2>
-<table class="rooms">
-  for _, room := range rooms {
-    <tr>
-        <td>{ room.Name }</td>
-        <td><a href={templ.URL(room.PlayerUrl())}>Join as Player</a></td>
-        <td><a href={templ.URL(room.ModeratorUrl())}>Join as Moderator</a></td>
-        <td><a class="button action edit" href={templ.SafeURL(room.EditUrl())}>Edit</a></td>
-    </tr>
-  }
-</table>
-
 }

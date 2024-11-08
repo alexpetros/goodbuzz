@@ -24,8 +24,10 @@ func Middleware(next func (http.ResponseWriter, *http.Request)) http.Handler {
 		}
 
 		isMod := lib.IsMod(r)
+		isAdmin := lib.IsAdmin(r)
 		ctx := context.WithValue(r.Context(), "tournament", tournament)
 		ctx = context.WithValue(ctx, "isMod", isMod)
+		ctx = context.WithValue(ctx, "isAdmin", isAdmin)
 
 		r = r.WithContext(ctx)
 		next(w, r)

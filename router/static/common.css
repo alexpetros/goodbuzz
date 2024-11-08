@@ -20,6 +20,14 @@ body {
   display: none;
 }
 
+.notice {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: lightblue;
+  font-size: 1.1rem;
+  border-radius: 3px;
+}
+
 .alert {
   margin: 20px 0;
   padding: 20px;

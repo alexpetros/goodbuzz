@@ -14,7 +14,14 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 templ index(tournaments []db.Tournament, isMod bool, isAdmin bool) {
+
 <main class="index">
+  if isAdmin {
+  <div class="notice">Logged in as an Admin</div>
+  } else if isMod {
+  <div class="notice">Logged in as a Moderator</div>
+  }
+
   <h2>Ongoing Tournaments</h2>
   <table class="tournaments">
     for _, tournament := range tournaments {
@@ -24,17 +31,11 @@ templ index(tournaments []db.Tournament, isMod bool, isAdmin bool) {
     }
   </table>
 
-  if isAdmin {
-    <h2>Admin View</h2>
-  } else if isMod {
-    <h2>Moderator View</h2>
-  } else {
-    <h2>Login</h2>
-  }
-
   if isAdmin || isMod {
+  <h2>Logout</h2>
   <p><button hx-delete="/login" class="action delete">Logout</button></p>
   } else {
+  <h2>Login</h2>
   <p>Moderators and admins, <a href="/login">login here</a>.</p>
   }
 

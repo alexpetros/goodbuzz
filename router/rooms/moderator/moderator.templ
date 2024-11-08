@@ -4,6 +4,7 @@ import (
   "net/http"
   "fmt"
   "goodbuzz/lib"
+  "goodbuzz/lib/db"
   "goodbuzz/lib/room"
   "goodbuzz/router/rooms"
 )
@@ -20,15 +21,18 @@ func Get(w http.ResponseWriter, r *http.Request) {
       http.NotFound(w, r)
       return
     }
+    tournament := db.GetTournamentForRoom(r.Context(), room_id)
 
     title := fmt.Sprintf("%s - Moderator", room.Name)
-    content := index(room)
+    content := index(room, tournament)
     lib.Render(w, r, title, content)
 }
 
-templ index(room *room.Room) {
+templ index(room *room.Room, tournament *db.Tournament) {
 <link rel="stylesheet" href="/static/moderator.css">
 <script defer src="/static/webcomponents/editable-field.js"></script>
+
+<p><a href={templ.SafeURL(tournament.Url())}>Back to {tournament.Name()}</a></p>
 
 <h1>{room.Name}</h1>
 
@@ -76,6 +80,7 @@ templ index(room *room.Room) {
     <button>Save</button>
   </form>
   <div class="hidden"><button>Save</button></div>
+
 </section>
 
 </main>

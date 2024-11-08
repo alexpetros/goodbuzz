@@ -1,10 +1,3 @@
-.description textarea {
-  background-color: lightgray;
-  width: 60%;
-  height: 3rem;
-  resize: none;
-}
-
 main.moderator {
   display: grid;
   grid-template-columns: 1fr;
@@ -56,8 +49,9 @@ main.moderator {
 
 section.settings {
   textarea {
-    width: min(90%, 400px);
-    resize: none;
+    width: 100%;
+    resize: vertical;
+    height: 4rem;
     margin-bottom: 10px;
   }
 

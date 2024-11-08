@@ -44,7 +44,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	db.SetRoomNameAndDescription(ctx, room.Id, name, description)
 
 	dbRoom := db.GetRoom(ctx, room.Id)
-	route := fmt.Sprintf("/tournaments/%d/admin", dbRoom.TournamentId)
+	route := fmt.Sprintf("/tournaments/%d", dbRoom.TournamentId)
 	lib.HxRedirect(w, r, route)
 }
 
@@ -64,7 +64,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	room := ctx.Value("room").(*room.Room)
 	dbRoom := db.GetRoom(ctx, room.Id)
-	route := fmt.Sprintf("/tournaments/%d/admin", dbRoom.TournamentId)
+	route := fmt.Sprintf("/tournaments/%d", dbRoom.TournamentId)
 
 	db.DeleteRoom(ctx, room.Id)
 	openRooms.DeleteRoom(room.Id)
