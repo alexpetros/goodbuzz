@@ -58,6 +58,7 @@ section.players {
 }
 
 @media (min-width: 600px) {
+  section.details { grid-area: details }
   section.buzzer { grid-area: buzzer }
   section.settings { grid-area: settings }
   section.players { grid-area: players }
@@ -66,6 +67,7 @@ section.players {
   main.player {
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
+      "details details"
       "buzzer settings"
       "buzzer players"
       "logs logs";

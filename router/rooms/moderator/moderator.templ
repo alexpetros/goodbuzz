@@ -34,15 +34,18 @@ templ index(room *room.Room, tournament *db.Tournament) {
 
 <p><a href={templ.SafeURL(tournament.Url())}>Back to {tournament.Name()}</a></p>
 
-<h1>{room.Name}</h1>
 
 <main
-  class="moderator"
+  class="game moderator"
   hx-ext="sse"
   sse-connect="./moderator/live"
   sse-close="close"
   hx-on::sse-close="onKick()"
 >
+
+<section class="details">
+  <h1>{room.Name}</h1>
+</section>
 
 <section class="controls">
   <h2>Buzzer Controls</h2>

@@ -21,18 +21,20 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
 templ index(room *room.Room) {
 <link rel="stylesheet" href="/static/player.css">
-<h1>{room.Name}</h1>
-
-<p class="description">{room.Description}</p>
 
 <main
-  class="player"
+  class="game player"
   hx-ext="sse"
   sse-swap="main"
   sse-connect="./player/live"
   sse-close="close"
   hx-on::sse-close="onKick()"
 >
+
+<section class="details">
+  <h1>{room.Name}</h1>
+  <p class="description">{room.Description}</p>
+</section>
 
 <section class="buzzer">
   <h2>Buzzer</h2>

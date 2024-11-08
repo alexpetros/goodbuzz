@@ -11,16 +11,24 @@ import (
 func Get(w http.ResponseWriter, r *http.Request) {
     tournament := r.Context().Value("tournament").(*db.Tournament)
     isAdmin := r.Context().Value("isAdmin").(bool)
-    isMod := r.Context().Value("isMod").(bool) || isAdmin
+    isMod := r.Context().Value("isMod").(bool)
 
     var content templ.Component
 
     rooms := rooms.GetRoomsForTournament(r.Context(), tournament.Id())
-    content = get(tournament, rooms, isMod, isAdmin)
+
+    if isAdmin {
+      content = admin(tournament, rooms)
+    } else if isMod {
+      content = mod(tournament, rooms)
+    } else {
+      content = player(tournament, rooms)
+    }
+
     lib.Render(w, r, tournament.Name(), content)
 }
 
-templ get(tournament *db.Tournament, rooms []room.Room, isMod bool, isAdmin bool) {
+templ admin (tournament *db.Tournament, rooms []room.Room) {
 <h1>{tournament.Name()}</h1>
 
 <h2>Rooms</h2>
@@ -28,24 +36,54 @@ templ get(tournament *db.Tournament, rooms []room.Room, isMod bool, isAdmin bool
   <tr>
     <th>Name</th>
     <th></th>
-    if isMod {
-    <th></th>
-    }
-    if isAdmin {
-    <th></th>
-    }
+    <th colspan="2">Join the Room</th>
+    <th>Description</th>
+  </tr>
+  for _, room := range rooms {
+    <tr>
+        <td>{room.Name}</td>
+        <td><a class="button action edit" href={templ.SafeURL(room.EditUrl())}>Edit</a></td>
+        <td><a href={templ.URL(room.PlayerUrl())}>Player</a></td>
+        <td><a href={templ.URL(room.ModeratorUrl())}>Moderator</a></td>
+        <td style="width: 40%">{ room.Description }</td>
+    </tr>
+  }
+</table>
+}
+
+templ mod(tournament *db.Tournament, rooms []room.Room) {
+<h1>{tournament.Name()}</h1>
+
+<h2>Rooms</h2>
+<table class="rooms-player">
+  <tr>
+    <th>Name</th>
+    <th colspan="2">Join Links</th>
     <th>Description</th>
   </tr>
   for _, room := range rooms {
     <tr>
         <td>{room.Name}</td>
         <td><a href={templ.URL(room.PlayerUrl())}>Player</a></td>
-        if isMod {
         <td><a href={templ.URL(room.ModeratorUrl())}>Moderator</a></td>
-        }
-        if isAdmin {
-        <td><a class="button action edit" href={templ.SafeURL(room.EditUrl())}>Edit</a></td>
-        }
+        <td>{ room.Description }</td>
+    </tr>
+  }
+</table>
+}
+
+templ player(tournament *db.Tournament, rooms []room.Room) {
+<h1>{tournament.Name()}</h1>
+
+<h2>Rooms</h2>
+<table class="rooms-player">
+  <tr>
+    <th>Room</th>
+    <th>Description</th>
+  </tr>
+  for _, room := range rooms {
+    <tr>
+        <td><a href={templ.URL(room.PlayerUrl())}>{room.Name}</a></td>
         <td>{ room.Description }</td>
     </tr>
   }
