@@ -1,44 +1,37 @@
 package admin
 
-import "net/http"
-import "goodbuzz/lib"
-import "goodbuzz/lib/db"
-import "strconv"
+import (
+  "net/http"
+  "goodbuzz/lib"
+  "goodbuzz/lib/db"
+)
 
 func Get(w http.ResponseWriter, r *http.Request) {
-    tournaments := db.GetTournaments(r.Context())
-    content := index(tournaments)
-    lib.Render(w, r, "Admin Page", content)
+    modPassword := db.ModPassword(r.Context())
+    adminPassword := db.AdminPassword(r.Context())
+    lib.Render(w, r, "Admin Page", index(modPassword, adminPassword))
 }
 
-templ index(tournaments []db.Tournament) {
-<h1>Admin Page</h1>
+templ index(modPassword string, adminPassword string) {
+<style>
+button, label {
+  display: block;
+  margin: 20px 0;
+}
+</style>
 
-<h2>Tournaments</h2>
-<table class="tournaments">
-  <tr>
-    <th>Name</th>
-    <th>Rooms</th>
-    <th></th>
-  </tr>
-  for _, tournament := range tournaments {
-    <tr>
-        <td>
-          <a href={templ.URL(tournament.AdminUrl())}>
-          { tournament.Name() } </a>
-         </td>
-         <td>
-          {strconv.FormatInt(tournament.NumRooms(), 10)}
-         </td>
-        <td>
-          <button
-            class="action delete"
-            hx-delete={tournament.Url()}
-            hx-confirm="Are you sure you want to delete this tournament and all its rooms?"
-            >Delete
-            </button>
-        </td>
-    </tr>
-  }
-</table>
+<h1>Admin Settings</h1>
+
+<form hx-put="/admin">
+<label>
+  <div>Moderator Password</div>
+  <input name="mod_password" type="text" value={modPassword}>
+</label>
+<label>
+  <div>Admin Password</div>
+  <input name="admin_password" type="text" value={adminPassword}>
+</label>
+
+<div><button class="action edit">Save</button></div>
+</form>
 }

@@ -17,7 +17,7 @@ templ index(tournaments []db.Tournament, isMod bool, isAdmin bool) {
 
 <main class="index">
   if isAdmin {
-  <div class="notice">Logged in as an Admin</div>
+  <div class="notice">Logged in as an Admin. (<a href="/admin">Change settings</a>)</div>
   } else if isMod {
   <div class="notice">Logged in as a Moderator</div>
   }

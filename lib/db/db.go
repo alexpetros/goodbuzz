@@ -478,3 +478,23 @@ func AdminPassword(ctx context.Context) string {
 
 	return run(ctx, fn)
 }
+
+func SetSetting(ctx context.Context, key string, value string) error {
+	fn := func(conn *sqlite.Conn) error {
+		stmt := conn.Prep("UPDATE settings SET value = $1 WHERE key = $2")
+		defer stmt.Reset()
+
+		stmt.SetText("$1", value)
+		stmt.SetText("$2", key)
+
+		_, err := stmt.Step()
+		if err != nil {
+			logger.Error("Failed to set key: %s\n%v", err, err)
+			return err
+		}
+
+		return nil
+	}
+
+	return run(ctx, fn)
+}
