@@ -1,8 +1,8 @@
-INSERT INTO tournaments (name, url)
+INSERT INTO tournaments (name)
 VALUES
-  ('October Online Regionals - History Bee', 'october-online-history'),
-  ('October Online Tournament - Geography Bee', 'october-online-geography'),
-  ('October Online Tournament - Science Bee', 'october-online-science');
+  ('October Online Regionals - History Bee'),
+  ('October Online Tournament - Geography Bee'),
+  ('October Online Tournament - Science Bee');
 
 INSERT INTO rooms (name, tournament_id)
 VALUES

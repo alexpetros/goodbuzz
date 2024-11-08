@@ -31,6 +31,14 @@ templ index(tournaments []db.Tournament, isMod bool, isAdmin bool) {
     }
   </table>
 
+  if isAdmin {
+  <form class="fake-row" hx-post="/tournaments">
+    <input name="name" type="text">
+    <button>Add new</button>
+  </form>
+  }
+
+
   if isAdmin || isMod {
   <h2>Logout</h2>
   <p><button hx-delete="/login" class="action delete">Logout</button></p>

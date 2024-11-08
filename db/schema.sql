@@ -1,7 +1,6 @@
 CREATE TABLE tournaments (
   tournament_id INTEGER PRIMARY KEY,
-  name TEXT NOT NULL,
-  url TEXT NOT NULL
+  name TEXT NOT NULL
 ) STRICT;
 
 CREATE TABLE rooms (

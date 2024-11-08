@@ -35,6 +35,22 @@ func Middleware(next func (http.ResponseWriter, *http.Request)) http.Handler {
 }
 
 func Post(w http.ResponseWriter, r *http.Request) {
+	name := r.PostFormValue("name")
+	if name == "" {
+		lib.BadRequest(w, r)
+		return
+	}
+
+	err := db.CreateTournament(r.Context(), name)
+
+	if err == nil {
+		w.Header().Add("HX-Refresh", "true")
+	} else {
+		lib.ServerError(w, r)
+	}
+}
+
+func PostRoom(w http.ResponseWriter, r *http.Request) {
 	tournament := r.Context().Value("tournament").(*db.Tournament)
 	name := r.PostFormValue("name")
 	if name == "" {

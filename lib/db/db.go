@@ -184,6 +184,25 @@ func GetTournaments(ctx context.Context) []Tournament {
 	return run(ctx, fn)
 }
 
+func CreateTournament(ctx context.Context, name string) error {
+	fn := func(conn *sqlite.Conn) error {
+		stmt := conn.Prep("INSERT INTO tournaments (name) VALUES ($1)")
+		defer stmt.Reset()
+
+		stmt.SetText("$1", name)
+
+		_, err := stmt.Step()
+		if err != nil {
+			logger.Error("%v", err)
+			return err
+		}
+
+		return nil
+	}
+
+	return run(ctx, fn)
+}
+
 func CreateRoom(ctx context.Context, tournament_id int64, name string) error {
 	fn := func(conn *sqlite.Conn) error {
 		stmt := conn.Prep("INSERT INTO rooms (name, tournament_id) VALUES ($1, $2)")
@@ -203,7 +222,6 @@ func CreateRoom(ctx context.Context, tournament_id int64, name string) error {
 
 	return run(ctx, fn)
 }
-
 
 func GetRoom(ctx context.Context, room_id int64) *Room {
 	fn := func(conn *sqlite.Conn) *Room {
