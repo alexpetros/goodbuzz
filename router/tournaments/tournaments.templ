@@ -38,17 +38,19 @@ templ admin (tournament *db.Tournament, rooms []room.Room) {
 </form>
 
 <h2>Rooms</h2>
+<p>
+  Click into the rooms to edit or delete them. You can also join the rooms as either a player or
+moderator.
+</p>
 <table class="rooms-player">
   <tr>
     <th>Name</th>
-    <th></th>
     <th colspan="2">Join the Room</th>
     <th>Description</th>
   </tr>
   for _, room := range rooms {
     <tr>
-        <td>{room.Name}</td>
-        <td><a class="button action edit" href={templ.SafeURL(room.EditUrl())}>Edit</a></td>
+        <td><a href={templ.SafeURL(room.EditUrl())}>{room.Name}</a></td>
         <td><a href={templ.URL(room.PlayerUrl())}>Player</a></td>
         <td><a href={templ.URL(room.ModeratorUrl())}>Moderator</a></td>
         <td style="width: 40%">{ room.Description }</td>
