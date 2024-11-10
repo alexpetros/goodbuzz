@@ -37,7 +37,6 @@ button.buzzer .explanation {
 }
 
 section.settings {
-  form { width: 80%; }
   button { display: block; }
   label {
     display: grid;
@@ -77,6 +76,8 @@ section.players {
       "buzzer players"
       "logs logs";
   }
+
+  section.settings form { width: 70%; }
 
   section.players .player-tables {
     grid-template-columns: 1fr 1fr;
