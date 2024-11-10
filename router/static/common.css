@@ -6,6 +6,7 @@
   --loading-color: gray;
   --processing-color: orange;
   --locked-color: red;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -13,7 +14,6 @@ body {
   max-width: 1000px;
   padding: 15px 10px;
   margin: 0 auto;
-  scrollbar-gutter: stable;
 }
 
 .hidden {
