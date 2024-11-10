@@ -6,20 +6,15 @@ BINARY_NAME=buzzer
 PROJECT_NAME=goodbuzz
 DB_NAME=goodbuzz.db
 
-.PHONY: live
-live:
-	GOODBUZZ_PROXY_PORT=$(PROXY_PORT) make -j2 live/templ live/air
-	@echo "Development mode is live\n Access application at http://localhost:$(PROXY_PORT)"
-
-.PHONY: templ
-templ:
-	templ generate
-
 .PHONY: dev
 dev:
 	make templ
 	go build
 	GOODBUZZ_PORT=8080 GOODBUZZ_DEV_MODE=true ./$(PROJECT_NAME)
+
+.PHONY: templ
+templ:
+	templ generate
 
 .PHONY: prod
 prod:
@@ -43,24 +38,6 @@ install:
 deploy:
 	ssh goodbuzz 'cd goodbuzz && git pull && make install && systemctl reestart goodbuzz'
 
-
-.PHONY: live/templ
-live/templ:
-	@templ generate --watch \
-		--proxy="http://localhost:$(PORT)" \
-		--proxyport="$(PROXY_PORT)" \
-		--open-browser=false -v
-
-.PHONY: live/air
-live/air:
-	@air \
-			--tmp_dir "dist" \
-			--build.cmd "go build -o dist/tmp/$(BINARY_NAME)" \
-			--build.bin "dist/tmp/$(BINARY_NAME)" \
-			--build.delay "100" \
-			--build.include_ext "go,css" \
-			--build.stop_on_error "false" \
-			--misc.clean_on_exit "true"
 
 .PHONY: clean
 clean:

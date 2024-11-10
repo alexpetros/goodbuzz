@@ -10,13 +10,11 @@ It's not yet hosted publicly, but it will be once I make a couple modifications 
 
 ## Developer Setup
 
-This uses [templ](https://github.com/a-h/templ) for templating and [air](https://github.com/air-verse/air) for live-reloading development.
-Follow the installation instructions for both.
+This uses [templ](https://github.com/a-h/templ) for templating, so make sure that the `templ` command is installed and accessible from the shell
 
-Once these are installed, use the makefile to build and run the program:
+Use the makefile to build and run the program:
 
-- `make` / `make live` - start the hot-reloading dev version
-- `make build` - build the production version
+- `make` / `make build` - build the production version
 - `make dev` - build and run the dev  version
 - `make prod` - build and run the production  version
 - `make clean` - remove all build artifacts
