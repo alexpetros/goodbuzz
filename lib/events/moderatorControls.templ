@@ -28,11 +28,19 @@ func UnlockedStatusEvent() string {
 }
 
 func ModeratorPlayerControlsEvent(roomId int64, players []*users.Player) string {
-	component := ModeratorPlayerControls(roomId, players)
+  team1, team2 := users.SplitIntoTeams(players)
+	component := ModeratorPlayerControls(roomId, team1, team2)
 	return lib.FormatEventComponent("controls", component)
 }
 
-templ ModeratorPlayerControls(roomId int64, players []*users.Player) {
+templ ModeratorPlayerControls(roomId int64, team1 []*users.Player, team2 []*users.Player) {
+  @ModTable(roomId, team1, 1)
+  @ModTable(roomId, team2, 2)
+}
+
+templ ModTable (roomId int64, players []*users.Player, teamNum int64) {
+  <div>
+  <h3>Team {fmt.Sprintf("%d", teamNum)}</h3>
   <table>
     for _, player := range players {
     <tr>
@@ -61,4 +69,5 @@ templ ModeratorPlayerControls(roomId int64, players []*users.Player) {
     </tr>
     }
   </table>
+  </div>
 }

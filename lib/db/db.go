@@ -360,7 +360,6 @@ func CreatePlayer(ctx context.Context, userToken string, name string, team int64
 		stmt.SetInt64("$4", roomId)
 
 		_, err := stmt.Step()
-		logger.Debug("%v", roomId)
 		if err != nil {
 			logger.Error("Failed to create player: %s", err)
 			return err
@@ -391,14 +390,35 @@ func GetPlayer(ctx context.Context, userToken string) *Player {
 		return &Player {
 			UserToken: stmt.ColumnText(0),
 			Name: stmt.ColumnText(1),
-			Team: stmt.ColumnInt64(1),
-			RoomId: stmt.ColumnInt64(1),
+			Team: stmt.ColumnInt64(2),
+			RoomId: stmt.ColumnInt64(3),
 		}
 	}
 
 	return run(ctx, fn)
 }
 
+
+func UpdatePlayer(ctx context.Context, userToken string, name string, team int64) error {
+	fn := func(conn *sqlite.Conn) error {
+		stmt := conn.Prep("UPDATE players SET name = $1, team = $2 WHERE user_token = $3")
+		defer stmt.Reset()
+
+		stmt.SetText("$1", name)
+		stmt.SetInt64("$2", team)
+		stmt.SetText("$3", userToken)
+
+		_, err := stmt.Step()
+		if err != nil {
+			logger.Error("Failed to update player: %s", err)
+			return err
+		}
+
+		return nil
+	}
+
+	return run(ctx, fn)
+}
 
 func SetUserName(ctx context.Context, userToken string, name string) error {
 	fn := func(conn *sqlite.Conn) error {

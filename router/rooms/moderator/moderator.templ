@@ -32,8 +32,6 @@ templ index(room *room.Room, tournament *db.Tournament) {
 <link rel="stylesheet" href="/static/moderator.css">
 <script defer src="/static/webcomponents/editable-field.js"></script>
 
-
-
 <main
   class="game moderator"
   hx-ext="sse"
@@ -63,7 +61,7 @@ templ index(room *room.Room, tournament *db.Tournament) {
 
 <section class="players">
   <h2>Player Controls</h2>
-  <div sse-swap="controls" hx-swap="innerHTML"></div>
+  <div sse-swap="controls" hx-swap="innerHTML" class="player-tables"></div>
 </section>
 
 <section class="logs">

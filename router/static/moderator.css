@@ -3,10 +3,18 @@ main.moderator {
   grid-template-columns: 1fr;
 }
 
-.players tr {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+section.players {
+  .player-tables {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  tr {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+  }
 }
+
 
 .controls {
   display: grid;
@@ -72,7 +80,7 @@ a.edit {
   section.settings { grid-area: settings }
 
   main.moderator {
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 1fr 1fr;
     grid-template-areas:
       "details details"
       "controls players"
@@ -81,4 +89,9 @@ a.edit {
     ;
     column-gap: 5%;
   }
+
+  section.players .player-tables {
+    grid-template-columns: 1fr 1fr;
+  }
+
 }
