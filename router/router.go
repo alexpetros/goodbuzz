@@ -51,8 +51,8 @@ func SetupRouter(mux *http.ServeMux) {
 	mux.Handle("DELETE /rooms/{id}/players/{userToken}", rooms.Middleware(rooms.KickPlayer))
 	mux.Handle("DELETE /rooms/{id}/locks/{userToken}", rooms.Middleware(locks.Delete))
 
-	mux.HandleFunc("GET /admin", admin.Get)
-	mux.HandleFunc("PUT /admin", admin.Put)
+	mux.Handle("GET /admin", admin.Middleware(admin.Get))
+	mux.Handle("PUT /admin", admin.Middleware(admin.Put))
 
 	mux.HandleFunc("GET /healthcheck", healthcheck.Get)
 }

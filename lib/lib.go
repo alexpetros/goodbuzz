@@ -38,6 +38,11 @@ func HxRedirect(w http.ResponseWriter, r *http.Request, route string) {
 	w.WriteHeader(200)
 }
 
+func Forbidden(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(403)
+	io.WriteString(w, "<h1>Forbidden</h1><p><a href=/>Return home</a>")
+}
+
 func BadRequest(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(400)
 	io.WriteString(w, "<h1>Bad Request</h1><p><a href=/>Return home</a>")

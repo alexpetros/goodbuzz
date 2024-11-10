@@ -601,3 +601,22 @@ func SetSetting(ctx context.Context, key string, value string) error {
 
 	return run(ctx, fn)
 }
+
+func WipeSessions(ctx context.Context, userToken string) error {
+	fn := func(conn *sqlite.Conn) error {
+		modDelete := conn.Prep("DELETE FROM mod_sessions")
+		defer modDelete.Reset()
+		// Delete all the sessions except that of the user doing the deleting
+		adminDelete := conn.Prep("DELETE FROM admin_sessions WHERE user_token != $1")
+		defer adminDelete.Reset()
+
+		adminDelete.SetText("$1", userToken)
+
+		modDelete.Step()
+		adminDelete.Step()
+
+		return nil
+	}
+
+	return run(ctx, fn)
+}
