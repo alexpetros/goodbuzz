@@ -35,14 +35,16 @@ body {
   font-size: 1.1rem;
 }
 
-main.index, main.login {
-  max-width: 600px;
+main {
   margin: 30px auto;
 }
 
+main.index, main.login {
+  max-width: 600px;
+}
+
 main.game {
-  max-width: 800px;
-  margin: 30px auto;
+  max-width: 900px;
 }
 
 .logo {

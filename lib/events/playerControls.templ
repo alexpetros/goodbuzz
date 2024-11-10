@@ -7,7 +7,8 @@ import (
 )
 
 func PlayerListEvent(players []*users.Player, self *users.Player) string {
-	return lib.FormatEventComponent("players", PlayerTable(players, self))
+  team1, team2 := users.SplitIntoTeams(players)
+	return lib.FormatEventComponent("players", PlayerTables(self, team1, team2))
 }
 
 func OtherPlayerWonBuzzerEvent(player *users.Player) string {
@@ -51,14 +52,19 @@ templ OtherPlayerWonBuzzer(player *users.Player) {
 </button>
 }
 
-templ PlayerTable(players []*users.Player, self *users.Player) {
-<table>
+templ PlayerTables(self *users.Player, team1 []*users.Player, team2 []*users.Player) {
+
+<div>
+<h3>Team 1</h3>
+<table class="team">
+  if self.Team == 1 {
   <tr>
     <td class={"you", "player-name", templ.KV("locked", self.IsLocked)}>
       {self.Name} (you)
     </td>
   </tr>
-  for _, player := range players {
+  }
+  for _, player := range team1 {
     if player.Token != self.Token {
       <tr>
         <td class={"other", "player-name", templ.KV("locked", player.IsLocked)}>
@@ -68,6 +74,29 @@ templ PlayerTable(players []*users.Player, self *users.Player) {
     }
   }
 </table>
+</div>
+
+<div>
+<h3>Team 2</h3>
+<table class="team">
+  if self.Team == 2 {
+  <tr>
+    <td class={"you", "player-name", templ.KV("locked", self.IsLocked)}>
+      {self.Name} (you)
+    </td>
+  </tr>
+  }
+  for _, player := range team2 {
+    if player.Token != self.Token {
+      <tr>
+        <td class={"other", "player-name", templ.KV("locked", player.IsLocked)}>
+          {player.Name}
+        </td>
+      </tr>
+    }
+  }
+</table>
+</div>
 }
 
 func ReadyBuzzerEvent(resetToken string) string {

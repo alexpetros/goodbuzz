@@ -53,7 +53,7 @@ templ index(room *room.Room) {
     <label>
       Team:
       <select name="team">
-      for i := 1; i <= 4; i++ {
+      for i := 1; i <= 2; i++ {
         <option value={fmt.Sprintf("%d", i)}>Team {fmt.Sprintf("%d", i)}</option>
       }
       </select>
@@ -64,8 +64,8 @@ templ index(room *room.Room) {
 </section>
 
 <section class="players">
-  <h3>Players</h3>
-  <div sse-swap="players" hx-swap="innerHTML"></div>
+  <h2>Players</h2>
+  <div class="player-tables" sse-swap="players" hx-swap="innerHTML"></div>
 </section>
 
 <section class="logs">

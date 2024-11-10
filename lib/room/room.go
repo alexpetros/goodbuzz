@@ -53,7 +53,7 @@ func (room *Room) convertUpdate(buzzerUpdate buzzer.BuzzerUpdate) roomUpdate {
 
 		// Ensures we never have a nil winner, if there's a winner
 		if !ok {
-			winner = users.NewPlayer("(disconnected player)", buzzerUpdate.WinnerToken, false)
+			winner = users.NewPlayer("(disconnected player)", 1, buzzerUpdate.WinnerToken, false)
 		} else {
 			winner = player
 		}
@@ -145,6 +145,16 @@ func (room *Room) KickAll() {
 	room.moderators.KickAll()
 }
 
+func (room *Room) UpdatePlayer(userToken string, name string, team int64) {
+	logger.Debug("Setting %s name to %s", userToken, name)
+
+	room.players.Run(userToken, func(player *users.Player) {
+		player.SetName(name)
+		player.SetTeam(team)
+	})
+
+	room.sendPlayerListUpdates()
+}
 
 func (room *Room) SetPlayerName(userToken string, name string) {
 	logger.Debug("Setting %s name to %s", userToken, name)
@@ -236,9 +246,9 @@ func (room *Room) IsPlayerAlreadyConnected(userToken string) bool {
 	return room.players.HasUser(userToken)
 }
 
-func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken string, name string) {
+func (room *Room) AttachPlayer(w http.ResponseWriter, r *http.Request, userToken string, name string, team int64) {
 	isLocked := room.locksCache.IsLocked(userToken)
-	player := users.NewPlayer(name, userToken, isLocked)
+	player := users.NewPlayer(name, team, userToken, isLocked)
 	closeChan := room.players.AddUser(w, r, userToken, player)
 
 	// Initialize Player

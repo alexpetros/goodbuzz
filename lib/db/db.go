@@ -349,18 +349,20 @@ func DeleteTournament(ctx context.Context, tournament_id int64) error {
 	return run(ctx, fn)
 }
 
-func CreatePlayer(ctx context.Context, userToken string, name string, roomId int64) error {
+func CreatePlayer(ctx context.Context, userToken string, name string, team int64, roomId int64) error {
 	fn := func(conn *sqlite.Conn) error {
-		stmt := conn.Prep("INSERT OR REPLACE INTO players (user_token, name, room_id) VALUES ($1, $2, $3)")
+		stmt := conn.Prep("INSERT OR REPLACE INTO players (user_token, name, team, room_id) VALUES ($1, $2, $3, $4)")
 		defer stmt.Reset()
 
 		stmt.SetText("$1", userToken)
 		stmt.SetText("$2", name)
-		stmt.SetInt64("$3", roomId)
+		stmt.SetInt64("$3", team)
+		stmt.SetInt64("$4", roomId)
 
 		_, err := stmt.Step()
+		logger.Debug("%v", roomId)
 		if err != nil {
-			logger.Error("Failed to set name: %s", err)
+			logger.Error("Failed to create player: %s", err)
 			return err
 		}
 

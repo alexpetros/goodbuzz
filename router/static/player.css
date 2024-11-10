@@ -47,6 +47,11 @@ section.settings {
 }
 
 section.players {
+  .player-tables {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
   table { margin-top: 15px; }
   tr {
     display: grid;
@@ -65,11 +70,15 @@ section.players {
   section.logs { grid-area: logs }
 
   main.player {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 2fr 3fr;
     grid-template-areas:
       "details details"
       "buzzer settings"
       "buzzer players"
       "logs logs";
+  }
+
+  section.players .player-tables {
+    grid-template-columns: 1fr 1fr;
   }
 }
