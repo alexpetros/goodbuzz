@@ -14,7 +14,7 @@ import (
 )
 
 type Room struct {
-	Id      int64
+	Id          int64
 	Name        string
 	Description string
 	logs        []events.Log
@@ -33,7 +33,7 @@ type roomUpdate struct {
 
 func (roomMap *RoomMap) newRoom(roomId int64, name string, description string) *Room {
 	room := Room{
-		Id:      roomId,
+		Id:          roomId,
 		Name:        name,
 		Description: description,
 		logs:        make([]events.Log, 0),

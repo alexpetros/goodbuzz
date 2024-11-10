@@ -12,7 +12,7 @@ import (
 
 var openRooms = room.NewRoomMap()
 
-func Middleware(next func (http.ResponseWriter, *http.Request)) http.Handler {
+func Middleware(next func(http.ResponseWriter, *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		roomId, paramErr := lib.GetIntParam(r, "id")
 		if paramErr != nil {
@@ -31,7 +31,6 @@ func Middleware(next func (http.ResponseWriter, *http.Request)) http.Handler {
 		next(w, r)
 	})
 }
-
 
 func Put(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()

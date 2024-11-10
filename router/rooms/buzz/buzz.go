@@ -3,22 +3,13 @@ package buzz
 import (
 	"goodbuzz/lib"
 	"goodbuzz/lib/logger"
+	"goodbuzz/lib/room"
 	"goodbuzz/router/rooms"
 	"net/http"
 )
 
 func Put(w http.ResponseWriter, r *http.Request) {
-	room_id, err := lib.GetIntParam(r, "id")
-	if err != nil {
-		lib.BadRequest(w, r)
-		return
-	}
-
-	room, notFoundErr := rooms.GetRoom(r.Context(), room_id)
-	if notFoundErr != nil {
-		http.NotFound(w, r)
-		return
-	}
+	room := r.Context().Value("room").(*room.Room)
 
 	cookie, noToken := r.Cookie("userToken")
 	if noToken != nil {
@@ -33,17 +24,7 @@ func Put(w http.ResponseWriter, r *http.Request) {
 }
 
 func Delete(w http.ResponseWriter, r *http.Request) {
-	room_id, err := lib.GetIntParam(r, "id")
-	if err != nil {
-		lib.BadRequest(w, r)
-		return
-	}
-
-	room, notFoundErr := rooms.GetRoom(r.Context(), room_id)
-	if notFoundErr != nil {
-		http.NotFound(w, r)
-		return
-	}
+	room := r.Context().Value("room").(*room.Room)
 
 	query := r.URL.Query()
 	mode := query.Get("mode")

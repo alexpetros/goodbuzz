@@ -31,7 +31,6 @@ func (um *UserMap[T]) AddUser(w http.ResponseWriter, r *http.Request, userToken 
 	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Connection", "keep-alive")
 
-
 	eventChan := make(chan string)
 	interruptChan := make(chan struct{})
 	closeChan := make(chan struct{})
@@ -144,7 +143,6 @@ func (um *UserMap[T]) KickAll() {
 		user.interruptChan <- struct{}{}
 	}
 }
-
 
 func (um *UserMap[T]) HasUser(userToken string) bool {
 	_, ok := um.Get(userToken)

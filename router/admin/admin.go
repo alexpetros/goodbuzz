@@ -1,9 +1,9 @@
 package admin
 
 import (
-  "net/http"
-  "goodbuzz/lib"
-  "goodbuzz/lib/db"
+	"goodbuzz/lib"
+	"goodbuzz/lib/db"
+	"net/http"
 )
 
 func Put(w http.ResponseWriter, r *http.Request) {

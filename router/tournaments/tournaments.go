@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func Middleware(next func (http.ResponseWriter, *http.Request)) http.Handler {
+func Middleware(next func(http.ResponseWriter, *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tournament_id, parse_err := lib.GetIntParam(r, "id")
 		if parse_err != nil {

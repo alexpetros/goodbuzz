@@ -2,7 +2,7 @@ package users
 
 type Player struct {
 	Name     string
-	Team int64
+	Team     int64
 	Token    string
 	IsLocked bool
 }

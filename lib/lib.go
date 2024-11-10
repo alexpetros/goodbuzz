@@ -72,7 +72,7 @@ func CombineEvents(events ...string) string {
 }
 
 func NewUserToken() *http.Cookie {
-	return &http.Cookie {
+	return &http.Cookie{
 		Name:     "userToken",
 		Value:    uuid.NewString(),
 		Path:     "/",

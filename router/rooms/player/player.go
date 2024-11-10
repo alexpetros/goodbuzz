@@ -38,7 +38,6 @@ func Put(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	room.UpdatePlayer(userToken, name, team)
 	db.UpdatePlayer(r.Context(), userToken, name, team)
 
@@ -93,7 +92,6 @@ func Live(w http.ResponseWriter, r *http.Request) {
 		name = player.Name
 		team = player.Team
 	}
-
 
 	// If the user has a name cookie that is different than the one in the db, update the name cookie
 	// We do this so that users don't revert to their old name when the moderator renames them

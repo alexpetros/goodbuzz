@@ -11,9 +11,9 @@ import (
 
 type Player struct {
 	UserToken string
-	Name          string
-	Team     int64
-	RoomId     int64
+	Name      string
+	Team      int64
+	RoomId    int64
 }
 
 type Tournament struct {
@@ -39,10 +39,10 @@ func (t *Tournament) Url() string {
 }
 
 type Room struct {
-	RoomId      int64
-	TournamentId      int64
-	Name        string
-	Description string
+	RoomId       int64
+	TournamentId int64
+	Name         string
+	Description  string
 }
 
 var pool *sqlitex.Pool
@@ -248,9 +248,9 @@ func GetRoom(ctx context.Context, room_id int64) *Room {
 		}
 
 		room := Room{
-			RoomId:      stmt.ColumnInt64(0),
-			Name:        stmt.ColumnText(1),
-			Description: stmt.ColumnText(2),
+			RoomId:       stmt.ColumnInt64(0),
+			Name:         stmt.ColumnText(1),
+			Description:  stmt.ColumnText(2),
 			TournamentId: stmt.ColumnInt64(3),
 		}
 
@@ -387,17 +387,16 @@ func GetPlayer(ctx context.Context, userToken string) *Player {
 			return nil
 		}
 
-		return &Player {
+		return &Player{
 			UserToken: stmt.ColumnText(0),
-			Name: stmt.ColumnText(1),
-			Team: stmt.ColumnInt64(2),
-			RoomId: stmt.ColumnInt64(3),
+			Name:      stmt.ColumnText(1),
+			Team:      stmt.ColumnInt64(2),
+			RoomId:    stmt.ColumnInt64(3),
 		}
 	}
 
 	return run(ctx, fn)
 }
-
 
 func UpdatePlayer(ctx context.Context, userToken string, name string, team int64) error {
 	fn := func(conn *sqlite.Conn) error {
