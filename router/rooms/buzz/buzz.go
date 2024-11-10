@@ -4,7 +4,6 @@ import (
 	"goodbuzz/lib"
 	"goodbuzz/lib/logger"
 	"goodbuzz/lib/room"
-	"goodbuzz/router/rooms"
 	"net/http"
 )
 
