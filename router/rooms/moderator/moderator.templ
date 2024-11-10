@@ -32,7 +32,6 @@ templ index(room *room.Room, tournament *db.Tournament) {
 <link rel="stylesheet" href="/static/moderator.css">
 <script defer src="/static/webcomponents/editable-field.js"></script>
 
-<p><a href={templ.SafeURL(tournament.Url())}>Back to {tournament.Name()}</a></p>
 
 
 <main
@@ -44,6 +43,7 @@ templ index(room *room.Room, tournament *db.Tournament) {
 >
 
 <section class="details">
+  <a href={templ.SafeURL(tournament.Url())}>Back to {tournament.Name()}</a>
   <h1>{room.Name}</h1>
 </section>
 
@@ -83,7 +83,6 @@ templ index(room *room.Room, tournament *db.Tournament) {
     <button>Save</button>
   </form>
   <div class="hidden"><button>Save</button></div>
-
 </section>
 
 </main>

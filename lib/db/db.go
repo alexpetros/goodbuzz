@@ -9,6 +9,13 @@ import (
 	"zombiezen.com/go/sqlite/sqlitex"
 )
 
+type Player struct {
+	UserToken string
+	Name          string
+	Team     int64
+	RoomId     int64
+}
+
 type Tournament struct {
 	tournament_id int64
 	name          string
@@ -342,9 +349,30 @@ func DeleteTournament(ctx context.Context, tournament_id int64) error {
 	return run(ctx, fn)
 }
 
-func GetName(ctx context.Context, userToken string) string {
-	fn := func(conn *sqlite.Conn) string {
-		stmt := conn.Prep("SELECT name FROM game_users WHERE user_token = $1")
+func CreatePlayer(ctx context.Context, userToken string, name string, roomId int64) error {
+	fn := func(conn *sqlite.Conn) error {
+		stmt := conn.Prep("INSERT OR REPLACE INTO players (user_token, name, room_id) VALUES ($1, $2, $3)")
+		defer stmt.Reset()
+
+		stmt.SetText("$1", userToken)
+		stmt.SetText("$2", name)
+		stmt.SetInt64("$3", roomId)
+
+		_, err := stmt.Step()
+		if err != nil {
+			logger.Error("Failed to set name: %s", err)
+			return err
+		}
+
+		return nil
+	}
+
+	return run(ctx, fn)
+}
+
+func GetPlayer(ctx context.Context, userToken string) *Player {
+	fn := func(conn *sqlite.Conn) *Player {
+		stmt := conn.Prep("SELECT user_token, name, team, room_id FROM players WHERE user_token = $1")
 		defer stmt.Reset()
 
 		stmt.SetText("$1", userToken)
@@ -352,15 +380,18 @@ func GetName(ctx context.Context, userToken string) string {
 		row, err := stmt.Step()
 		if err != nil {
 			logger.Error("Error getting user: %s", err)
-			return ""
+			return nil
 		}
-
 		if !row {
-			return ""
+			return nil
 		}
 
-		res := stmt.ColumnText(0)
-		return res
+		return &Player {
+			UserToken: stmt.ColumnText(0),
+			Name: stmt.ColumnText(1),
+			Team: stmt.ColumnInt64(1),
+			RoomId: stmt.ColumnInt64(1),
+		}
 	}
 
 	return run(ctx, fn)
@@ -369,7 +400,7 @@ func GetName(ctx context.Context, userToken string) string {
 
 func SetUserName(ctx context.Context, userToken string, name string) error {
 	fn := func(conn *sqlite.Conn) error {
-		stmt := conn.Prep("UPDATE game_users SET name = $1 WHERE user_token = $2")
+		stmt := conn.Prep("UPDATE players SET name = $1 WHERE user_token = $2")
 		defer stmt.Reset()
 
 		stmt.SetText("$1", name)

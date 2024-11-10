@@ -1,10 +1,8 @@
 package player
 
 import (
-	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/lib/db"
-	"goodbuzz/lib/events"
 	"goodbuzz/lib/logger"
 	"goodbuzz/lib/room"
 	"net/http"
@@ -27,7 +25,6 @@ func Put(w http.ResponseWriter, r *http.Request) {
 	userToken := cookie.Value
 	name := r.PostFormValue("name")
 
-	http.SetCookie(w, makeNameCookie(name))
 	room.SetPlayerName(userToken, name)
 	db.SetUserName(r.Context(), userToken, name)
 
@@ -65,42 +62,23 @@ func Live(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Content-Type", "text/event-stream")
 		w.Header().Add("Cache-Control", "no-cache")
 		w.Header().Add("Connection", "keep-alive")
-		fmt.Fprint(w, events.OtherTabOpenEvent(userToken))
 		return
 	}
 
-	nameCookie, err := r.Cookie("name")
+	player := db.GetPlayer(r.Context(), userToken)
 
 	var name string
-	if err != nil {
+	if player == nil {
 		name = "New Player"
+		db.CreatePlayer(r.Context(), userToken, name, room.Id)
 	} else {
-		name = nameCookie.Value
+		name = player.Name
 	}
 
 	// If the user has a name cookie that is different than the one in the db, update the name cookie
 	// We do this so that users don't revert to their old name when the moderator renames them
-	dbName := db.GetName(r.Context(), userToken)
-	if dbName != "" && dbName != name {
-		name = dbName
-		// Update the player's name cookie to the new name
-		http.SetCookie(w, makeNameCookie(name))
-	}
-
-
 	logger.Info("Player %s connected to room %d\n", userToken, room.Id)
 	room.AttachPlayer(w, r, userToken, name)
 
 	logger.Info("Player %s disconnected from room %d", userToken, room.Id)
-}
-
-func makeNameCookie(name string) *http.Cookie {
-	return &http.Cookie{
-		Name:     "name",
-		Value:    name,
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
-	}
 }
