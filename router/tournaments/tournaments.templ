@@ -42,7 +42,7 @@ templ admin (tournament *db.Tournament, rooms []room.Room) {
   Click into the rooms to edit or delete them. You can also join the rooms as either a player or
 moderator.
 </p>
-<table class="rooms-player">
+<table class="rooms">
   <tr>
     <th>Name</th>
     <th colspan="2">Join the Room</th>
@@ -76,7 +76,7 @@ templ mod(tournament *db.Tournament, rooms []room.Room) {
 <h1>{tournament.Name()}</h1>
 
 <h2>Rooms</h2>
-<table class="rooms-player">
+<table class="rooms">
   <tr>
     <th>Name</th>
     <th colspan="2">Join Links</th>
@@ -97,7 +97,7 @@ templ player(tournament *db.Tournament, rooms []room.Room) {
 <h1>{tournament.Name()}</h1>
 
 <h2>Rooms</h2>
-<table class="rooms-player">
+<table class="rooms player">
   <tr>
     <th>Room</th>
     <th>Description</th>

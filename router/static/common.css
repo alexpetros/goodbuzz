@@ -77,7 +77,7 @@ table.tournaments {
 
 }
 
-table.rooms-player {
+table.rooms {
   width: 100%;
 
   th {
@@ -88,8 +88,11 @@ table.rooms-player {
     padding: 5px 10px;
   }
 
-  td:first-child {
-    width: max-content;
+
+  &.player {
+    th:first-child, td:first-child {
+      width: 30%;
+    }
   }
 }
 
