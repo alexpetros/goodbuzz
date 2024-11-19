@@ -3,6 +3,11 @@ main.player {
   grid-template-columns: 1fr;
 }
 
+section.controls .spacebar-control {
+  display: block;
+  margin: 20px 0;
+}
+
 button.buzzer {
   display: block;
   margin: 0 auto;
@@ -63,7 +68,7 @@ section.players {
 
 @media (min-width: 600px) {
   section.details { grid-area: details }
-  section.buzzer { grid-area: buzzer }
+  section.controls { grid-area: buzzer }
   section.settings { grid-area: settings }
   section.players { grid-area: players }
   section.logs { grid-area: logs }
