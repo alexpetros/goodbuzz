@@ -41,7 +41,9 @@ templ index(room *room.Room) {
   <div sse-swap="buzzer" hx-swap="innerHTML">
     <button class="buzzer loading" disabled>Loading...</button>
   </div>
-  <label class="spacebar-control"><input type="checkbox">Enable spacebar buzzing</label>
+  <label class="spacebar-control">
+    <input type="checkbox" onchange="this.blur()">Enable spacebar buzzing
+  </label>
 </section>
 
 <section class="settings">

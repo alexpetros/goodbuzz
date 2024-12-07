@@ -6,6 +6,12 @@ main.player {
 section.controls .spacebar-control {
   display: block;
   margin: 20px 0;
+  font-size: 1.2rem;
+
+  input[type=checkbox] {
+    height: 1.2rem;
+    width: 1.2rem;
+  }
 }
 
 button.buzzer {
