@@ -36,7 +36,7 @@ install:
 
 .PHONY: deploy
 deploy:
-	ssh goodbuzz 'cd goodbuzz && git pull && make install && systemctl reestart goodbuzz'
+	ssh goodbuzz 'cd goodbuzz && git pull && make install && systemctl restart goodbuzz'
 
 
 .PHONY: clean
