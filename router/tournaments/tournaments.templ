@@ -30,11 +30,18 @@ func Get(w http.ResponseWriter, r *http.Request) {
 }
 
 templ admin (tournament *db.Tournament, rooms []room.Room) {
+<style>
+.tournament-details label { display: block; }
+</style>
+
 <h1>{tournament.Name()}</h1>
 
-<form hx-put={tournament.Url()}>
+<h2>Settings</h2>
+
+<form hx-put={tournament.Url()} class="tournament-details">
   <label>Name: <input name="name" type="text" value={tournament.Name()}></label>
-  <button class="action edit">Submit</button>
+  <label>Password: <input name="password" type="text" value={tournament.Password()}></label>
+  <div><button class="action edit">Submit</button></div>
 </form>
 
 <h2>Rooms</h2>

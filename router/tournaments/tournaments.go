@@ -25,9 +25,12 @@ func Middleware(next func(http.ResponseWriter, *http.Request)) http.Handler {
 
 		isMod := lib.IsMod(r)
 		isAdmin := lib.IsAdmin(r)
+		isUserAuthed := lib.IsUserAuthed(r, tournament_id)
+
 		ctx := context.WithValue(r.Context(), "tournament", tournament)
 		ctx = context.WithValue(ctx, "isMod", isMod)
 		ctx = context.WithValue(ctx, "isAdmin", isAdmin)
+		ctx = context.WithValue(ctx, "isUserAuthed", isUserAuthed)
 
 		r = r.WithContext(ctx)
 		next(w, r)
@@ -70,12 +73,14 @@ func PostRoom(w http.ResponseWriter, r *http.Request) {
 func Put(w http.ResponseWriter, r *http.Request) {
 	tournament := r.Context().Value("tournament").(*db.Tournament)
 	name := r.PostFormValue("name")
+	password := r.PostFormValue("password")
+
 	if name == "" {
 		lib.BadRequest(w, r)
 		return
 	}
 
-	err := db.SetTournamentInfo(r.Context(), tournament.Id(), name)
+	err := db.SetTournamentInfo(r.Context(), tournament.Id(), name, password)
 
 	if err == nil {
 		w.Header().Add("HX-Refresh", "true")

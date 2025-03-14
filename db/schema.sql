@@ -1,6 +1,7 @@
 CREATE TABLE tournaments (
   tournament_id INTEGER PRIMARY KEY,
-  name TEXT NOT NULL
+  name TEXT NOT NULL,
+  password TEXT NOT NULL DEFAULT "",
 ) STRICT;
 
 CREATE TABLE rooms (
@@ -18,6 +19,11 @@ CREATE TABLE admin_sessions (
 CREATE TABLE mod_sessions (
   user_token TEXT PRIMARY KEY,
   timestamp TEXT DEFAULT CURRENT_TIMESTAMP
+) STRICT;
+
+CREATE TABLE player_logins (
+  user_token TEXT NOT NULL,
+  tournament_id INTEGER NOT NULL
 ) STRICT;
 
 CREATE TABLE players (

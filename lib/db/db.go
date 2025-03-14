@@ -19,6 +19,7 @@ type Player struct {
 type Tournament struct {
 	tournament_id int64
 	name          string
+	password      string
 	num_rooms     int64
 }
 
@@ -28,6 +29,10 @@ func (t *Tournament) Id() int64 {
 
 func (t *Tournament) Name() string {
 	return t.name
+}
+
+func (t *Tournament) Password() string {
+	return t.password
 }
 
 func (t *Tournament) NumRooms() int64 {
@@ -83,7 +88,7 @@ func run[T any](ctx context.Context, fn dbFn[T]) T {
 
 func GetTournament(ctx context.Context, id int64) *Tournament {
 	fn := func(conn *sqlite.Conn) *Tournament {
-		stmt := conn.Prep("SELECT tournament_id, name FROM tournaments WHERE tournament_id = $id")
+		stmt := conn.Prep("SELECT tournament_id, name, password FROM tournaments WHERE tournament_id = $id")
 		defer stmt.Reset()
 
 		stmt.SetInt64("$id", id)
@@ -101,6 +106,7 @@ func GetTournament(ctx context.Context, id int64) *Tournament {
 		tournament := Tournament{
 			tournament_id: stmt.ColumnInt64(0),
 			name:          stmt.ColumnText(1),
+			password:          stmt.ColumnText(2),
 		}
 
 		return &tournament
@@ -109,13 +115,14 @@ func GetTournament(ctx context.Context, id int64) *Tournament {
 	return run(ctx, fn)
 }
 
-func SetTournamentInfo(ctx context.Context, tournamentId int64, name string) error {
+func SetTournamentInfo(ctx context.Context, tournamentId int64, name string, password string) error {
 	fn := func(conn *sqlite.Conn) error {
-		stmt := conn.Prep("UPDATE tournaments SET name = $1 WHERE tournament_id = $2")
+		stmt := conn.Prep("UPDATE tournaments SET name = $1, password = $2 WHERE tournament_id = $3")
 		defer stmt.Reset()
 
 		stmt.SetText("$1", name)
-		stmt.SetInt64("$2", tournamentId)
+		stmt.SetText("$2", password)
+		stmt.SetInt64("$3", tournamentId)
 
 		_, err := stmt.Step()
 		if err != nil {
@@ -616,6 +623,46 @@ func WipeSessions(ctx context.Context, userToken string) error {
 		adminDelete.Step()
 
 		return nil
+	}
+
+	return run(ctx, fn)
+}
+
+func AddUserToTournament(ctx context.Context, userToken string, tournament_id int64) error {
+	fn := func(conn *sqlite.Conn) error {
+		stmt := conn.Prep("INSERT INTO player_logins (user_token, tournament_id) VALUES ($1, $2)")
+		defer stmt.Reset()
+
+		stmt.SetText("$1", userToken)
+		stmt.SetInt64("$2", tournament_id)
+		stmt.Step()
+
+		return nil
+	}
+
+	return run(ctx, fn)
+}
+
+
+func IsUserAuthedForTournament(ctx context.Context, userToken string, tournament_id int64) bool {
+	fn := func(conn *sqlite.Conn) bool {
+		stmt := conn.Prep("SELECT 1 FROM player_logins WHERE user_token = $1")
+		defer stmt.Reset()
+
+		stmt.SetText("$1", userToken)
+
+		row, err := stmt.Step()
+		if err != nil {
+			logger.Error("Error attempting to get player tournament info %s", err)
+			return false
+		}
+		if !row {
+			return false
+		}
+
+		res := stmt.ColumnInt(0)
+
+		return res == 1
 	}
 
 	return run(ctx, fn)

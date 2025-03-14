@@ -108,3 +108,14 @@ func IsAdmin(r *http.Request) bool {
 
 	return isAdmin
 }
+
+func IsUserAuthed(r *http.Request, tournament_id int64) bool {
+	isAuthed := false
+
+	cookie, noToken := r.Cookie("userToken")
+	if noToken == nil {
+		isAuthed = db.IsUserAuthedForTournament(r.Context(), cookie.Value, tournament_id)
+	}
+
+	return isAuthed
+}
