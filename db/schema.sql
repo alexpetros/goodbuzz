@@ -21,9 +21,10 @@ CREATE TABLE mod_sessions (
   timestamp TEXT DEFAULT CURRENT_TIMESTAMP
 ) STRICT;
 
-CREATE TABLE player_logins (
+CREATE TABLE player_sessions (
   user_token TEXT NOT NULL,
-  tournament_id INTEGER NOT NULL
+  tournament_id INTEGER NOT NULL,
+  timestamp TEXT DEFAULT CURRENT_TIMESTAMP
 ) STRICT;
 
 CREATE TABLE players (

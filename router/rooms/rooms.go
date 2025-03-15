@@ -26,6 +26,16 @@ func Middleware(next func(http.ResponseWriter, *http.Request)) http.Handler {
 			return
 		}
 
+		tournament := db.GetTournamentForRoom(r.Context(), roomId)
+		isMod := lib.IsMod(r)
+		isAdmin := lib.IsAdmin(r)
+		isUserAuthed := lib.IsUserAuthed(r, tournament.Id())
+
+		if !(isUserAuthed || isMod || isAdmin) {
+			lib.Forbidden(w, r)
+			return
+		}
+
 		ctx := context.WithValue(r.Context(), "room", room)
 		r = r.WithContext(ctx)
 		next(w, r)

@@ -486,14 +486,20 @@ func LoginAdmin(ctx context.Context, userToken string) error {
 
 func DeleteLogin(ctx context.Context, userToken string) error {
 	fn := func(conn *sqlite.Conn) error {
+
+		userDelete := conn.Prep("DELETE FROM player_sessions WHERE user_token = $1")
+		defer userDelete.Reset()
 		modDelete := conn.Prep("DELETE FROM mod_sessions WHERE user_token = $1")
 		defer modDelete.Reset()
 		adminDelete := conn.Prep("DELETE FROM admin_sessions WHERE user_token = $1")
 		defer adminDelete.Reset()
 
+
+		userDelete.SetText("$1", userToken)
 		modDelete.SetText("$1", userToken)
 		adminDelete.SetText("$1", userToken)
 
+		userDelete.Step()
 		modDelete.Step()
 		adminDelete.Step()
 
@@ -630,7 +636,7 @@ func WipeSessions(ctx context.Context, userToken string) error {
 
 func AddUserToTournament(ctx context.Context, userToken string, tournament_id int64) error {
 	fn := func(conn *sqlite.Conn) error {
-		stmt := conn.Prep("INSERT INTO player_logins (user_token, tournament_id) VALUES ($1, $2)")
+		stmt := conn.Prep("INSERT INTO player_sessions (user_token, tournament_id) VALUES ($1, $2)")
 		defer stmt.Reset()
 
 		stmt.SetText("$1", userToken)
@@ -645,7 +651,7 @@ func AddUserToTournament(ctx context.Context, userToken string, tournament_id in
 
 func IsUserAuthedForTournament(ctx context.Context, userToken string, tournament_id int64) bool {
 	fn := func(conn *sqlite.Conn) bool {
-		stmt := conn.Prep("SELECT 1 FROM player_logins WHERE user_token = $1 AND tournament_id = $2")
+		stmt := conn.Prep("SELECT 1 FROM player_sessions WHERE user_token = $1 AND tournament_id = $2")
 		defer stmt.Reset()
 
 		stmt.SetText("$1", userToken)

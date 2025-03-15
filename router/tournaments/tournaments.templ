@@ -31,18 +31,10 @@ func Get(w http.ResponseWriter, r *http.Request) {
 
 templ admin (tournament *db.Tournament, rooms []room.Room) {
 <style>
-.tournament-details label { display: block; }
+.tournament-details label { display: block; margin: 10px 0;}
 </style>
 
 <h1>{tournament.Name()}</h1>
-
-<h2>Settings</h2>
-
-<form hx-put={tournament.Url()} class="tournament-details">
-  <label>Name: <input name="name" type="text" value={tournament.Name()}></label>
-  <label>Password: <input name="password" type="text" value={tournament.Password()}></label>
-  <div><button class="action edit">Submit</button></div>
-</form>
 
 <h2>Rooms</h2>
 <p>
@@ -68,6 +60,17 @@ moderator.
 <form style="width: 30%; padding: 10px" hx-post={tournament.Url()}>
   <input name="name" type="text">
   <button>Add new</button>
+</form>
+
+<h2>Settings</h2>
+<form
+  hx-put={tournament.Url()}
+  class="tournament-details"
+  hx-on::after-request="window.scrollTo(0, 0)"
+  >
+  <label>Name: <input name="name" type="text" value={tournament.Name()}></label>
+  <label>Password: <input name="password" type="text" value={tournament.Password()}></label>
+  <div><button class="action edit">Submit</button></div>
 </form>
 
 <h2>Delete</h2>
