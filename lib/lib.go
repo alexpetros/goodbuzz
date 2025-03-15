@@ -38,6 +38,11 @@ func HxRedirect(w http.ResponseWriter, r *http.Request, route string) {
 	w.WriteHeader(200)
 }
 
+func LoginFailed(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(401)
+	io.WriteString(w, "<h1>Login Failed</h1><p>Invalid password, please try again<p><a href=/>Return home</a>")
+}
+
 func Forbidden(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(403)
 	io.WriteString(w, "<h1>Forbidden</h1><p><a href=/>Return home</a>")

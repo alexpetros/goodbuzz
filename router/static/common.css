@@ -43,6 +43,11 @@ main.index, main.login {
   max-width: 600px;
 }
 
+main.index label {
+  display: block;
+  margin: 10px 0;
+}
+
 main.game {
   max-width: 900px;
 }

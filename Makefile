@@ -60,4 +60,11 @@ reset-db:
 upcoming: reset-db
 	sqlite3 $(DB_NAME) < db/october-online.sql
 
+.PHONY: show-admin
+show-admin:
+	sqlite3 $(DB_NAME) "select value from settings where key = 'admin_password'"
+
+.PHONY: show-mod
+show-mod:
+	sqlite3 $(DB_NAME) "select value from settings where key = 'mod_password'"
 

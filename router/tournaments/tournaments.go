@@ -27,6 +27,11 @@ func Middleware(next func(http.ResponseWriter, *http.Request)) http.Handler {
 		isAdmin := lib.IsAdmin(r)
 		isUserAuthed := lib.IsUserAuthed(r, tournament_id)
 
+		if !(isUserAuthed || isMod || isAdmin) {
+			lib.Forbidden(w, r)
+			return
+		}
+
 		ctx := context.WithValue(r.Context(), "tournament", tournament)
 		ctx = context.WithValue(ctx, "isMod", isMod)
 		ctx = context.WithValue(ctx, "isAdmin", isAdmin)

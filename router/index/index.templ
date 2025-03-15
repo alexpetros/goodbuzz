@@ -1,5 +1,6 @@
 package index
 
+import "fmt"
 import "net/http"
 import "goodbuzz/lib"
 import "goodbuzz/lib/db"
@@ -9,11 +10,47 @@ func Get(w http.ResponseWriter, r *http.Request) {
     isMod := lib.IsMod(r)
     isAdmin := lib.IsAdmin(r)
 
-    content := index(tournaments, isMod, isAdmin)
+    var content templ.Component
+    if isAdmin || isMod {
+      content = loggedInIndex(tournaments, isMod, isAdmin)
+    } else {
+      content = notLoggedInIndex(tournaments)
+    }
+
     lib.Render(w, r, "Goodbuzz", content)
 }
 
-templ index(tournaments []db.Tournament, isMod bool, isAdmin bool) {
+templ notLoggedInIndex(tournaments []db.Tournament) {
+
+<main class="index">
+  <h2>Player Login</h2>
+  <form action="/login/player" method="POST">
+    <label>
+      Tournament:
+      <select name="tournament_id">
+        for _, tournament := range tournaments {
+          <option value={fmt.Sprintf("%d", tournament.Id())}>
+            { tournament.Name() }
+          </option>
+        }
+      </select>
+    </label>
+    <label>
+      Password:
+      <input type="password" name="password">
+    </label>
+    <button>Login</button>
+  </form>
+  <table class="tournaments">
+  </table>
+
+  <h2>Player Login</h2>
+  <p>Moderators and admins, <a href="/login">login here</a>.</p>
+</main>
+}
+
+// This is only for mods or admins
+templ loggedInIndex(tournaments []db.Tournament, isMod bool, isAdmin bool) {
 
 <main class="index">
   if isAdmin {
@@ -39,13 +76,8 @@ templ index(tournaments []db.Tournament, isMod bool, isAdmin bool) {
   }
 
 
-  if isAdmin || isMod {
   <h2>Logout</h2>
   <p><button hx-delete="/login" class="action delete">Logout</button></p>
-  } else {
-  <h2>Login</h2>
-  <p>Moderators and admins, <a href="/login">login here</a>.</p>
-  }
 
 </main>
 }

@@ -643,13 +643,13 @@ func AddUserToTournament(ctx context.Context, userToken string, tournament_id in
 	return run(ctx, fn)
 }
 
-
 func IsUserAuthedForTournament(ctx context.Context, userToken string, tournament_id int64) bool {
 	fn := func(conn *sqlite.Conn) bool {
-		stmt := conn.Prep("SELECT 1 FROM player_logins WHERE user_token = $1")
+		stmt := conn.Prep("SELECT 1 FROM player_logins WHERE user_token = $1 AND tournament_id = $2")
 		defer stmt.Reset()
 
 		stmt.SetText("$1", userToken)
+		stmt.SetInt64("$2", tournament_id)
 
 		row, err := stmt.Step()
 		if err != nil {
