@@ -77,4 +77,3 @@ func PostPlayer(w http.ResponseWriter, r *http.Request) {
 		lib.LoginFailed(w, r)
 	}
 }
-

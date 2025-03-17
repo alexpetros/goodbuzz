@@ -6,7 +6,7 @@
 * the boilerplate and so each function contains the same interminable error checking and
 * result checking. I could complain about the type system here, but I'm sure that
 * limitation could have been overcome and I simply lacked the interest.
-*/
+ */
 
 package db
 
@@ -116,7 +116,7 @@ func GetTournament(ctx context.Context, id int64) *Tournament {
 		tournament := Tournament{
 			tournament_id: stmt.ColumnInt64(0),
 			name:          stmt.ColumnText(1),
-			password:          stmt.ColumnText(2),
+			password:      stmt.ColumnText(2),
 		}
 
 		return &tournament
@@ -503,7 +503,6 @@ func DeleteLogin(ctx context.Context, userToken string) error {
 		defer modDelete.Reset()
 		adminDelete := conn.Prep("DELETE FROM admin_sessions WHERE user_token = $1")
 		defer adminDelete.Reset()
-
 
 		userDelete.SetText("$1", userToken)
 		modDelete.SetText("$1", userToken)
