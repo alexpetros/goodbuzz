@@ -52,9 +52,11 @@ main.index, main.login {
   max-width: 600px;
 }
 
-main.index label {
-  display: block;
-  margin: 10px 0;
+.form-basic {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 5px 15px;
+  max-width: 500px;
 }
 
 main.game {
@@ -133,12 +135,11 @@ table.rooms {
 button.action, a.action {
   font-family: 'Arial', 'Sans Serif';
   background-color: #f7f7f7;
-  border-radius: 2px;
+  border-radius: 3px;
+  padding: 3px 5px;
   border: 1px solid #424141;
   font-size: .9rem;
-  cursor: pointer;
   margin: 10px 0;
-  padding: 1px 4px;
 
   &:hover {
     background-color: #e2e2e2;

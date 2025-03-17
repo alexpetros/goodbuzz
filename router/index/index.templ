@@ -24,28 +24,25 @@ templ notLoggedInIndex(tournaments []db.Tournament) {
 
 <main class="index">
   <h2>Player Login</h2>
-  <form action="/login/player" method="POST">
-    <label>
-      Tournament:
-      <select name="tournament_id">
-        for _, tournament := range tournaments {
-          <option value={fmt.Sprintf("%d", tournament.Id())}>
-            { tournament.Name() }
-          </option>
-        }
-      </select>
-    </label>
-    <label>
-      Password:
-      <input type="password" name="password">
-    </label>
+  <form action="/login/player" method="POST" class="form-basic">
+    <label for="tournament">Tournament:</label>
+    <select name="tournament_id" class="tournament">
+      for _, tournament := range tournaments {
+        <option value={fmt.Sprintf("%d", tournament.Id())}>
+          { tournament.Name() }
+        </option>
+      }
+    </select>
+    <label for="password">Password:</label>
+    <input type="password" name="password" id="password">
     <button>Login</button>
   </form>
   <table class="tournaments">
   </table>
 
-  <h2>Player Login</h2>
-  <p>Moderators and admins, <a href="/login">login here</a>.</p>
+  <p style="margin-top: 40px">
+    Moderators and admins, <a href="/login">login here</a>.
+  </p>
 </main>
 }
 
