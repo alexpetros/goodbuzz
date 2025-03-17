@@ -38,6 +38,11 @@ install:
 deploy:
 	ssh goodbuzz 'cd goodbuzz && git pull && make install && systemctl restart goodbuzz'
 
+.PHONY: download-db
+download-db:
+	rm -f goodbuzz.db*
+	ssh goodbuzz 'sqlite3 goodbuzz/goodbuzz.db .dump' | sqlite3 goodbuzz.db
+
 
 .PHONY: clean
 clean:
