@@ -28,6 +28,15 @@ body {
   border-radius: 3px;
 }
 
+.notice.logout {
+  display: flex;
+  justify-content: space-between;
+}
+
+.notice.logout button {
+  margin: 0 0 0 auto;
+}
+
 .alert {
   margin: 20px 0;
   padding: 20px;

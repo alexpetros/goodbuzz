@@ -1,3 +1,13 @@
+/*
+* All the database functions.
+*
+* This is without question the most embarassing part of the application.
+* Not because it's a giant file of database operations, but because I never abstracted
+* the boilerplate and so each function contains the same interminable error checking and
+* result checking. I could complain about the type system here, but I'm sure that
+* limitation could have been overcome and I simply lacked the interest.
+*/
+
 package db
 
 import (

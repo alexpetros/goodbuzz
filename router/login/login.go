@@ -1,7 +1,6 @@
 package login
 
 import (
-	"fmt"
 	"goodbuzz/lib"
 	"goodbuzz/lib/db"
 	"net/http"
@@ -70,7 +69,6 @@ func PostPlayer(w http.ResponseWriter, r *http.Request) {
 		lib.LoginFailed(w, r)
 		return
 	}
-	fmt.Printf("%s", password)
 
 	if password == tournament.Password() {
 		db.AddUserToTournament(r.Context(), userToken, tournament_id)
