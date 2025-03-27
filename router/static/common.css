@@ -80,6 +80,13 @@ main.game {
   color: var(--logo-color);
 }
 
+.instructions {
+  background-color: var(--logo-color);
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+}
+
 table.tournaments {
   width: min(90%, 400px);
 

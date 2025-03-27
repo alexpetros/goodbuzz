@@ -24,6 +24,10 @@ templ notLoggedInIndex(tournaments []db.Tournament) {
 
 <main class="index">
   <h2>Player Login</h2>
+  <p class="instructions">
+    Select the tournament you wish to join from the drop-down list, and then click "Login".
+  </p>
+
   <form action="/login/player" method="POST" class="form-basic">
     <label for="tournament">Tournament:</label>
     <select name="tournament_id" class="tournament">
@@ -34,11 +38,9 @@ templ notLoggedInIndex(tournaments []db.Tournament) {
       }
     </select>
     <label for="password">Password:</label>
-    <input type="password" name="password" id="password">
+    <input type="password" name="password" id="password" placeholder="Leave blank if password isn't required">
     <button>Login</button>
   </form>
-  <table class="tournaments">
-  </table>
 
   <p style="margin-top: 40px">
     Moderators and admins, <a href="/login">login here</a>.
