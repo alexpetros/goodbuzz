@@ -21,6 +21,59 @@ Use the makefile to build and run the program:
 
 I found the hot-reloading somewhat problematic, and often found myself just using `make dev`.
 
+## Running with Docker
+
+The easiest way to run the app locally is with Docker Compose.
+
+### Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/) (included with Docker Desktop)
+
+### Start the app
+
+From the project root:
+
+```bash
+docker compose up --build
+```
+
+This will:
+
+- Build the app image from the `Dockerfile`
+- Start the container on port **8080**
+- Create a `data/` folder on your machine and mount it into the container
+- Initialize the SQLite database automatically on first run
+
+Open the app at [http://localhost:8080](http://localhost:8080).
+
+### Run in the background
+
+```bash
+docker compose up --build -d
+```
+
+### View logs
+
+```bash
+docker compose logs -f
+```
+
+### Stop the app
+
+```bash
+docker compose down
+```
+
+The database is stored in `./data/goodbuzz.db` on your host, so tournament and room data persists across restarts.
+
+### Build and run without Compose
+
+```bash
+docker build -t goodbuzz .
+docker run --rm -p 8080:8080 -v "$(pwd)/data:/app/data" goodbuzz
+```
+
 ## Server Installation
 
 Included with the source is a shell script, `./ubuntu-vps-setup.sh`, that sets up the program on a Virtual Private Server (VPS) running Ubuntu.

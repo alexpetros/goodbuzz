@@ -1,83 +1,209 @@
 main.player {
   display: grid;
   grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+main.player > section {
+  margin-bottom: 0;
+}
+
+/* ── Details ──────────────────────────────────────────── */
+
+section.details h1 {
+  margin-bottom: var(--space-sm);
+}
+
+/* ── Buzzer controls ──────────────────────────────────── */
+
+section.controls {
+  text-align: center;
+}
+
+section.controls h2 {
+  margin-bottom: var(--space-lg);
 }
 
 section.controls .spacebar-control {
-  display: block;
-  margin: 20px 0;
-  font-size: 1.2rem;
-
-  input[type=checkbox] {
-    height: 1.2rem;
-    width: 1.2rem;
-  }
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: var(--space-xl) auto 0;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #475569;
+  background: var(--bg-muted);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
+section.controls .spacebar-control:hover {
+  background: #e2e8f0;
+  border-color: var(--border-color-strong);
+}
+
+section.controls .spacebar-control input[type="checkbox"] {
+  height: 1.125rem;
+  width: 1.125rem;
+  margin: 0;
+}
+
+/* ── Buzzer button ────────────────────────────────────── */
+
 button.buzzer {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   margin: 0 auto;
   width: 200px;
   height: 200px;
   color: white;
-  font-size: 30px;
-  background-color: var(--unlocked-color);
-  border: 5px solid black;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: radial-gradient(circle at 35% 30%, #34d399 0%, var(--unlocked-color) 45%, #059669 100%);
+  border: 4px solid rgba(255, 255, 255, 0.35);
   border-radius: 50%;
+  box-shadow:
+    0 8px 24px rgba(16, 185, 129, 0.35),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.15),
+    inset 0 4px 12px rgba(255, 255, 255, 0.2);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), filter var(--transition-base);
+}
+
+button.buzzer:hover:enabled {
+  transform: scale(1.03);
+  box-shadow:
+    0 12px 32px rgba(16, 185, 129, 0.45),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.15),
+    inset 0 4px 12px rgba(255, 255, 255, 0.25);
+  filter: brightness(1.05);
 }
 
 button.buzzer:active:enabled {
-  background-color: var(--button-pressed-color);
+  transform: scale(0.97);
+  background: radial-gradient(circle at 35% 30%, #059669 0%, var(--button-pressed-color) 55%, #064e3b 100%);
+  box-shadow:
+    0 4px 12px rgba(16, 185, 129, 0.25),
+    inset 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 button.buzzer.you-won {
-  background-color: var(--button-pressed-color);
+  background: radial-gradient(circle at 35% 30%, #6ee7b7 0%, var(--button-pressed-color) 50%, #047857 100%);
+  animation: buzzer-pulse 1.5s ease-in-out infinite;
 }
 
 button.buzzer.locked {
-  background-color: var(--locked-color);
+  background: radial-gradient(circle at 35% 30%, #f87171 0%, var(--locked-color) 50%, #b91c1c 100%);
+  box-shadow:
+    0 8px 24px rgba(239, 68, 68, 0.3),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.15);
 }
 
-button.buzzer.loading, button.buzzer.waiting {
-  background-color: var(--loading-color);
+button.buzzer.loading,
+button.buzzer.waiting {
+  background: radial-gradient(circle at 35% 30%, #cbd5e1 0%, var(--loading-color) 50%, #64748b 100%);
+  box-shadow:
+    0 8px 24px rgba(148, 163, 184, 0.25),
+    inset 0 -4px 12px rgba(0, 0, 0, 0.1);
+  font-size: 1.25rem;
 }
 
 button.buzzer .explanation {
-  font-size: .9rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-top: var(--space-xs);
+  opacity: 0.9;
   overflow-wrap: break-word;
+  line-height: 1.3;
 }
 
-section.settings {
-  button { display: block; }
-  label {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-  }
-  button, label { margin: 10px 0; }
+@keyframes buzzer-pulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(4, 120, 87, 0.35), inset 0 -4px 12px rgba(0, 0, 0, 0.15); }
+  50% { box-shadow: 0 12px 36px rgba(4, 120, 87, 0.55), inset 0 -4px 12px rgba(0, 0, 0, 0.15); }
 }
 
-section.players {
-  .player-tables {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
+/* ── Settings ─────────────────────────────────────────── */
 
-  table { margin-top: 15px; }
-  tr {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-  }
-  .you { font-weight: bold; }
-  .other { font-style: italic; }
-  .locked { text-decoration: line-through; }
+section.settings button {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-md);
 }
+
+section.settings label {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+section.settings button,
+section.settings label {
+  margin: var(--space-md) 0;
+}
+
+section.settings label:first-of-type {
+  margin-top: 0;
+}
+
+/* ── Players ──────────────────────────────────────────── */
+
+section.players .player-tables {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+}
+
+section.players .player-tables > div {
+  background: var(--bg-muted);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+section.players .player-tables h3 {
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
+section.players table {
+  margin-top: var(--space-sm);
+}
+
+section.players tr {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+}
+
+section.players .player-name.you {
+  font-weight: 700;
+  color: var(--logo-color);
+}
+
+section.players .player-name.other {
+  font-style: italic;
+  color: #475569;
+}
+
+section.players .player-name.locked {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+
+/* ── Responsive grid ──────────────────────────────────── */
 
 @media (min-width: 600px) {
-  section.details { grid-area: details }
-  section.controls { grid-area: buzzer }
-  section.settings { grid-area: settings }
-  section.players { grid-area: players }
-  section.logs { grid-area: logs }
+  section.details { grid-area: details; }
+  section.controls { grid-area: buzzer; }
+  section.settings { grid-area: settings; }
+  section.players { grid-area: players; }
+  section.logs { grid-area: logs; }
 
   main.player {
     grid-template-columns: 2fr 3fr;
@@ -86,9 +212,12 @@ section.players {
       "buzzer settings"
       "buzzer players"
       "logs logs";
+    gap: var(--space-lg);
   }
 
-  section.settings form { width: 70%; }
+  section.settings form {
+    width: 100%;
+  }
 
   section.players .player-tables {
     grid-template-columns: 1fr 1fr;

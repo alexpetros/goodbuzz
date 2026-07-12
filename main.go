@@ -12,7 +12,7 @@ import (
 )
 
 const DEFAULT_PORT = "9090"
-const SQLITE_FILE = "goodbuzz.db"
+const SQLITE_FILE = "data/goodbuzz.db"
 
 func main() {
 	proxy_port := os.Getenv("GOODBUZZ_PROXY_PORT")
@@ -29,7 +29,7 @@ func main() {
 		port = DEFAULT_PORT
 	}
 
-	address := fmt.Sprintf("localhost:%s", port)
+	address := fmt.Sprintf(":%s", port)
 
 	if proxy_port != "" {
 		logger.Info("Now listening at http://localhost:%s\n", proxy_port)

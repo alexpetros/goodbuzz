@@ -87,7 +87,7 @@ func NewUserToken() *http.Cookie {
 		Value:    uuid.NewString(),
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false,
 		SameSite: http.SameSiteLaxMode,
 	}
 }
